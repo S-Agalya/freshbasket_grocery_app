@@ -70,15 +70,7 @@ const WelcomePage = () => {
   const goPrev = () => setSlide((prev) => (prev - 1 + images.length) % images.length);
   const goNext = () => setSlide((prev) => (prev + 1) % images.length);
 
-  const handleLogout = () => {
-    localStorage.removeItem("username");
-    navigate("/login");
-  };
-
-  const handleProfile = () => {
-      navigate("/profile");
-  };
-
+  
   const handleOrder = () => {
     navigate("/order");
   };
@@ -99,45 +91,47 @@ const WelcomePage = () => {
           <h2 className="text-xl font-bold mb-4 border-b pb-2">Categories</h2>
           <ul className="flex-1 flex flex-col gap-4">
             {titles.map((category, index) => (
-              <li
-                key={index}
-                className="bg-green-100 hover:bg-green-200 rounded-xl p-4 text-lg font-medium text-center shadow transition"
-              >
-                {category}
-              </li>
-            ))}
+  <li
+    key={index}
+    onClick={() => navigate(`/order?category=${encodeURIComponent(category)}`)}
+    className="cursor-pointer bg-green-100 hover:bg-green-200 rounded-xl p-4 text-lg font-medium text-center shadow transition"
+  >
+    {category}
+  </li>
+))}
+
           </ul>
         </aside>
 
         {/* CAROUSEL SECTION */}
+                {/* CAROUSEL SECTION */}
         <main className="flex-1 flex flex-col items-center justify-center px-4 md:px-8 py-6">
-          <div className="relative w-full max-w-3xl mx-auto">
+          <div className="flex items-center justify-center gap-4 md:gap-8 w-full max-w-5xl mx-auto">
+  
+  {/* Left button */}
+  <button
+    onClick={goPrev}
+    className="bg-green-700 hover:bg-green-800 text-white rounded-full shadow-lg flex items-center justify-center w-12 md:w-16 aspect-square text-2xl md:text-3xl transition"
+  >
+    &#8592;
+  </button>
 
-            {/* LEFT BUTTON */}
-            <button
-  onClick={goPrev}
-  className="absolute -left-4 md:-left-20 top-1/2 transform -translate-y-1/2 bg-green-700 hover:bg-green-800 text-white w-10 h-10 md:w-16 md:h-16 rounded-full shadow-lg text-xl md:text-3xl flex items-center justify-center transition"
->
-  &#8592;
-</button>
+  {/* Image */}
+  <img
+    src={images[slide]}
+    alt={titles[slide]}
+    className="flex-1 max-h-96 object-cover rounded-3xl shadow-xl border"
+  />
 
+  {/* Right button */}
+  <button
+    onClick={goNext}
+    className="bg-green-700 hover:bg-green-800 text-white rounded-full shadow-lg flex items-center justify-center w-12 md:w-16 aspect-square text-2xl md:text-3xl transition"
+  >
+    &#8594;
+  </button>
+</div>
 
-            {/* IMAGE */}
-           <img
-  src={images[slide]}
-  alt={titles[slide]}
-  className="w-full h-64 md:h-96 object-cover rounded-3xl shadow-xl border"
-/>
-
-
-            {/* RIGHT BUTTON */}
-            <button
-              onClick={goNext}
-             className="absolute -left-4 md:-left-20 top-1/2 transform -translate-y-1/2 bg-green-700 hover:bg-green-800 text-white w-10 h-10 md:w-16 md:h-16 rounded-full shadow-lg text-xl md:text-3xl flex items-center justify-center transition"
-            >
-              &#8594;
-            </button>
-          </div>
 
           <h3 className="text-2xl font-semibold mt-6 text-green-700">{titles[slide]}</h3>
 
@@ -148,6 +142,7 @@ const WelcomePage = () => {
             Are you ready to place your order?
           </button>
         </main>
+
       </div>
     </div>
   );

@@ -2,6 +2,25 @@ import db from "../config/db.js"
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+export const register = async (req, res) => {
+  const { name, email, password } = req.body;
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await db.query(
+      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *",
+      [name, email, hashedPassword]
+    );
+
+    res.status(201).json({
+      message: "User registered successfully",
+      user: result.rows[0],
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Registration failed", details: err.message });
+  }
+};
 
 
 export const login = async (req, res) => {
@@ -30,11 +49,18 @@ export const login = async (req, res) => {
     });
 
     // 4. Send success response
+    // res.json({
+    //   message: "Login successful",
+    //   token,
+    //   name: user.name, // 🟢 send name to frontend
+    // });
     res.json({
-      message: "Login successful",
-      token,
-      name: user.name, // 🟢 send name to frontend
-    });
+  message: "Login successful",
+  token,
+  name: user.name,
+  userId: user.id // ✅ Add this!
+});
+
   } catch (err) {
     res.status(500).json({ message: "Login failed", error: err.message });
   }

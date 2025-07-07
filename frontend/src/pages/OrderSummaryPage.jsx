@@ -32,9 +32,7 @@ const OrderSummaryPage = () => {
         cartItems
       };
 
-     // const response = await fetch("http://localhost:5000/api/orders", {
-     const response = await fetch(`${process.env.REACT_APP_API_URL}/api/orders`, {
-
+      const response = await fetch("http://localhost:5000/api/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

@@ -237,6 +237,7 @@ const ProfilePage = () => {
       try {
         const res = await fetch(`${process.env.REACT_APP_API_URL}/api/profile/${userId}`)
                      //await fetch(`http://localhost:5000/api/profile/${userId}`)
+console.log("hsdbhj")
 
         const data = await res.json();
 

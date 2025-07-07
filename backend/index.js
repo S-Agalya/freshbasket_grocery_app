@@ -19,8 +19,8 @@ app.use(express.json());
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
-app.use("/api/register",register)
-app.use("/api/login",login)
+// app.use("/api/register",register)
+// app.use("/api/login",login)
 app.get("/", (req, res) => {
   res.send("FreshBasket backend is running 🚀");
 });

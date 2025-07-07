@@ -239,6 +239,7 @@ const ProfilePage = () => {
                      //await fetch(`http://localhost:5000/api/profile/${userId}`)
 
         const data = await res.json();
+console.log(`${process.env.REACT_APP_API_URL}/api/profile/${userId}`);
 
         // setProfile({
         //   username: data.username || "",

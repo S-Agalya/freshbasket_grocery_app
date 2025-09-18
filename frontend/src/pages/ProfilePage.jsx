@@ -235,7 +235,7 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/profile/${userId}`)
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/profile/${userId}`)
                      //await fetch(`http://localhost:5000/api/profile/${userId}`)
 
         const data = await res.json();
@@ -273,7 +273,7 @@ const ProfilePage = () => {
   const handleSave = async () => {
     try {
       
- await fetch(`http://localhost:5000/api/profile/${userId}`, {
+ await fetch(`${import.meta.env.VITE_API_URL}/api/profile/${userId}`, {
 // await fetch(`${process.env.REACT_APP_API_URL}/api/profile/${userId}`, {
 
         method: "PUT",

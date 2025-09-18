@@ -47,7 +47,7 @@ import { CartContext } from "../../context/CartContext";
 import riceImage from "../../assets/rice.jpg";
 import AashirvaadAttaImage from "../../assets/wheat.jpg";
 import FortuneOilImage from "../../assets/Cooking Oil.jpg";
-import sugarImage from "../../assets/sugar.jpg";
+import sugarImage from "../../assets/Sugar.jpg";
 
 const groceryProducts = [
   { id: 501, name: "Rice", price: 60, image: riceImage },

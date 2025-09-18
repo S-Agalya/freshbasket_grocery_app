@@ -33,8 +33,6 @@ const OrderSummaryPage = () => {
       };
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
-     //const response = await fetch(`${process.env.REACT_APP_API_URL}/api/orders`, {
-
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -46,49 +44,26 @@ const OrderSummaryPage = () => {
         throw new Error("Failed to place order");
       }
 
-//       const data = await response.json();
-// console.log("Order API response:", data);
-//       // Format orderId to 4 digits
-//       const formattedOrderId = String(data.orderId).padStart(4, '0');
-//       setOrderId(formattedOrderId);
+      const data = await response.json();
+      console.log("Order API response:", data);
 
-//       // Show popup
-//       alert(`🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`);
+      if (!data.orderId) {
+        throw new Error("Order ID missing in response");
+      }
 
-//       clearCart();
+      // Format orderId to 4 digits
+      const formattedOrderId = String(data.orderId).padStart(4, "0");
+      setOrderId(formattedOrderId);
 
+      // Show popup
+      alert(`🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`);
 
-const handlePlaceOrder = async () => {
-  try {
-    const response = await fetch("https://your-backend/api/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(orderData),
-    });
-
-    const data = await response.json();
-    console.log("Order API response:", data);
-
-    if (!data.orderId) {
-      throw new Error("Order ID missing in response");
-    }
-
-    const formattedOrderId = String(data.orderId).padStart(4, "0");
-    console.log("Formatted orderId:", formattedOrderId);
-
-    setOrderId(formattedOrderId); // ✅ should be fine
-
-    alert(`🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`);
-
-    clearCart(); // ✅ make sure clearCart is really a function
-
+      clearCart();
     } catch (error) {
-      console.error(error);
-     // alert("Error placing order. Please try again.");
-     if (!orderId) {
-      // only show error if order was not placed before
-      alert("Error placing order. Please try again.");
-    }
+      console.error("Error placing order:", error);
+      if (!orderId) {
+        alert("Error placing order. Please try again.");
+      }
     }
   };
 
@@ -190,12 +165,12 @@ const handlePlaceOrder = async () => {
                   onChange={(e) => setComments(e.target.value)}
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-300"
                 ></textarea>
-         {!orderId && (<button
-            onClick={handlePlaceOrder}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded shadow-lg transition w-full"
-          >
-            Place Order
-          </button>)}
+                <button
+                  onClick={handlePlaceOrder}
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded shadow-lg transition w-full"
+                >
+                  Place Order
+                </button>
               </div>
             )}
 

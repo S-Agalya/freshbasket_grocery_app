@@ -56,20 +56,31 @@ const OrderSummaryPage = () => {
 //       alert(`🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`);
 
 //       clearCart();
-const data = await response.json();
-console.log("Order API response:", data);
 
-if (!data.orderId) {
-  throw new Error("Order ID missing in response");
-}
 
-// Format orderId to 4 digits
-const formattedOrderId = String(data.orderId).padStart(4, "0");
-setOrderId(formattedOrderId);
+const handlePlaceOrder = async () => {
+  try {
+    const response = await fetch("https://your-backend/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderData),
+    });
 
-alert(`🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`);
+    const data = await response.json();
+    console.log("Order API response:", data);
 
-clearCart();
+    if (!data.orderId) {
+      throw new Error("Order ID missing in response");
+    }
+
+    const formattedOrderId = String(data.orderId).padStart(4, "0");
+    console.log("Formatted orderId:", formattedOrderId);
+
+    setOrderId(formattedOrderId); // ✅ should be fine
+
+    alert(`🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`);
+
+    clearCart(); // ✅ make sure clearCart is really a function
 
     } catch (error) {
       console.error(error);

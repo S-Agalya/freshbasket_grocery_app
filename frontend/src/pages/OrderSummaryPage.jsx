@@ -47,7 +47,7 @@ const OrderSummaryPage = () => {
       }
 
       const data = await response.json();
-
+console.log("Order API response:", data);
       // Format orderId to 4 digits
       const formattedOrderId = String(data.orderId).padStart(4, '0');
       setOrderId(formattedOrderId);

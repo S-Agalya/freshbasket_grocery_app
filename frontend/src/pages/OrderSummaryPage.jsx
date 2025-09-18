@@ -46,16 +46,31 @@ const OrderSummaryPage = () => {
         throw new Error("Failed to place order");
       }
 
-      const data = await response.json();
+//       const data = await response.json();
+// console.log("Order API response:", data);
+//       // Format orderId to 4 digits
+//       const formattedOrderId = String(data.orderId).padStart(4, '0');
+//       setOrderId(formattedOrderId);
+
+//       // Show popup
+//       alert(`🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`);
+
+//       clearCart();
+const data = await response.json();
 console.log("Order API response:", data);
-      // Format orderId to 4 digits
-      const formattedOrderId = String(data.orderId).padStart(4, '0');
-      setOrderId(formattedOrderId);
 
-      // Show popup
-      alert(`🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`);
+if (!data.orderId) {
+  throw new Error("Order ID missing in response");
+}
 
-      clearCart();
+// Format orderId to 4 digits
+const formattedOrderId = String(data.orderId).padStart(4, "0");
+setOrderId(formattedOrderId);
+
+alert(`🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`);
+
+clearCart();
+
     } catch (error) {
       console.error(error);
      // alert("Error placing order. Please try again.");

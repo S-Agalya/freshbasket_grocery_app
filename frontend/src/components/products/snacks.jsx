@@ -1,36 +1,29 @@
-// src/pages/Fruits.js
 import { useContext } from "react";
 import { CartContext } from "../../context/CartContext";
 
-import appleImage from "../../assets/apple.jpg";
-import bananaImage from "../../assets/banana.jpg";
-import orangeImage from "../../assets/orange.jpg";
-import papayaImage from "../../assets/papaya.jpg";
-import grapesImage from "../../assets/grapes.jpg";
+import chipsImage from "../../assets/chips.jpg";
+import biscuitsImage from "../../assets/biscuits.jpg";
+import chocolatesImage from "../../assets/chocolates.jpg";
+import namkeenImage from "../../assets/namkeen.jpg";
 
-const fruitProducts = [
-  { id: 101, name: "Apple", price: 120, image: appleImage },
-  { id: 102, name: "Banana", price: 60, image: bananaImage },
-  { id: 103, name: "Orange", price: 80, image: orangeImage },
-  { id: 104, name: "Papaya", price: 150, image: papayaImage },
-  { id: 105, name: "Grapes", price: 90, image: grapesImage },
+const snackProducts = [
+  { id: 401, name: "Chips", price: 30, image: chipsImage },
+  { id: 402, name: "Biscuits", price: 25, image: biscuitsImage },
+  { id: 403, name: "Chocolates", price: 80, image: chocolatesImage },
+  { id: 404, name: "Namkeen", price: 60, image: namkeenImage },
 ];
 
-export default function Fruits() {
+export default function Snacks() {
   const { addToCart } = useContext(CartContext);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {fruitProducts.map((product) => (
+      {snackProducts.map((product) => (
         <div
           key={product.id}
           className="bg-white rounded-xl shadow-lg hover:shadow-xl transition overflow-hidden flex flex-col"
         >
-          <img
-            src={product.image}
-            alt={product.name}
-            className="h-48 w-full object-cover"
-          />
+          <img src={product.image} alt={product.name} className="h-48 w-full object-cover" />
           <div className="p-4 flex flex-col flex-grow">
             <h3 className="text-lg font-semibold mb-1">{product.name}</h3>
             <p className="text-green-700 font-bold">₹ {product.price}</p>

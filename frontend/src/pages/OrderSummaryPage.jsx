@@ -182,7 +182,7 @@ const handlePlaceOrder = async () => {
     clearCart();
   } catch (error) {
     console.error("Error placing order:", error);
-    alert(`⚠️ Error placing order: ${error.message}`);
+    // alert(`⚠️ Error placing order: ${error.message}`);
   }
 };
 

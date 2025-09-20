@@ -17,54 +17,105 @@ const OrderSummaryPage = () => {
     0
   );
 
+  // const handlePlaceOrder = async () => {
+  //   if (!customerName || !customerPhone || !customerAddress) {
+  //     alert("Please fill in your name, phone, and address!");
+  //     return;
+  //   }
+
+  //   try {
+  //     const payload = {
+  //       customerName,
+  //       customerPhone,
+  //       customerAddress,
+  //       comments,
+  //       cartItems
+  //     };
+
+  //     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json"
+  //       },
+  //       body: JSON.stringify(payload)
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error("Failed to place order");
+  //     }
+
+  //     const data = await response.json();
+  //     console.log("Order API response:", data);
+
+  //     if (!data.orderId) {
+  //       throw new Error("Order ID missing in response");
+  //     }
+
+  //     // Format orderId to 4 digits
+  //     const formattedOrderId = String(data.orderId).padStart(4, "0");
+  //     setOrderId(formattedOrderId);
+
+  //     // Show popup
+  //     alert(`🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`);
+
+  //     clearCart();
+  //   } catch (error) {
+  //     console.error("Error placing order:", error);
+  //     if (!orderId) {
+  //       alert("Error placing order. Please try again.");
+  //     }
+  //   }
+
   const handlePlaceOrder = async () => {
-    if (!customerName || !customerPhone || !customerAddress) {
-      alert("Please fill in your name, phone, and address!");
-      return;
-    }
+  if (!customerName || !customerPhone || !customerAddress) {
+    alert("Please fill in your name, phone, and address!");
+    return;
+  }
 
-    try {
-      const payload = {
-        customerName,
-        customerPhone,
-        customerAddress,
-        comments,
-        cartItems
-      };
+  try {
+    const payload = {
+      customerName,
+      customerPhone,
+      customerAddress,
+      comments,
+      cartItems,
+    };
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/orders`,
+      {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to place order");
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       }
+    );
 
-      const data = await response.json();
-      console.log("Order API response:", data);
+    const data = await response.json();
+    console.log("Order API response:", data);
 
-      if (!data.orderId) {
-        throw new Error("Order ID missing in response");
-      }
-
-      // Format orderId to 4 digits
-      const formattedOrderId = String(data.orderId).padStart(4, "0");
-      setOrderId(formattedOrderId);
-
-      // Show popup
-      alert(`🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`);
-
-      clearCart();
-    } catch (error) {
-      console.error("Error placing order:", error);
-      if (!orderId) {
-        alert("Error placing order. Please try again.");
-      }
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to place order");
     }
+
+    if (!data.orderId) {
+      throw new Error("Order ID missing in response");
+    }
+
+    // ✅ Success
+    const formattedOrderId = String(data.orderId).padStart(4, "0");
+    setOrderId(formattedOrderId);
+
+    alert(
+      `🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`
+    );
+
+    clearCart();
+  } catch (error) {
+    console.error("Error placing order:", error);
+    alert("⚠️ Error placing order. Please try again.");
+  }
+};
+
   };
 
   const buildWhatsappMessage = () => {

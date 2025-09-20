@@ -130,6 +130,7 @@ const OrderSummaryPage = () => {
 //   }
 // };
 
+ 
 const handlePlaceOrder = async () => {
   if (!customerName || !customerPhone || !customerAddress) {
     alert("Please fill in your name, phone, and address!");
@@ -175,11 +176,19 @@ const handlePlaceOrder = async () => {
     const formattedOrderId = String(data.orderId).padStart(4, "0");
     setOrderId(formattedOrderId);
 
+    // alert(
+    //   `🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`
+    // );
+
+    // clearCart();
+     clearCart()
+
     alert(
       `🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`
     );
 
-    clearCart();
+    // ✅ Optional: navigate back to home or products page
+    navigate("/order");
   } catch (error) {
     console.error("Error placing order:", error);
     // alert(`⚠️ Error placing order: ${error.message}`);

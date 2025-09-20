@@ -6,6 +6,7 @@ import { FaShoppingCart, FaUserCircle } from "react-icons/fa";
 const Header = ({ username = "User" }) => {
   const navigate = useNavigate();
   const { cartItems } = useContext(CartContext);
+const totalQty = cartItems.reduce((sum, item) => sum + item.qty, 0);
 
   const handleLogout = () => {
     localStorage.removeItem("username");
@@ -28,11 +29,18 @@ const Header = ({ username = "User" }) => {
           aria-label="Cart"
         >
           <FaShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
-          {cartItems.length > 0 && (
+          {/* {cartItems.length > 0 && (
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] md:text-xs rounded-full w-5 h-5 flex items-center justify-center">
               {cartItems.length}
             </span>
-          )}
+            
+          )} */}
+          {totalQty > 0 && (
+  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] md:text-xs rounded-full w-5 h-5 flex items-center justify-center">
+    {totalQty}
+  </span>
+)}
+
         </button>
 
         <FaUserCircle

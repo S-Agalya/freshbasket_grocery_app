@@ -73,7 +73,64 @@ const OrderSummaryPage = () => {
   //   }
   // };
 
-  const handlePlaceOrder = async () => {
+//   const handlePlaceOrder = async () => {
+//   if (!customerName || !customerPhone || !customerAddress) {
+//     alert("Please fill in your name, phone, and address!");
+//     return;
+//   }
+
+//   try {
+//     const payload = {
+//       customerName,
+//       customerPhone,
+//       customerAddress,
+//       comments,
+//       cartItems,
+//     };
+
+//     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify(payload),
+//     });
+
+//     // ✅ Safely parse JSON
+//     let data;
+//     try {
+//       data = await response.json();
+//     } catch (err) {
+//       const text = await response.text();
+//       console.error("Server returned non-JSON response:", text);
+//       throw new Error("Server returned unexpected response");
+//     }
+
+//     console.log("Order API response:", data);
+
+//     // ✅ Check for HTTP errors
+//     if (!response.ok) {
+//       throw new Error(data.message || "Failed to place order");
+//     }
+
+//     // ✅ Ensure orderId exists
+//     if (!data.orderId) {
+//       throw new Error("Order ID missing in response");
+//     }
+
+//     const formattedOrderId = String(data.orderId).padStart(4, "0");
+//     setOrderId(formattedOrderId);
+
+//     alert(
+//       `🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`
+//     );
+
+//     clearCart();
+//   } catch (error) {
+//     console.error("Error placing order:", error);
+//     alert(`⚠️ Error placing order: ${error.message}`);
+//   }
+// };
+
+const handlePlaceOrder = async () => {
   if (!customerName || !customerPhone || !customerAddress) {
     alert("Please fill in your name, phone, and address!");
     return;
@@ -94,24 +151,23 @@ const OrderSummaryPage = () => {
       body: JSON.stringify(payload),
     });
 
-    // ✅ Safely parse JSON
+    // ✅ Only parse JSON if response is JSON
     let data;
-    try {
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
       data = await response.json();
-    } catch (err) {
+    } else {
       const text = await response.text();
       console.error("Server returned non-JSON response:", text);
-      throw new Error("Server returned unexpected response");
+      throw new Error("Server returned unexpected response (maybe 404 or 500)");
     }
 
     console.log("Order API response:", data);
 
-    // ✅ Check for HTTP errors
     if (!response.ok) {
       throw new Error(data.message || "Failed to place order");
     }
 
-    // ✅ Ensure orderId exists
     if (!data.orderId) {
       throw new Error("Order ID missing in response");
     }

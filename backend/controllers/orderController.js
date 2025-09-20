@@ -64,3 +64,33 @@ export const placeOrder = async (req, res) => {
     res.status(500).json({ message: "Failed to place order", error: err.message });
   }
 };
+
+export const getOrderById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Fetch order info
+    const orderResult = await db.query(
+      `SELECT * FROM orders WHERE id = $1`,
+      [id]
+    );
+
+    if (orderResult.rows.length === 0) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const order = orderResult.rows[0];
+
+    // Fetch items for this order
+    const itemsResult = await db.query(
+      `SELECT * FROM cart_items WHERE order_id = $1`,
+      [id]
+    );
+
+    order.items = itemsResult.rows;
+
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch order", error: err.message });
+  }
+};

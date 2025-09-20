@@ -403,8 +403,11 @@ const handlePlaceOrder = async () => {
     // );
 
     // clearCart();
-     clearCart()
-setOrderId(formattedOrderId); 
+   setOrderedItems(cartItems); // save items for later display
+clearCart();
+setOrderId(formattedOrderId);
+
+
     alert(
       `🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`
     );
@@ -466,84 +469,56 @@ setOrderId(formattedOrderId);
           <p className="text-gray-600 text-lg mb-6">Your cart is empty.</p>
         ) : (
           <>
-            {cartItems.length > 0 && (
-              <div className="mb-6">
-                <h2 className="text-xl font-bold mb-4 text-green-700">
-                  Your Items:
-                </h2>
-                <ul className="space-y-2">
-                  {cartItems.map((item, index) => (
-                    <li
-                      key={index}
-                      className="bg-white p-3 rounded shadow flex justify-between items-center"
-                    >
-                      <span>
-                        {item.name} x {item.qty}
-                      </span>
-                      <span className="font-bold text-green-700">
-                        ₹ {item.price * item.qty}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-4 text-right text-lg font-bold text-green-800">
-                  Total: ₹ {totalAmount}
-                </div>
-              </div>
-            )}
+            {(cartItems.length > 0 || orderedItems.length > 0) && (
+  <div className="mb-6">
+    <h2 className="text-xl font-bold mb-4 text-green-700">
+      Your Items:
+    </h2>
+    <ul className="space-y-2">
+      {(orderId ? orderedItems : cartItems).map((item, index) => (
+        <li
+          key={index}
+          className="bg-white p-3 rounded shadow flex justify-between items-center"
+        >
+          <span>{item.name} x {item.qty}</span>
+          <span className="font-bold text-green-700">₹ {item.price * item.qty}</span>
+        </li>
+      ))}
+    </ul>
+    <div className="mt-4 text-right text-lg font-bold text-green-800">
+      Total: ₹ {(orderId ? orderedItems : cartItems).reduce((sum, item) => sum + item.price * item.qty, 0)}
+    </div>
+  </div>
+)}
 
-            {!orderId && (
-              <div className="bg-white p-4 rounded shadow space-y-4">
-                <h2 className="text-lg font-bold text-green-700">
-                  Customer Details
-                </h2>
-                <input
-                  type="text"
-                  placeholder="Name"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-300"
-                />
-                <input
-                  type="text"
-                  placeholder="Phone"
-                  value={customerPhone}
-                  onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-300"
-                />
-                <textarea
-                  placeholder="Address"
-                  value={customerAddress}
-                  onChange={(e) => setCustomerAddress(e.target.value)}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-300"
-                ></textarea>
-                <textarea
-                  placeholder="Additional Comments (e.g. items not listed)"
-                  value={comments}
-                  onChange={(e) => setComments(e.target.value)}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-300"
-                ></textarea>
-                <button
-                  onClick={handlePlaceOrder}
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded shadow-lg transition w-full"
-                >
-                  Place Order
-                </button>
-              </div>
-            )}
+{/* Show customer details only if order not placed */}
+{!orderId && (
+  <div className="bg-white p-4 rounded shadow space-y-4">
+    <h2 className="text-lg font-bold text-green-700">Customer Details</h2>
+    <input type="text" placeholder="Name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="w-full border rounded p-2" />
+    <input type="text" placeholder="Phone" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} className="w-full border rounded p-2" />
+    <textarea placeholder="Address" value={customerAddress} onChange={(e) => setCustomerAddress(e.target.value)} className="w-full border rounded p-2"></textarea>
+    <textarea placeholder="Additional Comments" value={comments} onChange={(e) => setComments(e.target.value)} className="w-full border rounded p-2"></textarea>
+    <button onClick={handlePlaceOrder} className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded shadow-lg w-full">
+      Place Order
+    </button>
+  </div>
+)}
 
-            {orderId && (
-              <div className="mt-6 flex flex-col items-center">
-                <a
-                  href={`https://wa.me/${ownerPhoneNumber}?text=${buildWhatsappMessage()}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded shadow-lg transition text-center block w-full md:w-auto"
-                >
-                  Send Order via WhatsApp
-                </a>
-              </div>
-            )}
+{/* Show WhatsApp button only after order is placed */}
+{orderId && (
+  <div className="mt-6 flex flex-col items-center">
+    <a
+      href={`https://wa.me/${ownerPhoneNumber}?text=${buildWhatsappMessage()}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded shadow-lg block w-full md:w-auto"
+    >
+      Send Order via WhatsApp
+    </a>
+  </div>
+)}
+
           </>
         )}
       </main>

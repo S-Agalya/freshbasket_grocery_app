@@ -174,14 +174,17 @@ const handlePlaceOrder = async () => {
     }
 
     const formattedOrderId = String(data.orderId).padStart(4, "0");
-    setOrderId(formattedOrderId);
+    //setOrderId(formattedOrderId);
 
     // alert(
     //   `🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`
     // );
 
     // clearCart();
-     clearCart()
+    
+setOrderedItems(cartItems); // Save current cart
+clearCart(); // Clear cart for future orders
+setOrderId(formattedOrderId); // Show WhatsApp button
 
     alert(
       `🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`

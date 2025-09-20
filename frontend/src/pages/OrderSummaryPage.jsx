@@ -188,7 +188,7 @@ const handlePlaceOrder = async () => {
     );
 
     // ✅ Optional: navigate back to home or products page
-    navigate("/order");
+    //navigate("/order");
   } catch (error) {
     console.error("Error placing order:", error);
     // alert(`⚠️ Error placing order: ${error.message}`);

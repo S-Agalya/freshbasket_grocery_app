@@ -17,107 +17,60 @@ const OrderSummaryPage = () => {
     0
   );
 
-  // const handlePlaceOrder = async () => {
-  //   if (!customerName || !customerPhone || !customerAddress) {
-  //     alert("Please fill in your name, phone, and address!");
-  //     return;
-  //   }
-
-  //   try {
-  //     const payload = {
-  //       customerName,
-  //       customerPhone,
-  //       customerAddress,
-  //       comments,
-  //       cartItems
-  //     };
-
-  //     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json"
-  //       },
-  //       body: JSON.stringify(payload)
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error("Failed to place order");
-  //     }
-
-  //     const data = await response.json();
-  //     console.log("Order API response:", data);
-
-  //     if (!data.orderId) {
-  //       throw new Error("Order ID missing in response");
-  //     }
-
-  //     // Format orderId to 4 digits
-  //     const formattedOrderId = String(data.orderId).padStart(4, "0");
-  //     setOrderId(formattedOrderId);
-
-  //     // Show popup
-  //     alert(`🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`);
-
-  //     clearCart();
-  //   } catch (error) {
-  //     console.error("Error placing order:", error);
-  //     if (!orderId) {
-  //       alert("Error placing order. Please try again.");
-  //     }
-  //   }
-
+  // ✅ FIXED handlePlaceOrder
   const handlePlaceOrder = async () => {
-  if (!customerName || !customerPhone || !customerAddress) {
-    alert("Please fill in your name, phone, and address!");
-    return;
-  }
+    if (!customerName || !customerPhone || !customerAddress) {
+      alert("Please fill in your name, phone, and address!");
+      return;
+    }
 
-  try {
-    const payload = {
-      customerName,
-      customerPhone,
-      customerAddress,
-      comments,
-      cartItems,
-    };
+    try {
+      const payload = {
+        customerName,
+        customerPhone,
+        customerAddress,
+        comments,
+        cartItems,
+      };
 
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/orders`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/orders`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await response.json();
+      console.log("Order API response:", data);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to place order");
       }
-    );
 
-    const data = await response.json();
-    console.log("Order API response:", data);
+      if (!data.orderId) {
+        throw new Error("Order ID missing in response");
+      }
 
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to place order");
+      // ✅ Success
+      const formattedOrderId = String(data.orderId).padStart(4, "0");
+      setOrderId(formattedOrderId);
+
+      alert(
+        `🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`
+      );
+
+      clearCart();
+    } catch (error) {
+      console.error("Error placing order:", error);
+      if (!orderId) {
+        alert("⚠️ Error placing order. Please try again.");
+      }
     }
-
-    if (!data.orderId) {
-      throw new Error("Order ID missing in response");
-    }
-
-    // ✅ Success
-    const formattedOrderId = String(data.orderId).padStart(4, "0");
-    setOrderId(formattedOrderId);
-
-    alert(
-      `🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`
-    );
-
-    clearCart();
-  } catch (error) {
-    console.error("Error placing order:", error);
-    alert("⚠️ Error placing order. Please try again.");
-  }
-};
-
   };
 
+  // ✅ WhatsApp Message Builder
   const buildWhatsappMessage = () => {
     let message = `🛒 *New Order*\n\n`;
 
@@ -134,7 +87,9 @@ const OrderSummaryPage = () => {
       message += `- No items in cart\n`;
     } else {
       cartItems.forEach((item, index) => {
-        message += `${index + 1}. ${item.name} x ${item.qty} = ₹${item.price * item.qty}\n`;
+        message += `${index + 1}. ${item.name} x ${item.qty} = ₹${
+          item.price * item.qty
+        }\n`;
       });
     }
 
@@ -165,7 +120,9 @@ const OrderSummaryPage = () => {
           <>
             {cartItems.length > 0 && (
               <div className="mb-6">
-                <h2 className="text-xl font-bold mb-4 text-green-700">Your Items:</h2>
+                <h2 className="text-xl font-bold mb-4 text-green-700">
+                  Your Items:
+                </h2>
                 <ul className="space-y-2">
                   {cartItems.map((item, index) => (
                     <li
@@ -189,7 +146,9 @@ const OrderSummaryPage = () => {
 
             {!orderId && (
               <div className="bg-white p-4 rounded shadow space-y-4">
-                <h2 className="text-lg font-bold text-green-700">Customer Details</h2>
+                <h2 className="text-lg font-bold text-green-700">
+                  Customer Details
+                </h2>
                 <input
                   type="text"
                   placeholder="Name"

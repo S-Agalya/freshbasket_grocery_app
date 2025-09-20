@@ -64,9 +64,9 @@ const OrderSummaryPage = () => {
       clearCart();
     } catch (error) {
       console.error("Error placing order:", error);
-      if (!orderId) {
-        alert("⚠️ Error placing order. Please try again.");
-      }
+      // if (!orderId) {
+      //   alert("⚠️ Error placing order. Please try again.");
+      // }
     }
   };
 

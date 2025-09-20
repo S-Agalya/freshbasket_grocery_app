@@ -18,57 +18,118 @@ const OrderSummaryPage = () => {
   );
 
   // ✅ FIXED handlePlaceOrder
+  // const handlePlaceOrder = async () => {
+  //   if (!customerName || !customerPhone || !customerAddress) {
+  //     alert("Please fill in your name, phone, and address!");
+  //     return;
+  //   }
+
+  //   try {
+  //     const payload = {
+  //       customerName,
+  //       customerPhone,
+  //       customerAddress,
+  //       comments,
+  //       cartItems,
+  //     };
+
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_API_URL}/api/orders`,
+  //       {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify(payload),
+  //       }
+  //     );
+
+   
+
+
+  //     const data = await response.json();
+  //     console.log("Order API response:", data);
+
+  //     if (!response.ok) {
+  //       throw new Error(data.message || "Failed to place order");
+  //     }
+
+  //     if (!data.orderId) {
+  //       throw new Error("Order ID missing in response");
+  //     }
+
+  //     // ✅ Success
+  //     const formattedOrderId = String(data.orderId).padStart(4, "0");
+  //     setOrderId(formattedOrderId);
+
+  //     alert(
+  //       `🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`
+  //     );
+
+  //     clearCart();
+  //   } catch (error) {
+  //     console.error("Error placing order:", error);
+  //     // if (!orderId) {
+  //     //   alert("⚠️ Error placing order. Please try again.");
+  //     // }
+  //   }
+  // };
+
   const handlePlaceOrder = async () => {
-    if (!customerName || !customerPhone || !customerAddress) {
-      alert("Please fill in your name, phone, and address!");
-      return;
-    }
+  if (!customerName || !customerPhone || !customerAddress) {
+    alert("Please fill in your name, phone, and address!");
+    return;
+  }
 
+  try {
+    const payload = {
+      customerName,
+      customerPhone,
+      customerAddress,
+      comments,
+      cartItems,
+    };
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    // ✅ Safely parse JSON
+    let data;
     try {
-      const payload = {
-        customerName,
-        customerPhone,
-        customerAddress,
-        comments,
-        cartItems,
-      };
-
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/orders`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      const data = await response.json();
-      console.log("Order API response:", data);
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to place order");
-      }
-
-      if (!data.orderId) {
-        throw new Error("Order ID missing in response");
-      }
-
-      // ✅ Success
-      const formattedOrderId = String(data.orderId).padStart(4, "0");
-      setOrderId(formattedOrderId);
-
-      alert(
-        `🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`
-      );
-
-      clearCart();
-    } catch (error) {
-      console.error("Error placing order:", error);
-      // if (!orderId) {
-      //   alert("⚠️ Error placing order. Please try again.");
-      // }
+      data = await response.json();
+    } catch (err) {
+      const text = await response.text();
+      console.error("Server returned non-JSON response:", text);
+      throw new Error("Server returned unexpected response");
     }
-  };
+
+    console.log("Order API response:", data);
+
+    // ✅ Check for HTTP errors
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to place order");
+    }
+
+    // ✅ Ensure orderId exists
+    if (!data.orderId) {
+      throw new Error("Order ID missing in response");
+    }
+
+    const formattedOrderId = String(data.orderId).padStart(4, "0");
+    setOrderId(formattedOrderId);
+
+    alert(
+      `🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`
+    );
+
+    clearCart();
+  } catch (error) {
+    console.error("Error placing order:", error);
+    alert(`⚠️ Error placing order: ${error.message}`);
+  }
+};
+
 
   // ✅ WhatsApp Message Builder
   const buildWhatsappMessage = () => {

@@ -74,6 +74,8 @@
 
 import Sidebar from "../components/Sidebar"; // import Sidebar
 
+import { Outlet } from "react-router-dom";
+
 function AdminDashboard() {
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -99,6 +101,8 @@ function AdminDashboard() {
             <p className="text-3xl font-bold text-red-500">8</p>
           </div>
         </div>
+
+         <Outlet />
       </main>
     </div>
   );

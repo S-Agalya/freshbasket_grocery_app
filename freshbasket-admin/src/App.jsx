@@ -34,7 +34,7 @@ function App() {
 
         {/* Dashboard layout with nested routes */}
         <Route path="/dashboard" element={<Dashboard />}>
-          <Route path="products" element={<AdminProducts />} />
+          <Route path="/products" element={<AdminProducts />} />
           {/* You can add more nested pages here, like orders, settings, etc. */}
         </Route>
       </Routes>

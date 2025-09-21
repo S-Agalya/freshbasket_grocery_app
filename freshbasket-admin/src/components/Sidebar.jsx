@@ -16,7 +16,7 @@ function Sidebar() {
       </div>
       <nav className="flex-1 p-4 space-y-3">
         <button
-          onClick={() => navigate("/dashboard/products")}
+          onClick={() => navigate("/products")}
           className="flex items-center w-full px-4 py-2 rounded hover:bg-green-600"
         >
           <FaShoppingCart className="mr-3" /> Products

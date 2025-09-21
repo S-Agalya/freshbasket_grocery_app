@@ -18,9 +18,18 @@ function AdminDashboard() {
           FreshBasket Admin
         </div>
         <nav className="flex-1 p-4 space-y-3">
-          <button className="flex items-center w-full px-4 py-2 rounded hover:bg-green-600">
+          {/* <button className="flex items-center w-full px-4 py-2 rounded hover:bg-green-600">
             <FaBox className="mr-3" /> Products
-          </button>
+          </button> */}
+
+          <div
+  onClick={() => navigate("/admin/products")}
+  className="bg-white p-6 rounded shadow text-center cursor-pointer hover:bg-gray-50"
+>
+  <h2 className="text-lg font-semibold text-gray-700">Total Products</h2>
+  <p className="text-3xl font-bold text-green-600">120</p>
+</div>
+
           <button className="flex items-center w-full px-4 py-2 rounded hover:bg-green-600">
             <FaShoppingCart className="mr-3" /> Orders
           </button>

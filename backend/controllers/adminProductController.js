@@ -44,20 +44,19 @@
 
 
 import db from "../config/db.js";
-import path from "path";
 
-// GET all admin products
+// Get all admin products
 export const getAdminProducts = async (req, res) => {
   try {
-    const products = await db.query("SELECT * FROM products ORDER BY id DESC");
-    res.json(products.rows);
+    const result = await db.query("SELECT * FROM products ORDER BY id DESC");
+    res.json(result.rows);
   } catch (err) {
     console.error("❌ Error fetching products:", err);
-    res.status(500).json({ message: "Server error", error: err.message });
+    res.status(500).json({ message: "Failed to fetch products", error: err.message });
   }
 };
 
-// ADD a new product
+// Add a new product
 export const addAdminProduct = async (req, res) => {
   try {
     const { name, price, unitType, category } = req.body;
@@ -67,19 +66,15 @@ export const addAdminProduct = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const newProduct = await db.query(
-      `INSERT INTO products (name, price, unit_type, category, image)
+    const result = await db.query(
+      `INSERT INTO products (name, price, unit_type, category, image) 
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
       [name, price, unitType, category, image]
     );
 
-    // Add full URL for the frontend to display image
-    const product = newProduct.rows[0];
-    product.image_url = `${process.env.VITE_API_URL}/uploads/${product.image}`;
-
-    res.status(201).json(product);
+    res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error("❌ Error adding product:", err);
-    res.status(500).json({ message: "Server error", error: err.message });
+    res.status(500).json({ message: "Failed to add product", error: err.message });
   }
 };

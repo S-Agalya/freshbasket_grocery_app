@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { register, login } from "./controllers/authController.js";
 import authRoutes from "./routes/authRoutes.js"; // ✅
 import productRoutes from "./routes/productRoutes.js";
-
+import adminRoutes from "./routes/adminRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 
@@ -25,5 +25,7 @@ app.get("/", (req, res) => {
 });
 app.use("/api/profile", profileRoutes);
 
+
+app.use("/api/admin", adminRoutes);
 const PORT = process.env.PORT ;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

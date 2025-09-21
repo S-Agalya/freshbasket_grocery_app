@@ -8,7 +8,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 
-
+import adminProductRoutes from "./routes/adminProductRoutes.js";
 
 dotenv.config();
 
@@ -26,6 +26,8 @@ app.get("/", (req, res) => {
 app.use("/api/profile", profileRoutes);
 
 
+
+app.use("/api/admin/products", adminProductRoutes);
 app.use("/api/admin", adminRoutes);
 const PORT = process.env.PORT ;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

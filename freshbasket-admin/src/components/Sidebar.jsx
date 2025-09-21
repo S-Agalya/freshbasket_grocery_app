@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { FaBox, FaShoppingCart, FaCog, FaSignOutAlt } from "react-icons/fa";
+import { FaShoppingCart, FaCog, FaSignOutAlt } from "react-icons/fa";
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -15,22 +15,21 @@ function Sidebar() {
         FreshBasket Admin
       </div>
       <nav className="flex-1 p-4 space-y-3">
-        <div
+        <button
           onClick={() => navigate("/dashboard/products")}
-          className="bg-white p-6 rounded shadow text-center cursor-pointer hover:bg-gray-50"
+          className="flex items-center w-full px-4 py-2 rounded hover:bg-green-600"
         >
-          <h2 className="text-lg font-semibold text-gray-700">Total Products</h2>
-          <p className="text-3xl font-bold text-green-600">120</p>
-        </div>
+          <FaShoppingCart className="mr-3" /> Products
+        </button>
 
         <button
-          onClick={() => navigate("/dashboard/orders")} // optional, later add nested route
+          onClick={() => navigate("/dashboard/orders")}
           className="flex items-center w-full px-4 py-2 rounded hover:bg-green-600"
         >
           <FaShoppingCart className="mr-3" /> Orders
         </button>
         <button
-          onClick={() => navigate("/dashboard/settings")} // optional
+          onClick={() => navigate("/dashboard/settings")}
           className="flex items-center w-full px-4 py-2 rounded hover:bg-green-600"
         >
           <FaCog className="mr-3" /> Settings

@@ -1,13 +1,17 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AddProductModal from "../components/AddProductModal"; // import the modal
 
 function AdminProducts() {
-  const navigate = useNavigate();
   const [products, setProducts] = useState([]); // initially empty
+  const [showModal, setShowModal] = useState(false);
 
   const handleAddProduct = () => {
-    // navigate to add product page (you can create it later)
-    navigate("/admin/add-product");
+    setShowModal(true); // open modal instead of navigating
+  };
+
+  const handleProductAdded = (newProduct) => {
+    // update products list when a new product is added
+    setProducts((prev) => [...prev, newProduct]);
   };
 
   return (
@@ -40,12 +44,25 @@ function AdminProducts() {
                 key={index}
                 className="bg-white p-4 rounded shadow flex justify-between items-center"
               >
-                <span className="font-semibold">{p.name}</span>
-                <span className="text-gray-600">{p.price} ₹</span>
+                <div>
+                  <span className="font-semibold">{p.name}</span>
+                  <span className="ml-2 text-gray-500">{p.category}</span>
+                </div>
+                <span className="text-gray-600">
+                  {p.price} ₹ / {p.unitType}
+                </span>
               </li>
             ))}
           </ul>
         </div>
+      )}
+
+      {/* Add Product Modal */}
+      {showModal && (
+        <AddProductModal
+          onClose={() => setShowModal(false)}
+          onProductAdded={handleProductAdded}
+        />
       )}
     </div>
   );

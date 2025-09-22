@@ -81,26 +81,55 @@ export const addAdminProduct = async (req, res) => {
 
 
 // Update product
+// export const updateAdminProduct = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const { name, price, unitType, category } = req.body;
+//     const image = req.file ? req.file.filename : null;
+
+//     const result = await db.query(
+//       `UPDATE products 
+//        SET name = $1, price = $2, unit_type = $3, category = $4, ${image ? "image = $5" : ""} 
+//        WHERE id = $6 
+//        RETURNING *`,
+//       image ? [name, price, unitType, category, image, id] : [name, price, unitType, category, id]
+//     );
+
+//     res.json(result.rows[0]);
+//   } catch (err) {
+//     console.error("❌ Error updating product:", err);
+//     res.status(500).json({ message: "Failed to update product", error: err.message });
+//   }
+// };
+
+
 export const updateAdminProduct = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, price, unitType, category } = req.body;
     const image = req.file ? req.file.filename : null;
 
-    const result = await db.query(
-      `UPDATE products 
-       SET name = $1, price = $2, unit_type = $3, category = $4, ${image ? "image = $5" : ""} 
-       WHERE id = $6 
-       RETURNING *`,
-      image ? [name, price, unitType, category, image, id] : [name, price, unitType, category, id]
-    );
+    // Dynamic query
+    let query = `UPDATE products SET name=$1, price=$2, unit_type=$3, category=$4`;
+    const params = [name, price, unitType, category];
 
+    if (image) {
+      query += `, image=$5 WHERE id=$6 RETURNING *`;
+      params.push(image, id);
+    } else {
+      query += ` WHERE id=$5 RETURNING *`;
+      params.push(id);
+    }
+
+    const result = await db.query(query, params);
     res.json(result.rows[0]);
   } catch (err) {
     console.error("❌ Error updating product:", err);
     res.status(500).json({ message: "Failed to update product", error: err.message });
   }
 };
+
+
 
 // Delete product
 export const deleteAdminProduct = async (req, res) => {

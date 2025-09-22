@@ -53,7 +53,7 @@ export default function Vegetables() {
     const fetchProducts = async () => {
       try {
         const res = await axios.get(`${API_URL}/api/products`); // your products route
-        setVegetableProducts(res.data.filter(p => p.category === "Vegetables")); // filter by category
+        setVegetableProducts(res.data.filter(p => p.category.toLowerCase() === "Vegetables")); // filter by category
       } catch (err) {
         console.error("Failed to fetch products:", err);
       }

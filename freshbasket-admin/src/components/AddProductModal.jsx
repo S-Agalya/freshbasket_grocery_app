@@ -175,26 +175,52 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
     formData.append("category", category);
     if (image) formData.append("image", image);
 
-    try {
-      let res;
-      if (editProduct) {
-        // Update product
-        res = await axios.put(`${API_URL}/api/admin/products/${editProduct.id}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-      } else {
-        // Add new product
-        res = await axios.post(`${API_URL}/api/admin/products`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-      }
+    // try {
+    //   let res;
+    //   if (editProduct) {
+    //     // Update product
+    //     res = await axios.put(`${API_URL}/api/admin/products/${editProduct.id}`, formData, {
+    //       headers: { "Content-Type": "multipart/form-data" },
+    //     });
+    //   } else {
+    //     // Add new product
+    //     res = await axios.post(`${API_URL}/api/admin/products`, formData, {
+    //       headers: { "Content-Type": "multipart/form-data" },
+    //     });
+    //   }
 
-      onProductAdded(res.data);
-      onClose();
-    } catch (err) {
-      console.error(err);
-      alert(editProduct ? "Failed to update product" : "Failed to add product");
-    }
+    //   onProductAdded(res.data);
+    //   onClose();
+    // } catch (err) {
+    //   console.error(err);
+    //   alert(editProduct ? "Failed to update product" : "Failed to add product");
+    // }
+
+    try {
+  let res;
+  if (editProduct) {
+    // ✅ Update product
+    res = await axios.put(
+      `${API_URL}/api/admin/products/update/${editProduct.id}`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+  } else {
+    // ✅ Add new product
+    res = await axios.post(
+      `${API_URL}/api/admin/products/add`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+  }
+
+  onProductAdded(res.data);
+  onClose();
+} catch (err) {
+  console.error(err);
+  alert(editProduct ? "Failed to update product" : "Failed to add product");
+}
+
   };
 
   return (

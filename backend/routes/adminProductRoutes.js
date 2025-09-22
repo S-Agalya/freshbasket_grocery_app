@@ -1,30 +1,24 @@
-
-
-
 import express from "express";
-import multer from "multer";
-import { getAdminProducts, addAdminProduct ,updateAdminProduct, deleteAdminProduct} from "../controllers/adminProductController.js";
+import {
+  addAdminProduct,
+  updateAdminProduct,
+  getAdminProducts,
+  deleteAdminProduct
+} from "../controllers/adminProductController.js";
+import { upload } from "../middlewares/upload.js";
 
 const router = express.Router();
 
-// Create uploads folder if it doesn't exist
-import fs from "fs";
-if (!fs.existsSync("uploads")) fs.mkdirSync("uploads");
+// Add product (with image)
+router.post("/add", upload.single("image"), addAdminProduct);
 
-// Multer config
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-const upload = multer({ storage });
+// Update product (image optional)
+router.put("/update/:id", upload.single("image"), updateAdminProduct);
 
-// Routes
+// Get all products
 router.get("/", getAdminProducts);
-router.post("/", upload.single("image"), addAdminProduct);
-router.put("/:id", upload.single("image"), updateAdminProduct); // update product
-router.delete("/:id", deleteAdminProduct); // delete product
+
+// Delete product
+router.delete("/:id", deleteAdminProduct);
+
 export default router;

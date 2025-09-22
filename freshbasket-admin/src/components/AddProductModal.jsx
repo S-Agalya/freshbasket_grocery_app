@@ -451,6 +451,7 @@ function AddProductModal({ onClose, onProductAdded }) {
           <select value={unitType} onChange={(e) => setUnitType(e.target.value)} className="w-full border px-3 py-2 rounded">
             <option value="kg">Per kg</option>
             <option value="piece">Per piece</option>
+            <option value="piece">Per litre</option>
           </select>
           <input type="number" placeholder="Price" value={price} onChange={(e) => setPrice(e.target.value)} className="w-full border px-3 py-2 rounded" />
           <input type="file" accept="image/*" onChange={(e) => setImage(e.target.files[0])} />

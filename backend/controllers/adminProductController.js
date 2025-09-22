@@ -78,3 +78,38 @@ export const addAdminProduct = async (req, res) => {
     res.status(500).json({ message: "Failed to add product", error: err.message });
   }
 };
+
+
+// Update product
+export const updateAdminProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, price, unitType, category } = req.body;
+    const image = req.file ? req.file.filename : null;
+
+    const result = await db.query(
+      `UPDATE products 
+       SET name = $1, price = $2, unit_type = $3, category = $4, ${image ? "image = $5" : ""} 
+       WHERE id = $6 
+       RETURNING *`,
+      image ? [name, price, unitType, category, image, id] : [name, price, unitType, category, id]
+    );
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("❌ Error updating product:", err);
+    res.status(500).json({ message: "Failed to update product", error: err.message });
+  }
+};
+
+// Delete product
+export const deleteAdminProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query("DELETE FROM products WHERE id = $1", [id]);
+    res.json({ message: "Product deleted successfully" });
+  } catch (err) {
+    console.error("❌ Error deleting product:", err);
+    res.status(500).json({ message: "Failed to delete product", error: err.message });
+  }
+};

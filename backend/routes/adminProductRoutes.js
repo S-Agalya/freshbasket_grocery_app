@@ -24,7 +24,7 @@
 
 import express from "express";
 import multer from "multer";
-import { getAdminProducts, addAdminProduct } from "../controllers/adminProductController.js";
+import { getAdminProducts, addAdminProduct ,updateAdminProduct, deleteAdminProduct} from "../controllers/adminProductController.js";
 
 const router = express.Router();
 
@@ -46,5 +46,6 @@ const upload = multer({ storage });
 // Routes
 router.get("/", getAdminProducts);
 router.post("/", upload.single("image"), addAdminProduct);
-
+router.put("/:id", upload.single("image"), updateAdminProduct); // update product
+router.delete("/:id", deleteAdminProduct); // delete product
 export default router;

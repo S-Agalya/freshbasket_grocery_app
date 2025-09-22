@@ -30,6 +30,6 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/admin/products", adminProductRoutes);
 app.use("/api/admin", adminRoutes);
 
-app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 const PORT = process.env.PORT ;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

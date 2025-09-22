@@ -225,7 +225,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
           >
             <option value="kg">Per kg</option>
             <option value="piece">Per piece</option>
-            <option value="piece">Per litre</option>
+            <option value="litre">Per litre</option>
           </select>
           <input
             type="number"

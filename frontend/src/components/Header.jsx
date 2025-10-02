@@ -22,12 +22,7 @@ const totalQty = cartItems.reduce((sum, item) => sum + item.qty, 0);
       <h1 className="text-2xl md:text-3xl font-bold text-green-700 text-center md:text-left">
         Welcome <span className="capitalize">{username}</span>
       </h1>
-      <button
-                className="lg:hidden text-2xl absolute left-4 top-4 z-50"
-                onClick={() => setMenuOpen(!menuOpen)}
-              >
-                <FaBars />
-              </button>
+      
       <div className="flex items-center space-x-3 md:space-x-4">
         <button
           onClick={() => navigate("/cart")}

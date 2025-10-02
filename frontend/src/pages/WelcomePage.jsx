@@ -242,8 +242,7 @@ const WelcomePage = () => {
         {/* MOBILE SIDEBAR */}
         <div
           className={`fixed inset-y-0 left-0 w-64 bg-white shadow-lg transform ${
-            menuOpen ? "translate-x-0" : "-translate-x-full"
-          } transition-transform duration-300 ease-in-out z-10 md:hidden`}
+            menuOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
         >
           <h2 className="text-xl font-bold mb-4 p-4 border-b">Categories</h2>
           <ul className="flex flex-col gap-4 p-4">

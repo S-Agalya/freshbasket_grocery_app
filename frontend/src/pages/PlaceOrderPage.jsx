@@ -303,14 +303,14 @@ export default function PlaceOrderPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-yellow-50 to-blue-50">
       {/* HEADER with Hamburger always visible on mobile */}
       <Header username={username}>
-       
-      </Header>
- <button
+       <button
           className="lg:hidden text-2xl absolute left-4 top-4 z-50"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <FaBars />
         </button>
+      </Header>
+ 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar (Desktop) */}
         <aside className="w-72 bg-white p-6 shadow-lg flex flex-col hidden lg:flex">

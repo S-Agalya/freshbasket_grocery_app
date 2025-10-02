@@ -175,7 +175,7 @@ const WelcomePage = () => {
   }, [location]);
 
   const handleCategoryClick = (category) => {
-    navigate(/order?category=${encodeURIComponent(category)});
+    navigate(`/order?category=${encodeURIComponent(category)}`);
   };
 
   return (

@@ -106,7 +106,7 @@ import Vegetables from "../components/products/Vegetables";
 import Fruits from "../components/products/Fruits";
 import Dairy from "../components/products/Dairy";
 import SoapsAndDetergents from "../components/products/SoapsandDetergents";
-import Snacks from "../components/products/Snacks";
+import Snacks from "../components/products/snacks"
 import Groceries from "../components/products/Groceries";
 import { useSearchParams } from "react-router-dom";
 import { FaBars, FaShoppingCart, FaUserCircle, FaSignOutAlt } from "react-icons/fa";
@@ -147,7 +147,7 @@ export default function PlaceOrderPage() {
       case "Soaps & Detergents":
         return <SoapsAndDetergents />;
       case "Snacks":
-        return <Snacks />;
+        return < Snacks/>
       default:
         return <AllProducts />;
     }

@@ -150,7 +150,6 @@
 
 // export default WelcomePage;
 
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
@@ -200,7 +199,7 @@ const WelcomePage = () => {
   const goNext = () => setSlide((prev) => (prev + 1) % images.length);
 
   const handleCategoryClick = (category) => {
-    setSidebarOpen(false);
+    setSidebarOpen(false); // close sidebar
     setTimeout(() => {
       navigate(`/order?category=${encodeURIComponent(category)}`);
     }, 200);
@@ -298,6 +297,13 @@ const WelcomePage = () => {
           </div>
 
           <h3 className="text-2xl font-semibold mt-6 text-green-700">{titles[slide]}</h3>
+
+          <button
+            onClick={() => navigate("/order")}
+            className="mt-8 bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full text-lg shadow-lg transition"
+          >
+            Are you ready to place your order?
+          </button>
         </main>
       </div>
     </div>

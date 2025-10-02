@@ -314,7 +314,7 @@ export default function PlaceOrderPage() {
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar (Desktop) */}
         <aside className="w-72 bg-white p-6 shadow-lg flex flex-col hidden lg:flex">
-          <h2 className="text-xl font-bold mb-4 border-b pb-2">Categories</h2>
+          <h2 className="text-xl font-bold mb-6 border-b pb-2">Categories</h2>
           <ul className="flex-1 flex flex-col gap-4">
             {categories.map((category) => (
               <li

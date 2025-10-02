@@ -152,8 +152,8 @@
 
 
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { FaBars } from "react-icons/fa"; // Hamburger icon
+import { useNavigate, useLocation } from "react-router-dom";
+import { FaBars } from "react-icons/fa";
 import Header from "../components/Header";
 
 import vegetablesImage from "../assets/vegetables.jpg";
@@ -165,6 +165,7 @@ import snacksImage from "../assets/snacks.jpeg";
 
 const WelcomePage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const username = localStorage.getItem("username") || "User";
 
   const [slide, setSlide] = useState(0);
@@ -188,12 +189,18 @@ const WelcomePage = () => {
     "Snacks",
   ];
 
+  // Auto slide every 4 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setSlide((prev) => (prev + 1) % images.length);
     }, 4000);
     return () => clearInterval(interval);
   }, [images.length]);
+
+  // Close sidebar on route change
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname, location.search]);
 
   const goPrev = () => setSlide((prev) => (prev - 1 + images.length) % images.length);
   const goNext = () => setSlide((prev) => (prev + 1) % images.length);
@@ -204,15 +211,15 @@ const WelcomePage = () => {
 
   const handleCategoryClick = (category) => {
     navigate(`/order?category=${encodeURIComponent(category)}`);
-    setSidebarOpen(false); // close sidebar after selecting
+    setSidebarOpen(false);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-yellow-50 to-blue-50">
-      {/* TOPBAR */}
+      {/* Header */}
       <Header username={username} />
 
-      {/* Mobile Hamburger Button */}
+      {/* Mobile Hamburger */}
       <div className="md:hidden p-4 flex justify-between items-center bg-white shadow">
         <button
           onClick={() => setSidebarOpen(true)}
@@ -224,7 +231,7 @@ const WelcomePage = () => {
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar (Desktop + Mobile Slide-in) */}
+        {/* Sidebar */}
         <aside
           className={`fixed md:static top-0 left-0 h-full w-72 bg-white p-6 shadow-lg flex flex-col transform transition-transform duration-300 z-50
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
@@ -243,37 +250,33 @@ const WelcomePage = () => {
           </ul>
         </aside>
 
-        {/* Main Carousel Section */}
+        {/* Main Carousel */}
         <main className="flex-1 flex flex-col items-center justify-center px-4 md:px-8 py-6">
-          {/* Desktop Carousel (Left/Right) */}
+          {/* Desktop Carousel */}
           <div className="hidden md:flex items-center justify-center gap-4 md:gap-8 w-full max-w-5xl mx-auto">
-            {/* Left button */}
             <button
               onClick={goPrev}
-              className="bg-green-700 hover:bg-green-800 text-white rounded-full shadow-lg flex items-center justify-center w-12 md:w-16 aspect-square text-2xl md:text-3xl transition"
+              className="bg-green-700 hover:bg-green-800 text-white rounded-full shadow-lg flex items-center justify-center w-16 aspect-square text-3xl transition"
             >
               &#8592;
             </button>
 
-            {/* Image */}
             <img
               src={images[slide]}
               alt={titles[slide]}
-              className="flex-1 w-full max-h-[400px] md:max-h-[500px] object-contain rounded-3xl shadow-xl border"
+              className="flex-1 max-h-96 w-full object-contain rounded-3xl shadow-xl border"
             />
 
-            {/* Right button */}
             <button
               onClick={goNext}
-              className="bg-green-700 hover:bg-green-800 text-white rounded-full shadow-lg flex items-center justify-center w-12 md:w-16 aspect-square text-2xl md:text-3xl transition"
+              className="bg-green-700 hover:bg-green-800 text-white rounded-full shadow-lg flex items-center justify-center w-16 aspect-square text-3xl transition"
             >
               &#8594;
             </button>
           </div>
 
-          {/* Mobile Carousel (Up/Down) */}
+          {/* Mobile Carousel */}
           <div className="flex md:hidden flex-col items-center gap-4 w-full max-w-sm mx-auto">
-            {/* Up button */}
             <button
               onClick={goPrev}
               className="bg-green-700 hover:bg-green-800 text-white rounded-full shadow-lg flex items-center justify-center w-12 aspect-square text-2xl transition"
@@ -281,14 +284,12 @@ const WelcomePage = () => {
               &#8593;
             </button>
 
-            {/* Image */}
             <img
               src={images[slide]}
               alt={titles[slide]}
-              className="w-full h-auto max-h-64 object-contain rounded-2xl shadow-lg border"
+              className="w-full max-h-64 sm:max-h-80 object-contain rounded-2xl shadow-lg border"
             />
 
-            {/* Down button */}
             <button
               onClick={goNext}
               className="bg-green-700 hover:bg-green-800 text-white rounded-full shadow-lg flex items-center justify-center w-12 aspect-square text-2xl transition"
@@ -308,7 +309,7 @@ const WelcomePage = () => {
         </main>
       </div>
 
-      {/* Overlay for mobile sidebar */}
+      {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
@@ -320,4 +321,3 @@ const WelcomePage = () => {
 };
 
 export default WelcomePage;
-

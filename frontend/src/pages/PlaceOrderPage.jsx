@@ -257,7 +257,7 @@ export default function PlaceOrderPage() {
   const username = localStorage.getItem("username") || "User";
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchParams] = useSearchParams();
-  const [menuOpen, setMenuOpen] = useState(false); // ✅ Mobile menu state
+  const [menuOpen, setMenuOpen] = useState(false); // Mobile sidebar state
 
   const categories = [
     "All",
@@ -301,10 +301,10 @@ export default function PlaceOrderPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-yellow-50 to-blue-50">
-      {/* HEADER with Hamburger for Mobile */}
+      {/* HEADER with Hamburger always visible on mobile */}
       <Header username={username}>
         <button
-          className="lg:hidden text-2xl absolute left-4 top-4"
+          className="lg:hidden text-2xl absolute left-4 top-4 z-50"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <FaBars />
@@ -350,7 +350,7 @@ export default function PlaceOrderPage() {
                     key={category}
                     onClick={() => {
                       setSelectedCategory(category);
-                      setMenuOpen(false); // close after selection
+                      setMenuOpen(false); // only close sidebar
                     }}
                     className={`rounded-xl p-4 text-lg font-medium text-center shadow transition cursor-pointer
                       ${

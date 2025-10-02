@@ -152,7 +152,7 @@
 
 
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import Header from "../components/Header";
 
@@ -165,7 +165,6 @@ import snacksImage from "../assets/snacks.jpeg";
 
 const WelcomePage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const username = localStorage.getItem("username") || "User";
 
   const [slide, setSlide] = useState(0);
@@ -189,18 +188,13 @@ const WelcomePage = () => {
     "Snacks",
   ];
 
-  // Auto slide every 4 seconds
+  // Auto slide
   useEffect(() => {
     const interval = setInterval(() => {
       setSlide((prev) => (prev + 1) % images.length);
     }, 4000);
     return () => clearInterval(interval);
   }, [images.length]);
-
-  // Close sidebar on route change
-  useEffect(() => {
-    setSidebarOpen(false);
-  }, [location.pathname, location.search]);
 
   const goPrev = () => setSlide((prev) => (prev - 1 + images.length) % images.length);
   const goNext = () => setSlide((prev) => (prev + 1) % images.length);
@@ -210,8 +204,12 @@ const WelcomePage = () => {
   };
 
   const handleCategoryClick = (category) => {
-    navigate(`/order?category=${encodeURIComponent(category)}`);
+    // Close sidebar first for animation
     setSidebarOpen(false);
+    // Small delay ensures smooth sliding before navigation
+    setTimeout(() => {
+      navigate(`/order?category=${encodeURIComponent(category)}`);
+    }, 200);
   };
 
   return (

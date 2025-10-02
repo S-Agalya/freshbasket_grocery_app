@@ -151,7 +151,6 @@
 // export default WelcomePage;
 
 
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
@@ -200,8 +199,10 @@ const WelcomePage = () => {
   const goPrev = () => setSlide((prev) => (prev - 1 + images.length) % images.length);
   const goNext = () => setSlide((prev) => (prev + 1) % images.length);
 
+  const handleOrder = () => navigate("/order");
+
   const handleCategoryClick = (category) => {
-    setSidebarOpen(false); // close sidebar
+    setSidebarOpen(false);
     setTimeout(() => {
       navigate(`/order?category=${encodeURIComponent(category)}`);
     }, 200);
@@ -212,7 +213,7 @@ const WelcomePage = () => {
       {/* Header */}
       <Header username={username} />
 
-      {/* Mobile Hamburger always visible */}
+      {/* Mobile Hamburger - always visible */}
       <div className="md:hidden fixed top-4 left-4 z-50">
         <button
           onClick={() => setSidebarOpen(true)}
@@ -226,7 +227,7 @@ const WelcomePage = () => {
         {/* Sidebar */}
         <aside
           className={`fixed top-0 left-0 h-full w-72 bg-white p-6 shadow-lg flex flex-col transform transition-transform duration-300 z-50
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
         >
           <h2 className="text-xl font-bold mb-4 border-b pb-2">Categories</h2>
           <ul className="flex-1 flex flex-col gap-4">
@@ -242,7 +243,7 @@ const WelcomePage = () => {
           </ul>
         </aside>
 
-        {/* Overlay */}
+        {/* Mobile overlay */}
         {sidebarOpen && (
           <div
             className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
@@ -301,7 +302,7 @@ const WelcomePage = () => {
           <h3 className="text-2xl font-semibold mt-6 text-green-700">{titles[slide]}</h3>
 
           <button
-            onClick={() => navigate("/order")}
+            onClick={handleOrder}
             className="mt-8 bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full text-lg shadow-lg transition"
           >
             Are you ready to place your order?
@@ -313,4 +314,3 @@ const WelcomePage = () => {
 };
 
 export default WelcomePage;
-

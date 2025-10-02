@@ -259,7 +259,7 @@ const WelcomePage = () => {
             <img
               src={images[slide]}
               alt={titles[slide]}
-              className="flex-1 max-h-96 w-full object-contain rounded-3xl shadow-xl border"
+              className="flex-1 w-full max-h-[400px] md:max-h-[500px] object-contain rounded-3xl shadow-xl border"
             />
 
             {/* Right button */}
@@ -285,7 +285,7 @@ const WelcomePage = () => {
             <img
               src={images[slide]}
               alt={titles[slide]}
-              className="w-full max-h-64 object-contain rounded-2xl shadow-lg border"
+              className="w-full h-auto max-h-64 object-contain rounded-2xl shadow-lg border"
             />
 
             {/* Down button */}
@@ -320,3 +320,4 @@ const WelcomePage = () => {
 };
 
 export default WelcomePage;
+

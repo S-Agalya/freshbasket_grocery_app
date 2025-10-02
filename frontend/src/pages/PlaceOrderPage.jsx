@@ -256,8 +256,8 @@ import { FaBars } from "react-icons/fa";
 export default function PlaceOrderPage() {
   const username = localStorage.getItem("username") || "User";
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [menuOpen, setMenuOpen] = useState(false);
   const [searchParams] = useSearchParams();
-  const [menuOpen, setMenuOpen] = useState(false); // ✅ Mobile menu state
 
   const categories = [
     "All",
@@ -301,10 +301,11 @@ export default function PlaceOrderPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-yellow-50 to-blue-50">
-      {/* HEADER with Hamburger for Mobile */}
+      {/* Header with Hamburger inside */}
       <Header username={username}>
+        {/* Hamburger only on mobile */}
         <button
-          className="lg:hidden text-2xl absolute left-4 top-4"
+          className="lg:hidden text-2xl p-2"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <FaBars />
@@ -336,11 +337,11 @@ export default function PlaceOrderPage() {
         {/* Mobile Sidebar */}
         {menuOpen && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-40 z-40 lg:hidden"
+            className="fixed inset-0 bg-black bg-opacity-40 z-40"
             onClick={() => setMenuOpen(false)}
           >
             <aside
-              className="absolute left-0 top-0 w-72 bg-white p-6 shadow-lg h-full"
+              className="absolute left-0 top-0 w-72 h-full bg-white p-6 shadow-lg"
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-xl font-bold mb-4 border-b pb-2">Categories</h2>
@@ -350,7 +351,7 @@ export default function PlaceOrderPage() {
                     key={category}
                     onClick={() => {
                       setSelectedCategory(category);
-                      setMenuOpen(false); // close after selection
+                      setMenuOpen(false);
                     }}
                     className={`rounded-xl p-4 text-lg font-medium text-center shadow transition cursor-pointer
                       ${

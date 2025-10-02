@@ -593,12 +593,19 @@ export default function PlaceOrderPage() {
           onClose={() => setMenuOpen(false)}
         />
 
-        <main className="flex-1 overflow-y-auto p-6">
+        {/* <main className="flex-1 overflow-y-auto p-6">
           <h2 className="text-2xl font-bold text-green-700 mb-6 text-center">
             {selectedCategory === "All" ? "Place Your Order" : selectedCategory}
           </h2>
           {renderCategoryComponent()}
-        </main>
+        </main> */}
+        <main className="flex-1 overflow-y-auto p-6 md:ml-72">
+  <h2 className="text-2xl font-bold text-green-700 mb-6 text-center">
+    {selectedCategory === "All" ? "Place Your Order" : selectedCategory}
+  </h2>
+  {renderCategoryComponent()}
+</main>
+
       </div>
     </div>
   );

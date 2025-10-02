@@ -359,7 +359,7 @@ export default function WelcomePage() {
         onClose={() => setSidebarOpen(false)}
       />
 
-      <main className="flex-1 flex flex-col items-center justify-center px-4 md:px-8 py-6">
+      {/* <main className="flex-1 flex flex-col items-center justify-center px-4 md:px-8 py-6">
         <div className="flex items-center justify-center gap-4 md:gap-8 w-full max-w-5xl mx-auto">
           <button
             onClick={goPrev}
@@ -390,7 +390,40 @@ export default function WelcomePage() {
         >
           Are you ready to place your order?
         </button>
-      </main>
+      </main> */}
+      <main className="flex-1 flex flex-col items-center justify-center px-4 md:px-8 py-6 md:ml-72">
+  <div className="flex items-center justify-center gap-4 md:gap-8 w-full max-w-5xl mx-auto">
+    <button
+      onClick={goPrev}
+      className="bg-green-700 hover:bg-green-800 text-white rounded-full shadow-lg flex items-center justify-center w-12 md:w-16 aspect-square text-2xl md:text-3xl transition"
+    >
+      &#8592;
+    </button>
+
+    <img
+      src={images[slide]}
+      alt={categories[slide]}
+      className="flex-1 max-h-96 object-cover rounded-3xl shadow-xl border"
+    />
+
+    <button
+      onClick={goNext}
+      className="bg-green-700 hover:bg-green-800 text-white rounded-full shadow-lg flex items-center justify-center w-12 md:w-16 aspect-square text-2xl md:text-3xl transition"
+    >
+      &#8594;
+    </button>
+  </div>
+
+  <h3 className="text-2xl font-semibold mt-6 text-green-700">{categories[slide]}</h3>
+
+  <button
+    onClick={() => navigate("/order")}
+    className="mt-8 bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full text-lg shadow-lg transition"
+  >
+    Are you ready to place your order?
+  </button>
+</main>
+
     </div>
   );
 }

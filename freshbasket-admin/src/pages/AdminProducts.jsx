@@ -84,8 +84,8 @@ function AdminProducts() {
                 {p.image && (
                   <img
                     //src={p.image}
-                    src={`${import.meta.env.VITE_API_URL}/${product.image}`}
-
+                    //src={`${import.meta.env.VITE_API_URL}/${product.image}`}
+                    src={`${API_URL}/${p.image}`}
                     alt={p.name}
                     className="w-16 h-16 object-cover rounded"
                   />

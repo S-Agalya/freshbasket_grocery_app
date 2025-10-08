@@ -84,10 +84,7 @@ export default function Vegetables() {
           className="bg-white rounded-xl shadow-lg hover:shadow-xl transition overflow-hidden flex flex-col"
         >
           <img
-            src={product.image}
-            
-            //src={`${import.meta.env.VITE_API_URL}/${product.image}`}
-
+            src={product.image} // ✅ Direct Cloudinary URL
             alt={product.name}
             className="h-48 sm:h-56 md:h-48 lg:h-52 w-full object-cover"
           />

@@ -1,6 +1,3 @@
-
-
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import AddProductModal from "../components/AddProductModal";
@@ -11,7 +8,7 @@ function AdminProducts() {
   const [editProduct, setEditProduct] = useState(null);
   const API_URL = import.meta.env.VITE_API_URL;
 
-  // Fetch products
+  // Fetch products from backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -37,16 +34,15 @@ function AdminProducts() {
     }
   };
 
-  // Open modal to edit
+  // Open modal for editing
   const handleEditProduct = (product) => {
     setEditProduct(product);
     setShowModal(true);
   };
 
-  // Handle after adding/updating product
+  // After adding/updating product
   const handleProductAdded = (newProduct) => {
     setProducts((prev) => {
-      // If editing, replace existing
       const index = prev.findIndex((p) => p.id === newProduct.id);
       if (index !== -1) {
         const updated = [...prev];
@@ -83,13 +79,10 @@ function AdminProducts() {
               <div className="flex items-center space-x-4">
                 {p.image && (
                   <img
-  src={p.image ? `${import.meta.env.VITE_API_URL}/${p.image}` : ""}
-  alt={p.name}
-  className="w-16 h-16 object-cover rounded"
-/>
-
-
-                  
+                    src={p.image} // ✅ Directly use Cloudinary URL
+                    alt={p.name}
+                    className="w-16 h-16 object-cover rounded"
+                  />
                 )}
                 <div>
                   <span className="font-semibold">{p.name}</span>

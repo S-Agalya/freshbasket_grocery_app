@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 
@@ -9,22 +7,16 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   const [unitType, setUnitType] = useState("kg");
   const [category, setCategory] = useState("");
   const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState(null); // For showing current/selected image
+  const [preview, setPreview] = useState(null);
 
-  // Pre-fill fields if editing
   useEffect(() => {
     if (editProduct) {
       setName(editProduct.name);
       setPrice(editProduct.price);
       setUnitType(editProduct.unit_type);
       setCategory(editProduct.category);
-      //setPreview(editProduct.image ? `${API_URL}/uploads/${editProduct.image}` : null);
-      //setPreview(editProduct.image || null);
-
-      setPreview(editProduct.image ? `${API_URL}/uploads/${editProduct.image}` : null);
-
-
-      setImage(null); // Only update if user selects a new file
+      setPreview(editProduct.image || null); // ✅ Use Cloudinary URL
+      setImage(null);
     } else {
       setName("");
       setPrice("");
@@ -37,7 +29,6 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!name || !price || !unitType || !category) {
       alert("Please fill all fields");
       return;
@@ -50,52 +41,28 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
     formData.append("category", category);
     if (image) formData.append("image", image);
 
-    // try {
-    //   let res;
-    //   if (editProduct) {
-    //     // Update product
-    //     res = await axios.put(`${API_URL}/api/admin/products/${editProduct.id}`, formData, {
-    //       headers: { "Content-Type": "multipart/form-data" },
-    //     });
-    //   } else {
-    //     // Add new product
-    //     res = await axios.post(`${API_URL}/api/admin/products`, formData, {
-    //       headers: { "Content-Type": "multipart/form-data" },
-    //     });
-    //   }
-
-    //   onProductAdded(res.data);
-    //   onClose();
-    // } catch (err) {
-    //   console.error(err);
-    //   alert(editProduct ? "Failed to update product" : "Failed to add product");
-    // }
-
     try {
-  let res;
-  if (editProduct) {
-    // ✅ Update product
-    res = await axios.put(
-      `${API_URL}/api/admin/products/update/${editProduct.id}`,
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } }
-    );
-  } else {
-    // ✅ Add new product
-    res = await axios.post(
-      `${API_URL}/api/admin/products/add`,
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } }
-    );
-  }
+      let res;
+      if (editProduct) {
+        res = await axios.put(
+          `${API_URL}/api/admin/products/update/${editProduct.id}`,
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+      } else {
+        res = await axios.post(
+          `${API_URL}/api/admin/products/add`,
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+      }
 
-  onProductAdded(res.data);
-  onClose();
-} catch (err) {
-  console.error(err);
-  alert(editProduct ? "Failed to update product" : "Failed to add product");
-}
-
+      onProductAdded(res.data);
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert(editProduct ? "Failed to update product" : "Failed to add product");
+    }
   };
 
   return (

@@ -19,7 +19,10 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
       setUnitType(editProduct.unit_type);
       setCategory(editProduct.category);
       //setPreview(editProduct.image ? `${API_URL}/uploads/${editProduct.image}` : null);
-      setPreview(editProduct.image || null);
+      //setPreview(editProduct.image || null);
+
+      setPreview(editProduct.image ? `${API_URL}/uploads/${editProduct.image}` : null);
+
 
       setImage(null); // Only update if user selects a new file
     } else {

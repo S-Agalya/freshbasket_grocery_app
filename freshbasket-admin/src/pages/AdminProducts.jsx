@@ -83,12 +83,13 @@ function AdminProducts() {
               <div className="flex items-center space-x-4">
                 {p.image && (
                   <img
-                    //src={p.image}
-                    //src={`${import.meta.env.VITE_API_URL}/${product.image}`}
-                    src={`${API_URL}/${p.image}`}
-                    alt={p.name}
-                    className="w-16 h-16 object-cover rounded"
-                  />
+  src={p.image ? `${import.meta.env.VITE_API_URL}/${p.image}` : ""}
+  alt={p.name}
+  className="w-16 h-16 object-cover rounded"
+/>
+
+
+                  
                 )}
                 <div>
                   <span className="font-semibold">{p.name}</span>

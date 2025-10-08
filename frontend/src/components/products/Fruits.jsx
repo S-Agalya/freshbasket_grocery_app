@@ -77,6 +77,8 @@ export default function Fruits() {
         >
           <img
             src={product.image}
+            //src={`${import.meta.env.VITE_API_URL}/${product.image}`}
+
             alt={product.name}
             className="h-48 sm:h-56 md:h-48 lg:h-52 w-full object-cover"
           />

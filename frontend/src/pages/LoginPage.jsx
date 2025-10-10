@@ -34,7 +34,13 @@ const handleLogin = async (formData) => {
     localStorage.setItem("password", formData.password || "");
 localStorage.setItem("userId", response.userId); // ✅ This is needed for update later!
 
-    navigate("/welcome");
+    //navigate("/welcome");
+    useEffect(() => {
+    const username = localStorage.getItem("username");
+    if (username) {
+      navigate("/welcome"); // ✅ redirect if already logged in
+    }
+  }, []);
     console.log("FormData:", formData);
 
   } catch (err) {

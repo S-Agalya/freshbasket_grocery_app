@@ -18,7 +18,8 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
     "Detergents",
     "Shampoos",
     "Handwash",
-    "Snacks"
+    "Snacks",
+    "Soaps,"
   ];
 
   // Fill form if editing

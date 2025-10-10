@@ -12,38 +12,75 @@ export const getAdminProducts = async (req, res) => {
 };
 
 // ✅ Add new product
+// export const addAdminProduct = async (req, res) => {
+//   try {
+//     const { name, price, unitType, category } = req.body;
+
+//     let imageUrl = null;
+//     if (req.file) {
+//       const uploaded = await cloudinary.uploader.upload_stream(
+//         { folder: "products" },
+//         async (error, result) => {
+//           if (error) throw new Error("Cloudinary upload failed");
+//           imageUrl = result.secure_url;
+
+//           const dbRes = await db.query(
+//             `INSERT INTO products (name, price, unit_type, category, image)
+//              VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+//             [name, price, unitType, category, imageUrl]
+//           );
+
+//           return res.status(201).json(dbRes.rows[0]);
+//         }
+//       );
+
+//       // Pipe buffer data
+//       uploaded.end(req.file.buffer);
+//     } else {
+//       return res.status(400).json({ message: "Image is required" });
+//     }
+//   } catch (err) {
+//     console.error("❌ Error adding product:", err);
+//     res.status(500).json({ message: "Failed to add product", error: err.message });
+//   }
+// };'''
+
 export const addAdminProduct = async (req, res) => {
   try {
     const { name, price, unitType, category } = req.body;
 
-    let imageUrl = null;
-    if (req.file) {
-      const uploaded = await cloudinary.uploader.upload_stream(
-        { folder: "products" },
-        async (error, result) => {
-          if (error) throw new Error("Cloudinary upload failed");
-          imageUrl = result.secure_url;
-
-          const dbRes = await db.query(
-            `INSERT INTO products (name, price, unit_type, category, image)
-             VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-            [name, price, unitType, category, imageUrl]
-          );
-
-          return res.status(201).json(dbRes.rows[0]);
-        }
-      );
-
-      // Pipe buffer data
-      uploaded.end(req.file.buffer);
-    } else {
+    if (!req.file) {
       return res.status(400).json({ message: "Image is required" });
     }
+
+    // ✅ Proper Promise-based upload to Cloudinary
+    const uploaded = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: "products" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      stream.end(req.file.buffer);
+    });
+
+    const imageUrl = uploaded.secure_url; // ✅ Cloudinary URL
+
+    // ✅ Store the image URL in PostgreSQL
+    const dbRes = await db.query(
+      `INSERT INTO products (name, price, unit_type, category, image)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [name, price, unitType, category, imageUrl]
+    );
+
+    res.status(201).json(dbRes.rows[0]);
   } catch (err) {
     console.error("❌ Error adding product:", err);
     res.status(500).json({ message: "Failed to add product", error: err.message });
   }
 };
+
 
 // ✅ Update product
 export const updateAdminProduct = async (req, res) => {

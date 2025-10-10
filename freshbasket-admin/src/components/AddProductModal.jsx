@@ -9,13 +9,26 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
 
+  // ✅ Predefined categories
+  const categories = [
+    "Fruits",
+    "Vegetables",
+    "Dairy",
+    "Grocery",
+    "Detergents",
+    "Shampoos",
+    "Handwash",
+    "Snacks"
+  ];
+
+  // Fill form if editing
   useEffect(() => {
     if (editProduct) {
       setName(editProduct.name);
       setPrice(editProduct.price);
       setUnitType(editProduct.unit_type);
       setCategory(editProduct.category);
-      setPreview(editProduct.image || null); // ✅ Use Cloudinary URL
+      setPreview(editProduct.image || null);
       setImage(null);
     } else {
       setName("");
@@ -35,10 +48,10 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
     }
 
     const formData = new FormData();
-    formData.append("name", name);
+    formData.append("name", name.trim());
     formData.append("price", price);
     formData.append("unitType", unitType);
-    formData.append("category", category);
+    formData.append("category", category.trim());
     if (image) formData.append("image", image);
 
     try {
@@ -79,13 +92,23 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
             onChange={(e) => setName(e.target.value)}
             className="w-full border px-3 py-2 rounded"
           />
-          <input
-            type="text"
-            placeholder="Category"
+
+          {/* ✅ Category Dropdown */}
+          <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             className="w-full border px-3 py-2 rounded"
-          />
+          >
+            <option value="" disabled>
+              Select category
+            </option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+
           <select
             value={unitType}
             onChange={(e) => setUnitType(e.target.value)}
@@ -95,6 +118,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
             <option value="piece">Per piece</option>
             <option value="litre">Per litre</option>
           </select>
+
           <input
             type="number"
             placeholder="Price"
@@ -102,6 +126,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
             onChange={(e) => setPrice(e.target.value)}
             className="w-full border px-3 py-2 rounded"
           />
+
           <input
             type="file"
             accept="image/*"
@@ -110,9 +135,15 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
               setPreview(URL.createObjectURL(e.target.files[0]));
             }}
           />
+
           {preview && (
-            <img src={preview} alt="Preview" className="w-24 h-24 object-cover rounded mt-2" />
+            <img
+              src={preview}
+              alt="Preview"
+              className="w-24 h-24 object-cover rounded mt-2"
+            />
           )}
+
           <div className="flex justify-end space-x-2">
             <button
               type="button"

@@ -126,7 +126,7 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import AddProductModal from "./AddProductModal";
+import AddProductModal from "../components/AddProductModal";
 
 function AdminProducts({ API_URL }) {
   const [products, setProducts] = useState([]);

@@ -47,40 +47,48 @@ export const getAdminProducts = async (req, res) => {
 
 export const addAdminProduct = async (req, res) => {
   try {
-    const { name, price, unitType, category } = req.body;
+    console.log("📦 Incoming Product:", req.body);
+    console.log("📸 File received:", req.file ? req.file.originalname : "No file");
 
+    const { name, price, unitType, category } = req.body;
     if (!req.file) {
       return res.status(400).json({ message: "Image is required" });
     }
 
-    // ✅ Proper Promise-based upload to Cloudinary
+    // Upload image to Cloudinary
     const uploaded = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         { folder: "products" },
         (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
+          if (error) {
+            console.error("❌ Cloudinary upload error:", error);
+            reject(error);
+          } else {
+            console.log("✅ Cloudinary uploaded:", result.secure_url);
+            resolve(result);
+          }
         }
       );
       stream.end(req.file.buffer);
     });
 
-    const imageUrl = uploaded.secure_url; // ✅ Cloudinary URL
+    const imageUrl = uploaded.secure_url;
 
-    // ✅ Store the image URL in PostgreSQL
+    // Insert into PostgreSQL
+    console.log("🗄️ Inserting into DB...");
     const dbRes = await db.query(
       `INSERT INTO products (name, price, unit_type, category, image)
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
       [name, price, unitType, category, imageUrl]
     );
 
+    console.log("✅ Product added:", dbRes.rows[0]);
     res.status(201).json(dbRes.rows[0]);
   } catch (err) {
-    console.error("❌ Error adding product:", err);
+    console.error("🔥 Backend Error in addAdminProduct:", err);
     res.status(500).json({ message: "Failed to add product", error: err.message });
   }
 };
-
 
 // ✅ Update product
 export const updateAdminProduct = async (req, res) => {

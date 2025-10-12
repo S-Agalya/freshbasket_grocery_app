@@ -130,6 +130,8 @@
 
 // export default AdminDashboard;
 
+
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminProducts from "./AdminProducts";
@@ -139,7 +141,7 @@ import { FaTachometerAlt, FaBoxOpen, FaShoppingCart, FaUsers, FaSignOutAlt } fro
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [stats, setStats] = useState({ products: 0, orders: 0, outOfStock: 0, staff: 0 });
+  const [stats, setStats] = useState({ products: 0, orders: 0, outOfStock: 0 });
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -150,15 +152,16 @@ function AdminDashboard() {
   };
 
   // Fetch stats dynamically
+  const fetchStats = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/admin/stats`);
+      setStats(res.data);
+    } catch (err) {
+      console.error("Failed to fetch stats:", err);
+    }
+  };
+
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/api/admin/stats`);
-        setStats(res.data);
-      } catch (err) {
-        console.error("Failed to fetch stats:", err);
-      }
-    };
     fetchStats();
   }, []);
 
@@ -168,6 +171,12 @@ function AdminDashboard() {
     { name: "Orders", icon: <FaShoppingCart />, key: "orders" },
     { name: "Customers", icon: <FaUsers />, key: "customers" },
   ];
+
+  const handleSelectTab = (key) => {
+    setActiveTab(key);
+    if (isSidebarOpen) setIsSidebarOpen(false); // auto-close on mobile
+    if (key === "dashboard") fetchStats(); // refresh stats when going back
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -192,7 +201,7 @@ function AdminDashboard() {
             {menuItems.map((item) => (
               <button
                 key={item.key}
-                onClick={() => setActiveTab(item.key)}
+                onClick={() => handleSelectTab(item.key)}
                 className={`w-full text-left px-4 py-2 rounded-md font-medium flex items-center space-x-2 transition-colors ${
                   activeTab === item.key ? "bg-green-900 shadow-md" : "hover:bg-green-800"
                 }`}
@@ -226,7 +235,7 @@ function AdminDashboard() {
         {activeTab === "dashboard" && (
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Dashboard Overview</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="bg-white p-6 rounded shadow text-center">
                 <h3 className="text-lg font-semibold text-gray-700">Total Products</h3>
                 <p className="text-3xl font-bold text-green-600">{stats.products}</p>
@@ -239,15 +248,13 @@ function AdminDashboard() {
                 <h3 className="text-lg font-semibold text-gray-700">Out of Stock</h3>
                 <p className="text-3xl font-bold text-red-500">{stats.outOfStock}</p>
               </div>
-              <div className="bg-white p-6 rounded shadow text-center">
-                <h3 className="text-lg font-semibold text-gray-700">Staff Members</h3>
-                <p className="text-3xl font-bold text-blue-500">{stats.staff || 0}</p>
-              </div>
             </div>
           </div>
         )}
 
-        {activeTab === "products" && <AdminProducts />}
+        {activeTab === "products" && (
+          <AdminProducts onProductChange={fetchStats} /> // update dashboard count on product change
+        )}
       </main>
     </div>
   );

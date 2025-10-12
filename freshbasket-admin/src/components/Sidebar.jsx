@@ -120,60 +120,50 @@
 // export default Sidebar;
 
 
-import { FaShoppingCart, FaBox, FaCog, FaSignOutAlt, FaTachometerAlt } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
+import { FaShoppingCart, FaBox, FaCog, FaSignOutAlt } from "react-icons/fa";
 
 function Sidebar({ isOpen, onClose }) {
-  const menuItems = [
-    { name: "Dashboard", icon: <FaTachometerAlt />, path: "/admin/dashboard" },
-    { name: "Products", icon: <FaBox />, path: "/admin/products" },
-    { name: "Orders", icon: <FaShoppingCart />, path: "/admin/orders" },
-    { name: "Settings", icon: <FaCog />, path: "/admin/settings" },
-  ];
-
   return (
     <div
-      className={`fixed md:static top-0 left-0 h-full w-64 bg-green-800 text-white flex flex-col justify-between transform ${
+      className={`fixed md:static top-0 left-0 h-full w-64 bg-green-700 text-white flex flex-col justify-between transform ${
         isOpen ? "translate-x-0" : "-translate-x-full"
-      } transition-transform duration-300 md:translate-x-0 z-50 shadow-lg`}
+      } transition-transform duration-300 md:translate-x-0 z-50`}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-green-700">
-        <h1 className="text-2xl font-bold tracking-wide">FreshBasket</h1>
-        {isOpen && (
-          <button className="md:hidden text-white" onClick={onClose}>
-            ✖
+      {/* Top Section */}
+      <div>
+        <div className="text-2xl font-bold p-4 border-b border-green-600">
+          FreshBasket Admin
+        </div>
+
+        <nav className="mt-4 space-y-1">
+          <button className="w-full text-left px-6 py-3 hover:bg-green-800 flex items-center space-x-3">
+            <FaBox /> <span>Products</span>
           </button>
-        )}
+          <button className="w-full text-left px-6 py-3 hover:bg-green-800 flex items-center space-x-3">
+            <FaShoppingCart /> <span>Orders</span>
+          </button>
+          <button className="w-full text-left px-6 py-3 hover:bg-green-800 flex items-center space-x-3">
+            <FaCog /> <span>Settings</span>
+          </button>
+        </nav>
       </div>
 
-      {/* Menu */}
-      <nav className="flex-1 mt-4 space-y-1">
-        {menuItems.map((item) => (
-          <NavLink
-            key={item.name}
-            to={item.path}
-            className={({ isActive }) =>
-              `flex items-center space-x-3 px-6 py-3 transition-all duration-300 ${
-                isActive
-                  ? "bg-green-600 text-white font-semibold"
-                  : "hover:bg-green-700"
-              }`
-            }
-            onClick={onClose}
-          >
-            {item.icon} <span>{item.name}</span>
-          </NavLink>
-        ))}
-      </nav>
-
-      {/* Logout */}
-      <div className="border-t border-green-700 p-4">
-        <button className="w-full flex items-center justify-center space-x-3 bg-red-600 hover:bg-red-700 py-2 rounded-lg font-semibold transition duration-300">
-          <FaSignOutAlt />
-          <span>Logout</span>
+      {/* Logout at bottom */}
+      <div className="border-t border-green-600">
+        <button className="w-full text-left px-6 py-3 hover:bg-red-600 flex items-center space-x-3">
+          <FaSignOutAlt /> <span>Logout</span>
         </button>
       </div>
+
+      {/* Close sidebar on mobile after click */}
+      {isOpen && (
+        <button
+          className="absolute top-4 right-4 md:hidden"
+          onClick={onClose}
+        >
+          ✖
+        </button>
+      )}
     </div>
   );
 }

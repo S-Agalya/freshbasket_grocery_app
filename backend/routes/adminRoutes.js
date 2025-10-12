@@ -1,6 +1,6 @@
 import express from "express";
-import { registerAdmin, loginAdmin,getAdminStats } from "../controllers/adminController.js";
-
+import { registerAdmin, loginAdmin } from "../controllers/adminController.js";
+import { getAdminStats } from "../controllers/adminStatsController.js";
 const router = express.Router();
 
 // Register new admin

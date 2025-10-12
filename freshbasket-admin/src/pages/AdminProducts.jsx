@@ -78,11 +78,21 @@ function AdminProducts() {
             >
               <div className="flex items-center space-x-4">
                 {p.image && (
+                  // <img
+                  //   src={p.image} // ✅ Directly use Cloudinary URL
+                  //   alt={p.name}
+                  //   className="w-16 h-16 object-cover rounded"
+                  // />
                   <img
-                    src={p.image} // ✅ Directly use Cloudinary URL
-                    alt={p.name}
-                    className="w-16 h-16 object-cover rounded"
-                  />
+  src={
+    p.image.startsWith("http")
+      ? p.image
+      : `${API_URL}/uploads/${p.image}`
+  }
+  alt={p.name}
+  className="w-16 h-16 object-cover rounded"
+/>
+
                 )}
                 <div>
                   <span className="font-semibold">{p.name}</span>

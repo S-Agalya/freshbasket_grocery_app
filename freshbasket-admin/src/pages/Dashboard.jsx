@@ -384,9 +384,131 @@
 
 // export default AdminDashboard;
 
+// import { useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { FaBars, FaTimes } from "react-icons/fa";
+// import AdminProducts from "./AdminProducts";
+
+// function AdminDashboard() {
+//   const [activeTab, setActiveTab] = useState("products");
+//   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+//   const navigate = useNavigate();
+
+//   const handleLogout = () => {
+//     localStorage.removeItem("adminToken");
+//     sessionStorage.removeItem("adminToken");
+//     navigate("/login");
+//   };
+
+//   return (
+//     <div className="flex min-h-screen bg-gray-100 relative">
+//       {/* Sidebar */}
+//       <aside
+//         className={`fixed md:static top-0 left-0 h-full w-64 bg-green-700 text-white flex flex-col justify-between transform transition-transform duration-300 ease-in-out z-50
+//         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+//         `}
+//       >
+//         <div className="p-4">
+//           <div className="flex justify-between items-center md:block">
+//             <h1 className="text-2xl font-bold mb-6">Admin Panel</h1>
+//             {/* Close button only for mobile */}
+//             <button
+//               className="md:hidden text-white"
+//               onClick={() => setIsSidebarOpen(false)}
+//             >
+//               <FaTimes size={22} />
+//             </button>
+//           </div>
+
+//           <button
+//             onClick={() => {
+//               setActiveTab("products");
+//               setIsSidebarOpen(false);
+//             }}
+//             className={`w-full text-left px-3 py-2 rounded mb-2 ${
+//               activeTab === "products" ? "bg-green-900" : "hover:bg-green-800"
+//             }`}
+//           >
+//             🛒 Products
+//           </button>
+
+//           <button
+//             onClick={() => {
+//               alert("Orders feature coming soon!");
+//               setIsSidebarOpen(false);
+//             }}
+//             className="w-full text-left px-3 py-2 rounded mb-2 hover:bg-green-800"
+//           >
+//             📦 Orders
+//           </button>
+
+//           <button
+//             onClick={() => {
+//               alert("Customers feature coming soon!");
+//               setIsSidebarOpen(false);
+//             }}
+//             className="w-full text-left px-3 py-2 rounded mb-2 hover:bg-green-800"
+//           >
+//             👥 Customers
+//           </button>
+//         </div>
+
+//         {/* Logout Button */}
+//         <div className="p-4 border-t border-green-600">
+//           <button
+//             onClick={() => {
+//               handleLogout();
+//               setIsSidebarOpen(false);
+//             }}
+//             className="w-full bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition"
+//           >
+//             🚪 Logout
+//           </button>
+//         </div>
+//       </aside>
+
+//       {/* Overlay for mobile */}
+//       {isSidebarOpen && (
+//         <div
+//           className="fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden"
+//           onClick={() => setIsSidebarOpen(false)}
+//         ></div>
+//       )}
+
+//       {/* Main Content */}
+//       <main className="flex-1 p-6">
+//         <header className="flex justify-between items-center mb-6">
+//           <div className="flex items-center gap-4">
+//             {/* Hamburger only in mobile */}
+//             <button
+//               className="md:hidden text-green-700"
+//               onClick={() => setIsSidebarOpen(true)}
+//             >
+//               <FaBars size={24} />
+//             </button>
+//             <h2 className="text-2xl font-bold text-gray-800">
+//               {activeTab === "products" ? "Manage Products" : "Dashboard"}
+//             </h2>
+//           </div>
+
+//           <button
+//             className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+//             onClick={() => window.location.reload()}
+//           >
+//             🔄 Refresh
+//           </button>
+//         </header>
+
+//         {activeTab === "products" && <AdminProducts />}
+//       </main>
+//     </div>
+//   );
+// }
+
+// export default AdminDashboard;
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaBars, FaTimes } from "react-icons/fa";
 import AdminProducts from "./AdminProducts";
 
 function AdminDashboard() {
@@ -401,30 +523,28 @@ function AdminDashboard() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100 relative">
-      {/* Sidebar */}
+    <div className="flex min-h-screen bg-gray-100">
+      {/* ✅ Mobile Hamburger Button */}
+      <button
+        className="md:hidden fixed top-4 left-4 z-50 bg-green-700 text-white p-2 rounded-md shadow-md"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        ☰
+      </button>
+
+      {/* ✅ Sidebar */}
       <aside
-        className={`fixed md:static top-0 left-0 h-full w-64 bg-green-700 text-white flex flex-col justify-between transform transition-transform duration-300 ease-in-out z-50
-        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-        `}
+        className={`fixed md:static top-0 left-0 h-full w-64 bg-green-700 text-white flex flex-col justify-between transform transition-transform duration-300 z-40 ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        }`}
       >
         <div className="p-4">
-          <div className="flex justify-between items-center md:block">
-            <h1 className="text-2xl font-bold mb-6">Admin Panel</h1>
-            {/* Close button only for mobile */}
-            <button
-              className="md:hidden text-white"
-              onClick={() => setIsSidebarOpen(false)}
-            >
-              <FaTimes size={22} />
-            </button>
-          </div>
+          <h1 className="text-2xl font-bold mb-6 text-center md:text-left">
+            Admin Panel
+          </h1>
 
           <button
-            onClick={() => {
-              setActiveTab("products");
-              setIsSidebarOpen(false);
-            }}
+            onClick={() => setActiveTab("products")}
             className={`w-full text-left px-3 py-2 rounded mb-2 ${
               activeTab === "products" ? "bg-green-900" : "hover:bg-green-800"
             }`}
@@ -433,33 +553,24 @@ function AdminDashboard() {
           </button>
 
           <button
-            onClick={() => {
-              alert("Orders feature coming soon!");
-              setIsSidebarOpen(false);
-            }}
+            onClick={() => alert("Orders feature coming soon!")}
             className="w-full text-left px-3 py-2 rounded mb-2 hover:bg-green-800"
           >
             📦 Orders
           </button>
 
           <button
-            onClick={() => {
-              alert("Customers feature coming soon!");
-              setIsSidebarOpen(false);
-            }}
+            onClick={() => alert("Customers feature coming soon!")}
             className="w-full text-left px-3 py-2 rounded mb-2 hover:bg-green-800"
           >
             👥 Customers
           </button>
         </div>
 
-        {/* Logout Button */}
+        {/* ✅ Logout Button */}
         <div className="p-4 border-t border-green-600">
           <button
-            onClick={() => {
-              handleLogout();
-              setIsSidebarOpen(false);
-            }}
+            onClick={handleLogout}
             className="w-full bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition"
           >
             🚪 Logout
@@ -467,29 +578,20 @@ function AdminDashboard() {
         </div>
       </aside>
 
-      {/* Overlay for mobile */}
+      {/* ✅ Overlay for mobile (to close sidebar when clicked) */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden"
+          className="fixed inset-0 bg-black opacity-40 z-30 md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         ></div>
       )}
 
-      {/* Main Content */}
-      <main className="flex-1 p-6">
+      {/* ✅ Main Content */}
+      <main className="flex-1 p-6 md:ml-0">
         <header className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-4">
-            {/* Hamburger only in mobile */}
-            <button
-              className="md:hidden text-green-700"
-              onClick={() => setIsSidebarOpen(true)}
-            >
-              <FaBars size={24} />
-            </button>
-            <h2 className="text-2xl font-bold text-gray-800">
-              {activeTab === "products" ? "Manage Products" : "Dashboard"}
-            </h2>
-          </div>
+          <h2 className="text-2xl font-bold text-gray-800">
+            {activeTab === "products" ? "Manage Products" : "Dashboard"}
+          </h2>
 
           <button
             className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"

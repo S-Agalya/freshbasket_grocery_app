@@ -246,83 +246,55 @@
 // export default Dashboard;
 
 
-import { useEffect, useState } from "react";
-import axios from "axios";
+
+import { useState } from "react";
+import AdminProducts from "./AdminProducts";
 
 function AdminDashboard() {
-  const [totalProducts, setTotalProducts] = useState(0);
-  const [ordersToday, setOrdersToday] = useState(0);
-  const [outOfStock, setOutOfStock] = useState(0);
-  const API_URL = import.meta.env.VITE_API_URL;
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch all products
-        const productRes = await axios.get(`${API_URL}/api/products`);
-        const products = productRes.data || [];
-
-        setTotalProducts(products.length);
-        setOutOfStock(products.filter((p) => p.quantity === 0).length);
-
-        // Fetch today's orders (optional, adjust backend route as per your API)
-        const orderRes = await axios.get(`${API_URL}/api/orders/today`);
-        setOrdersToday(orderRes.data.count || 0);
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      }
-    };
-
-    fetchData();
-  }, [API_URL]);
+  const [activeTab, setActiveTab] = useState("products");
 
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-green-700 text-white flex flex-col">
-        <div className="p-6 text-2xl font-bold border-b border-green-600">
-          FreshBasket Admin
-        </div>
-
-        <nav className="flex-1 p-4 space-y-4 text-lg">
-          <a href="/admin/dashboard" className="flex items-center gap-2 hover:text-green-200">
-            <i className="fa fa-home"></i> Dashboard
-          </a>
-          <a href="/admin/products" className="flex items-center gap-2 hover:text-green-200">
-            <i className="fa fa-box"></i> Products
-          </a>
-          <a href="/admin/orders" className="flex items-center gap-2 hover:text-green-200">
-            <i className="fa fa-shopping-cart"></i> Orders
-          </a>
-        </nav>
-
-        <button className="p-4 border-t border-green-600 hover:bg-green-800 text-left text-lg">
-          <i className="fa fa-sign-out-alt"></i> Logout
+      <aside className="w-64 bg-green-700 text-white p-4 flex flex-col">
+        <h1 className="text-2xl font-bold mb-6">Admin Panel</h1>
+        <button
+          onClick={() => setActiveTab("products")}
+          className={`text-left px-3 py-2 rounded mb-2 ${
+            activeTab === "products" ? "bg-green-900" : "hover:bg-green-800"
+          }`}
+        >
+          🛒 Products
+        </button>
+        <button
+          onClick={() => alert("Coming soon!")}
+          className="text-left px-3 py-2 rounded hover:bg-green-800"
+        >
+          📦 Orders
+        </button>
+        <button
+          onClick={() => alert("Coming soon!")}
+          className="text-left px-3 py-2 rounded hover:bg-green-800"
+        >
+          👥 Customers
         </button>
       </aside>
 
-      {/* Dashboard Main Content */}
-      <main className="flex-1 p-8">
-        <h1 className="text-2xl font-bold text-green-700 mb-6">
-          Dashboard Overview
-        </h1>
+      {/* Main Content */}
+      <main className="flex-1 p-6">
+        <header className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">
+            {activeTab === "products" ? "Manage Products" : "Dashboard"}
+          </h2>
+          <button
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            onClick={() => window.location.reload()}
+          >
+            Refresh
+          </button>
+        </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white shadow rounded-2xl p-6 text-center">
-            <h2 className="text-lg font-semibold text-gray-700">Total Products</h2>
-            <p className="text-3xl font-bold text-green-600 mt-2">{totalProducts}</p>
-          </div>
-
-          <div className="bg-white shadow rounded-2xl p-6 text-center">
-            <h2 className="text-lg font-semibold text-gray-700">Orders Today</h2>
-            <p className="text-3xl font-bold text-green-600 mt-2">{ordersToday}</p>
-          </div>
-
-          <div className="bg-white shadow rounded-2xl p-6 text-center">
-            <h2 className="text-lg font-semibold text-gray-700">Out of Stock</h2>
-            <p className="text-3xl font-bold text-red-600 mt-2">{outOfStock}</p>
-          </div>
-        </div>
+        {activeTab === "products" && <AdminProducts />}
       </main>
     </div>
   );

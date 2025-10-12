@@ -247,37 +247,118 @@
 
 
 
+// import { useState } from "react";
+// import AdminProducts from "./AdminProducts";
+
+// function AdminDashboard() {
+//   const [activeTab, setActiveTab] = useState("products");
+
+//   return (
+//     <div className="flex min-h-screen bg-gray-100">
+//       {/* Sidebar */}
+//       <aside className="w-64 bg-green-700 text-white p-4 flex flex-col">
+//         <h1 className="text-2xl font-bold mb-6">Admin Panel</h1>
+//         <button
+//           onClick={() => setActiveTab("products")}
+//           className={`text-left px-3 py-2 rounded mb-2 ${
+//             activeTab === "products" ? "bg-green-900" : "hover:bg-green-800"
+//           }`}
+//         >
+//           🛒 Products
+//         </button>
+//         <button
+//           onClick={() => alert("Coming soon!")}
+//           className="text-left px-3 py-2 rounded hover:bg-green-800"
+//         >
+//           📦 Orders
+//         </button>
+//         <button
+//           onClick={() => alert("Coming soon!")}
+//           className="text-left px-3 py-2 rounded hover:bg-green-800"
+//         >
+//           👥 Customers
+//         </button>
+//       </aside>
+
+//       {/* Main Content */}
+//       <main className="flex-1 p-6">
+//         <header className="flex justify-between items-center mb-6">
+//           <h2 className="text-2xl font-bold text-gray-800">
+//             {activeTab === "products" ? "Manage Products" : "Dashboard"}
+//           </h2>
+//           <button
+//             className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+//             onClick={() => window.location.reload()}
+//           >
+//             Refresh
+//           </button>
+//         </header>
+
+//         {activeTab === "products" && <AdminProducts />}
+//       </main>
+//     </div>
+//   );
+// }
+
+// export default AdminDashboard;
+
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AdminProducts from "./AdminProducts";
 
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("products");
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // ✅ Clear admin auth token if stored
+    localStorage.removeItem("adminToken");
+    sessionStorage.removeItem("adminToken");
+
+    // ✅ Redirect to login page
+    navigate("/login");
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-green-700 text-white p-4 flex flex-col">
-        <h1 className="text-2xl font-bold mb-6">Admin Panel</h1>
-        <button
-          onClick={() => setActiveTab("products")}
-          className={`text-left px-3 py-2 rounded mb-2 ${
-            activeTab === "products" ? "bg-green-900" : "hover:bg-green-800"
-          }`}
-        >
-          🛒 Products
-        </button>
-        <button
-          onClick={() => alert("Coming soon!")}
-          className="text-left px-3 py-2 rounded hover:bg-green-800"
-        >
-          📦 Orders
-        </button>
-        <button
-          onClick={() => alert("Coming soon!")}
-          className="text-left px-3 py-2 rounded hover:bg-green-800"
-        >
-          👥 Customers
-        </button>
+      <aside className="w-64 bg-green-700 text-white flex flex-col justify-between">
+        <div className="p-4">
+          <h1 className="text-2xl font-bold mb-6">Admin Panel</h1>
+
+          <button
+            onClick={() => setActiveTab("products")}
+            className={`w-full text-left px-3 py-2 rounded mb-2 ${
+              activeTab === "products" ? "bg-green-900" : "hover:bg-green-800"
+            }`}
+          >
+            🛒 Products
+          </button>
+
+          <button
+            onClick={() => alert("Orders feature coming soon!")}
+            className="w-full text-left px-3 py-2 rounded mb-2 hover:bg-green-800"
+          >
+            📦 Orders
+          </button>
+
+          <button
+            onClick={() => alert("Customers feature coming soon!")}
+            className="w-full text-left px-3 py-2 rounded mb-2 hover:bg-green-800"
+          >
+            👥 Customers
+          </button>
+        </div>
+
+        {/* ✅ Logout Button at the bottom */}
+        <div className="p-4 border-t border-green-600">
+          <button
+            onClick={handleLogout}
+            className="w-full bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition"
+          >
+            🚪 Logout
+          </button>
+        </div>
       </aside>
 
       {/* Main Content */}
@@ -286,11 +367,12 @@ function AdminDashboard() {
           <h2 className="text-2xl font-bold text-gray-800">
             {activeTab === "products" ? "Manage Products" : "Dashboard"}
           </h2>
+
           <button
             className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
             onClick={() => window.location.reload()}
           >
-            Refresh
+            🔄 Refresh
           </button>
         </header>
 

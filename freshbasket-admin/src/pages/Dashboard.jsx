@@ -153,12 +153,91 @@
 //             <p className="text-3xl font-bold text-green-600">32</p>
 //           </div>
 //           <div className="bg-white p-6 rounded shadow text-center">
-//             <h2 className="text-lg font-semibold text-gray-700">Out of Stock</h2>
-//             <p className="text-3xl font-bold text-red-500">8</p>
-//           </div>
+// //             <h2 className="text-lg font-semibold text-gray-700">Out of Stock</h2>
+// //             <p className="text-3xl font-bold text-red-500">8</p>
+// //           </div>
+// //         </div>
+
+// //         <Outlet />
+// //       </main>
+// //     </div>
+// //   );
+// // }
+
+// // export default Dashboard;
+
+
+
+// import { useState, useEffect } from "react";
+// import Sidebar from "../components/Sidebar";
+// import { FaBars } from "react-icons/fa";
+// import axios from "axios";
+// import AdminProducts from "./AdminProducts";
+
+// function Dashboard() {
+//   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+//   const [page, setPage] = useState("dashboard");
+//   const [stats, setStats] = useState({ products: 0, orders: 0, outOfStock: 0 });
+//   const API_URL = import.meta.env.VITE_API_URL;
+
+//   // Fetch dashboard stats
+//   useEffect(() => {
+//     const fetchStats = async () => {
+//       try {
+//         const res = await axios.get(`${API_URL}/api/admin/stats`);
+//         setStats(res.data);
+//       } catch (err) {
+//         console.error("Failed to fetch stats:", err);
+//       }
+//     };
+//     fetchStats();
+//   }, []);
+
+//   return (
+//     <div className="flex min-h-screen bg-gray-100 relative">
+//       <Sidebar
+//         isOpen={isSidebarOpen}
+//         onClose={() => setIsSidebarOpen(false)}
+//         onSelect={(key) => setPage(key)}
+//       />
+
+//       <main className="flex-1 p-4 md:p-8 w-full">
+//         {/* Mobile top bar */}
+//         <div className="md:hidden flex items-center justify-between mb-4">
+//           <button
+//             className="text-green-700 text-2xl"
+//             onClick={() => setIsSidebarOpen(true)}
+//           >
+//             <FaBars />
+//           </button>
+//           <h1 className="text-xl font-bold text-green-700 capitalize">{page}</h1>
 //         </div>
 
-//         <Outlet />
+//         {/* Page rendering */}
+//         {page === "dashboard" && (
+//           <>
+//             <h1 className="hidden md:block text-2xl font-bold text-green-700 mb-6">
+//               Dashboard Overview
+//             </h1>
+//             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+//               <div className="bg-white p-6 rounded shadow text-center">
+//                 <h2 className="text-lg font-semibold text-gray-700">Total Products</h2>
+//                 <p className="text-3xl font-bold text-green-600">{stats.products}</p>
+//               </div>
+//               <div className="bg-white p-6 rounded shadow text-center">
+//                 <h2 className="text-lg font-semibold text-gray-700">Orders Today</h2>
+//                 <p className="text-3xl font-bold text-green-600">{stats.orders}</p>
+//               </div>
+//               <div className="bg-white p-6 rounded shadow text-center">
+//                 <h2 className="text-lg font-semibold text-gray-700">Out of Stock</h2>
+//                 <p className="text-3xl font-bold text-red-500">{stats.outOfStock}</p>
+//               </div>
+//             </div>
+//           </>
+//         )}
+
+//         {page === "products" && <AdminProducts />}
+//         {page === "orders" && <div>Orders page coming soon...</div>}
 //       </main>
 //     </div>
 //   );
@@ -167,80 +246,86 @@
 // export default Dashboard;
 
 
-
-import { useState, useEffect } from "react";
-import Sidebar from "../components/Sidebar";
-import { FaBars } from "react-icons/fa";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import AdminProducts from "./AdminProducts";
 
-function Dashboard() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [page, setPage] = useState("dashboard");
-  const [stats, setStats] = useState({ products: 0, orders: 0, outOfStock: 0 });
+function AdminDashboard() {
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [ordersToday, setOrdersToday] = useState(0);
+  const [outOfStock, setOutOfStock] = useState(0);
   const API_URL = import.meta.env.VITE_API_URL;
 
-  // Fetch dashboard stats
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchData = async () => {
       try {
-        const res = await axios.get(`${API_URL}/api/admin/stats`);
-        setStats(res.data);
-      } catch (err) {
-        console.error("Failed to fetch stats:", err);
+        // Fetch all products
+        const productRes = await axios.get(`${API_URL}/api/products`);
+        const products = productRes.data || [];
+
+        setTotalProducts(products.length);
+        setOutOfStock(products.filter((p) => p.quantity === 0).length);
+
+        // Fetch today's orders (optional, adjust backend route as per your API)
+        const orderRes = await axios.get(`${API_URL}/api/orders/today`);
+        setOrdersToday(orderRes.data.count || 0);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
       }
     };
-    fetchStats();
-  }, []);
+
+    fetchData();
+  }, [API_URL]);
 
   return (
-    <div className="flex min-h-screen bg-gray-100 relative">
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-        onSelect={(key) => setPage(key)}
-      />
-
-      <main className="flex-1 p-4 md:p-8 w-full">
-        {/* Mobile top bar */}
-        <div className="md:hidden flex items-center justify-between mb-4">
-          <button
-            className="text-green-700 text-2xl"
-            onClick={() => setIsSidebarOpen(true)}
-          >
-            <FaBars />
-          </button>
-          <h1 className="text-xl font-bold text-green-700 capitalize">{page}</h1>
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Sidebar */}
+      <aside className="w-64 bg-green-700 text-white flex flex-col">
+        <div className="p-6 text-2xl font-bold border-b border-green-600">
+          FreshBasket Admin
         </div>
 
-        {/* Page rendering */}
-        {page === "dashboard" && (
-          <>
-            <h1 className="hidden md:block text-2xl font-bold text-green-700 mb-6">
-              Dashboard Overview
-            </h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded shadow text-center">
-                <h2 className="text-lg font-semibold text-gray-700">Total Products</h2>
-                <p className="text-3xl font-bold text-green-600">{stats.products}</p>
-              </div>
-              <div className="bg-white p-6 rounded shadow text-center">
-                <h2 className="text-lg font-semibold text-gray-700">Orders Today</h2>
-                <p className="text-3xl font-bold text-green-600">{stats.orders}</p>
-              </div>
-              <div className="bg-white p-6 rounded shadow text-center">
-                <h2 className="text-lg font-semibold text-gray-700">Out of Stock</h2>
-                <p className="text-3xl font-bold text-red-500">{stats.outOfStock}</p>
-              </div>
-            </div>
-          </>
-        )}
+        <nav className="flex-1 p-4 space-y-4 text-lg">
+          <a href="/admin/dashboard" className="flex items-center gap-2 hover:text-green-200">
+            <i className="fa fa-home"></i> Dashboard
+          </a>
+          <a href="/admin/products" className="flex items-center gap-2 hover:text-green-200">
+            <i className="fa fa-box"></i> Products
+          </a>
+          <a href="/admin/orders" className="flex items-center gap-2 hover:text-green-200">
+            <i className="fa fa-shopping-cart"></i> Orders
+          </a>
+        </nav>
 
-        {page === "products" && <AdminProducts />}
-        {page === "orders" && <div>Orders page coming soon...</div>}
+        <button className="p-4 border-t border-green-600 hover:bg-green-800 text-left text-lg">
+          <i className="fa fa-sign-out-alt"></i> Logout
+        </button>
+      </aside>
+
+      {/* Dashboard Main Content */}
+      <main className="flex-1 p-8">
+        <h1 className="text-2xl font-bold text-green-700 mb-6">
+          Dashboard Overview
+        </h1>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white shadow rounded-2xl p-6 text-center">
+            <h2 className="text-lg font-semibold text-gray-700">Total Products</h2>
+            <p className="text-3xl font-bold text-green-600 mt-2">{totalProducts}</p>
+          </div>
+
+          <div className="bg-white shadow rounded-2xl p-6 text-center">
+            <h2 className="text-lg font-semibold text-gray-700">Orders Today</h2>
+            <p className="text-3xl font-bold text-green-600 mt-2">{ordersToday}</p>
+          </div>
+
+          <div className="bg-white shadow rounded-2xl p-6 text-center">
+            <h2 className="text-lg font-semibold text-gray-700">Out of Stock</h2>
+            <p className="text-3xl font-bold text-red-600 mt-2">{outOfStock}</p>
+          </div>
+        </div>
       </main>
     </div>
   );
 }
 
-export default Dashboard;
+export default AdminDashboard;

@@ -72,43 +72,43 @@
 // export default AdminDashboard;
 
 
-import Sidebar from "../components/Sidebar"; // import Sidebar
+// import Sidebar from "../components/Sidebar"; // import Sidebar
 
-import { Outlet } from "react-router-dom";
+// import { Outlet } from "react-router-dom";
 
-function AdminDashboard() {
-  return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <Sidebar />
+// function AdminDashboard() {
+//   return (
+//     <div className="flex min-h-screen bg-gray-100">
+//       {/* Sidebar */}
+//       <Sidebar />
 
-      {/* Main Content */}
-      <main className="flex-1 p-8">
-        <h1 className="text-2xl font-bold text-green-700 mb-6">Dashboard</h1>
+//       {/* Main Content */}
+//       <main className="flex-1 p-8">
+//         <h1 className="text-2xl font-bold text-green-700 mb-6">Dashboard</h1>
 
-        {/* Example Content */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded shadow text-center">
-            <h2 className="text-lg font-semibold text-gray-700">Total Products</h2>
-            <p className="text-3xl font-bold text-green-600">120</p>
-          </div>
-          <div className="bg-white p-6 rounded shadow text-center">
-            <h2 className="text-lg font-semibold text-gray-700">Orders Today</h2>
-            <p className="text-3xl font-bold text-green-600">32</p>
-          </div>
-          <div className="bg-white p-6 rounded shadow text-center">
-            <h2 className="text-lg font-semibold text-gray-700">Out of Stock</h2>
-            <p className="text-3xl font-bold text-red-500">8</p>
-          </div>
-        </div>
+//         {/* Example Content */}
+//         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+//           <div className="bg-white p-6 rounded shadow text-center">
+//             <h2 className="text-lg font-semibold text-gray-700">Total Products</h2>
+//             <p className="text-3xl font-bold text-green-600">120</p>
+//           </div>
+//           <div className="bg-white p-6 rounded shadow text-center">
+//             <h2 className="text-lg font-semibold text-gray-700">Orders Today</h2>
+//             <p className="text-3xl font-bold text-green-600">32</p>
+//           </div>
+//           <div className="bg-white p-6 rounded shadow text-center">
+//             <h2 className="text-lg font-semibold text-gray-700">Out of Stock</h2>
+//             <p className="text-3xl font-bold text-red-500">8</p>
+//           </div>
+//         </div>
 
-         <Outlet />
-      </main>
-    </div>
-  );
-}
+//          <Outlet />
+//       </main>
+//     </div>
+//   );
+// }
 
-export default AdminDashboard;
+// export default AdminDashboard;
 
 
 
@@ -165,3 +165,89 @@ export default AdminDashboard;
 // }
 
 // export default Dashboard;
+
+
+import { useState, useEffect } from "react";
+import Sidebar from "../components/Sidebar";
+import { Outlet } from "react-router-dom";
+import { FaBars } from "react-icons/fa";
+import axios from "axios";
+import { motion } from "framer-motion";
+
+function Dashboard() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [stats, setStats] = useState({ products: 0, orders: 0, outOfStock: 0 });
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/api/admin/stats`);
+        setStats(res.data);
+      } catch (err) {
+        console.error("Error fetching stats:", err);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  return (
+    <div className="flex min-h-screen bg-gray-100 relative">
+      {/* Sidebar */}
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
+      {/* Main Content */}
+      <main className="flex-1 p-4 md:p-8 w-full">
+        {/* Mobile top bar */}
+        <div className="md:hidden flex items-center justify-between mb-6">
+          <button
+            className="text-green-700 text-2xl"
+            onClick={() => setIsSidebarOpen(true)}
+          >
+            <FaBars />
+          </button>
+          <h1 className="text-xl font-bold text-green-700">Dashboard</h1>
+        </div>
+
+        {/* Header */}
+        <h1 className="hidden md:block text-3xl font-extrabold text-green-700 mb-8">
+          Admin Overview
+        </h1>
+
+        {/* Overview Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="bg-white rounded-2xl shadow-md hover:shadow-lg p-6 text-center transition-all duration-300"
+          >
+            <h2 className="text-lg font-semibold text-gray-600">Total Products</h2>
+            <p className="text-4xl font-extrabold text-green-600 mt-2">{stats.products}</p>
+          </motion.div>
+
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="bg-white rounded-2xl shadow-md hover:shadow-lg p-6 text-center transition-all duration-300"
+          >
+            <h2 className="text-lg font-semibold text-gray-600">Orders Today</h2>
+            <p className="text-4xl font-extrabold text-green-600 mt-2">{stats.orders}</p>
+          </motion.div>
+
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="bg-white rounded-2xl shadow-md hover:shadow-lg p-6 text-center transition-all duration-300"
+          >
+            <h2 className="text-lg font-semibold text-gray-600">Out of Stock</h2>
+            <p className="text-4xl font-extrabold text-red-500 mt-2">{stats.outOfStock}</p>
+          </motion.div>
+        </div>
+
+        {/* Nested Routes (like product list, etc.) */}
+        <div className="mt-10">
+          <Outlet />
+        </div>
+      </main>
+    </div>
+  );
+}
+
+export default Dashboard;

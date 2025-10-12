@@ -170,22 +170,24 @@
 
 import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
-import { Outlet } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import axios from "axios";
+import AdminProducts from "./AdminProducts";
 
 function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [page, setPage] = useState("dashboard");
   const [stats, setStats] = useState({ products: 0, orders: 0, outOfStock: 0 });
   const API_URL = import.meta.env.VITE_API_URL;
 
+  // Fetch dashboard stats
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const res = await axios.get(`${API_URL}/api/admin/stats`);
         setStats(res.data);
       } catch (err) {
-        console.error(err);
+        console.error("Failed to fetch stats:", err);
       }
     };
     fetchStats();
@@ -193,7 +195,11 @@ function Dashboard() {
 
   return (
     <div className="flex min-h-screen bg-gray-100 relative">
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        onSelect={(key) => setPage(key)}
+      />
 
       <main className="flex-1 p-4 md:p-8 w-full">
         {/* Mobile top bar */}
@@ -204,31 +210,34 @@ function Dashboard() {
           >
             <FaBars />
           </button>
-          <h1 className="text-xl font-bold text-green-700">Dashboard</h1>
+          <h1 className="text-xl font-bold text-green-700 capitalize">{page}</h1>
         </div>
 
-        {/* Dashboard Header */}
-        <h1 className="hidden md:block text-2xl font-bold text-green-700 mb-6">
-          Dashboard Overview
-        </h1>
+        {/* Page rendering */}
+        {page === "dashboard" && (
+          <>
+            <h1 className="hidden md:block text-2xl font-bold text-green-700 mb-6">
+              Dashboard Overview
+            </h1>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="bg-white p-6 rounded shadow text-center">
+                <h2 className="text-lg font-semibold text-gray-700">Total Products</h2>
+                <p className="text-3xl font-bold text-green-600">{stats.products}</p>
+              </div>
+              <div className="bg-white p-6 rounded shadow text-center">
+                <h2 className="text-lg font-semibold text-gray-700">Orders Today</h2>
+                <p className="text-3xl font-bold text-green-600">{stats.orders}</p>
+              </div>
+              <div className="bg-white p-6 rounded shadow text-center">
+                <h2 className="text-lg font-semibold text-gray-700">Out of Stock</h2>
+                <p className="text-3xl font-bold text-red-500">{stats.outOfStock}</p>
+              </div>
+            </div>
+          </>
+        )}
 
-        {/* Dynamic Overview Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded shadow text-center">
-            <h2 className="text-lg font-semibold text-gray-700">Total Products</h2>
-            <p className="text-3xl font-bold text-green-600">{stats.products}</p>
-          </div>
-          <div className="bg-white p-6 rounded shadow text-center">
-            <h2 className="text-lg font-semibold text-gray-700">Orders Today</h2>
-            <p className="text-3xl font-bold text-green-600">{stats.orders}</p>
-          </div>
-          <div className="bg-white p-6 rounded shadow text-center">
-            <h2 className="text-lg font-semibold text-gray-700">Out of Stock</h2>
-            <p className="text-3xl font-bold text-red-500">{stats.outOfStock}</p>
-          </div>
-        </div>
-
-        <Outlet />
+        {page === "products" && <AdminProducts />}
+        {page === "orders" && <div>Orders page coming soon...</div>}
       </main>
     </div>
   );

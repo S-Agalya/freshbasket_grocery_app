@@ -131,12 +131,12 @@
 // export default AdminDashboard;
 
 
-
+// AdminDashboard.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminProducts from "./AdminProducts";
 import axios from "axios";
-import { FaTachometerAlt, FaBoxOpen, FaShoppingCart, FaUsers, FaSignOutAlt } from "react-icons/fa";
+import { FaTachometerAlt, FaBoxOpen, FaShoppingCart, FaSignOutAlt } from "react-icons/fa";
 
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -151,7 +151,6 @@ function AdminDashboard() {
     navigate("/login");
   };
 
-  // Fetch stats dynamically
   const fetchStats = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/admin/stats`);
@@ -169,13 +168,12 @@ function AdminDashboard() {
     { name: "Dashboard", icon: <FaTachometerAlt />, key: "dashboard" },
     { name: "Products", icon: <FaBoxOpen />, key: "products" },
     { name: "Orders", icon: <FaShoppingCart />, key: "orders" },
-    { name: "Customers", icon: <FaUsers />, key: "customers" },
   ];
 
   const handleSelectTab = (key) => {
     setActiveTab(key);
     if (isSidebarOpen) setIsSidebarOpen(false); // auto-close on mobile
-    if (key === "dashboard") fetchStats(); // refresh stats when going back
+    if (key === "dashboard") fetchStats(); // refresh stats
   };
 
   return (
@@ -190,7 +188,7 @@ function AdminDashboard() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed md:static top-0 left-0 h-full w-64 bg-green-700 text-white flex flex-col justify-between transform transition-transform duration-300 z-50 shadow-lg
+        className={`fixed md:static top-0 left-0 h-screen w-64 bg-green-700 text-white flex flex-col justify-between transform transition-transform duration-300 z-50 shadow-lg
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
         <div>
@@ -253,7 +251,7 @@ function AdminDashboard() {
         )}
 
         {activeTab === "products" && (
-          <AdminProducts onProductChange={fetchStats} /> // update dashboard count on product change
+          <AdminProducts onProductChange={fetchStats} /> // update count dynamically
         )}
       </main>
     </div>

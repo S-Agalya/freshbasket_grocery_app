@@ -104,7 +104,7 @@ const OrderSummaryPage = () => {
 
 
 
-  const ownerPhoneNumber = import.meta.env.VITE_OWNER_PHONE.replace(/\D/g, '');
+  const ownerPhoneNumber = import.meta.env.VITE_OWNER_PHONE;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-yellow-50 to-blue-50 flex flex-col">

@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { FaTachometerAlt, FaBoxOpen, FaShoppingCart, FaSignOutAlt } from "react-icons/fa";
+import AdminOrderPage from "./AdminOrderPage";
 
 function AdminDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -36,6 +37,7 @@ function AdminDashboard() {
     { name: "Dashboard", icon: <FaTachometerAlt />, path: "/dashboard" },
     { name: "Products", icon: <FaBoxOpen />, path: "/dashboard/products" },
     { name: "Orders", icon: <FaShoppingCart />, path: "/dashboard/orders" },
+      { name: "Manage Orders", icon: <FaShoppingCart />, path: "/dashboard/manage-orders" },
   ];
 
   return (

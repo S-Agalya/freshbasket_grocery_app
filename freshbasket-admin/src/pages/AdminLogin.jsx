@@ -8,6 +8,13 @@ function AdminLogin() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+
+  useEffect(() => {
+  const token = localStorage.getItem("adminToken");
+  if (token) {
+    navigate("/dashboard");
+  }
+}, [navigate]);
   const handleLogin = async (e) => {
     e.preventDefault();
     try {

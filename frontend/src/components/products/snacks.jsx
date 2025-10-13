@@ -55,7 +55,7 @@ export default function Snacks() {
     try {
       const res = await axios.get(`${API_URL}/api/products`);
       // Match category with backend (use lowercase comparison for safety)
-      setSnackProducts(res.data.filter((p) => p.category?.trim().toLowerCase() === "Snacks"));
+      setSnackProducts(res.data.filter((p) => p.category?.trim() === "Snacks"));
     } catch (err) {
       console.error("❌ Failed to fetch snack products:", err);
     }

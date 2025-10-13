@@ -132,7 +132,7 @@ export default function SoapsAndDetergents() {
       const validCategories = ["Soaps", "Detergents", "Shampoos","Handwash"];
 
       const filtered = res.data.filter((p) =>
-        validCategories.includes(p.category?.trim().toLowerCase())
+        validCategories.includes(p.category?.trim())
       );
 
       setSoapsProducts(filtered);

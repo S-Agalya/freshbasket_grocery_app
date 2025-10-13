@@ -71,35 +71,40 @@ const OrderSummaryPage = () => {
   };
 
   // ✅ WhatsApp message uses orderedItems now
-  const buildWhatsappMessage = () => {
-    let message = `🛒 *New Order*\n\n`;
+  // ✅ Safe WhatsApp message builder
+const buildWhatsappMessage = () => {
+  // Start message
+  let message = `🛒 New Order\n\n`;
 
-    if (orderId) {
-      message += `📦 *Order ID:* ORD_ID ${orderId}\n`;
-    }
+  if (orderId) {
+    message += `Order ID: ORD_ID ${orderId}\n`;
+  }
 
-    message += `👤 *Name:* ${customerName}\n`;
-    message += `📞 *Phone:* ${customerPhone}\n`;
-    message += `🏠 *Address:* ${customerAddress}\n\n`;
+  message += `Name: ${customerName}\n`;
+  message += `Phone: ${customerPhone}\n`;
+  message += `Address: ${customerAddress}\n\n`;
 
-    message += `🗒️ *Order List:*\n`;
-    if (orderedItems.length === 0) {
-      message += `- No items\n`;
-    } else {
-      orderedItems.forEach((item, index) => {
-        message += `${index + 1}. ${item.name} x ${item.qty} = ₹${
-          item.price * item.qty
-        }\n`;
-      });
-    }
+  message += `Order List:\n`;
+  if (orderedItems.length === 0) {
+    message += `- No items\n`;
+  } else {
+    orderedItems.forEach((item, index) => {
+      message += `${index + 1}. ${item.name} x ${item.qty} = ₹${item.price * item.qty}\n`;
+    });
+  }
 
-    message += `\n💰 *Total Amount:* ₹${orderedTotal}\n\n`;
-    message += `📝 *Additional Comments:*\n${comments || "None"}`;
+  message += `\nTotal Amount: ₹${orderedTotal}\n\n`;
+  message += `Additional Comments:\n${comments || "None"}`;
 
-    return encodeURIComponent(message);
-  };
+  // Replace problematic characters (optional)
+  message = message.replace(/[*#]/g, ""); // remove * and # which may break URL in some cases
 
-  const ownerPhoneNumber = import.meta.env.VITE_OWNER_PHONE;
+  // Encode final message for URL
+  return encodeURIComponent(message);
+};
+
+
+  const ownerPhoneNumber = import.meta.env.VITE_OWNER_PHONE.replace(/\D/g, '');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-yellow-50 to-blue-50 flex flex-col">
@@ -208,14 +213,22 @@ const OrderSummaryPage = () => {
             </div>
 
             <div className="mt-6 flex flex-col items-center">
-              <a
+              {/* <a
                 href={`https://wa.me/${ownerPhoneNumber}?text=${buildWhatsappMessage()}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded shadow-lg transition text-center block w-full md:w-auto"
               >
                 Send Order via WhatsApp
-              </a>
+              </a> */}
+              <a
+  href={`https://wa.me/${ownerPhoneNumber}?text=${buildWhatsappMessage()}`}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded shadow-lg transition text-center block w-full md:w-auto"
+>
+  Send Order via WhatsApp
+</a>
             </div>
           </div>
         )}

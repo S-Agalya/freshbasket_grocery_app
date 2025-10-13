@@ -71,20 +71,23 @@ const OrderSummaryPage = () => {
   };
 
   // ✅ WhatsApp message uses orderedItems now
-  // ✅ Safe WhatsApp message builder
-const buildWhatsappMessage = () => {
-  // Start message
-  let message = `🛒 New Order\n\n`;
+ const buildWhatsappMessage = () => {
+  const name = customerName || "N/A";
+  const phone = customerPhone || "N/A";
+  const address = customerAddress || "N/A";
+  const commentsText = comments || "None";
+
+  let message = `🛒 *New Order*\n\n`;
 
   if (orderId) {
-    message += `Order ID: ORD_ID ${orderId}\n`;
+    message += `📦 *Order ID:* ORD_ID ${orderId}\n`;
   }
 
-  message += `Name: ${customerName}\n`;
-  message += `Phone: ${customerPhone}\n`;
-  message += `Address: ${customerAddress}\n\n`;
+  message += `👤 *Name:* ${name}\n`;
+  message += `📞 *Phone:* ${phone}\n`;
+  message += `🏠 *Address:* ${address}\n\n`;
 
-  message += `Order List:\n`;
+  message += `🗒️ *Order List:*\n`;
   if (orderedItems.length === 0) {
     message += `- No items\n`;
   } else {
@@ -93,15 +96,12 @@ const buildWhatsappMessage = () => {
     });
   }
 
-  message += `\nTotal Amount: ₹${orderedTotal}\n\n`;
-  message += `Additional Comments:\n${comments || "None"}`;
+  message += `\n💰 *Total Amount:* ₹${orderedTotal}\n\n`;
+  message += `📝 *Additional Comments:*\n${commentsText}`;
 
-  // Replace problematic characters (optional)
-  message = message.replace(/[*#]/g, ""); // remove * and # which may break URL in some cases
-
-  // Encode final message for URL
   return encodeURIComponent(message);
 };
+
 
 
   const ownerPhoneNumber = import.meta.env.VITE_OWNER_PHONE.replace(/\D/g, '');
@@ -213,23 +213,25 @@ const buildWhatsappMessage = () => {
             </div>
 
             <div className="mt-6 flex flex-col items-center">
-              {/* <a
-                href={`https://wa.me/${ownerPhoneNumber}?text=${buildWhatsappMessage()}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded shadow-lg transition text-center block w-full md:w-auto"
-              >
-                Send Order via WhatsApp
-              </a> */}
-              <a
-  href={`https://wa.me/${ownerPhoneNumber}?text=${buildWhatsappMessage()}`}
-  target="_blank"
-  rel="noopener noreferrer"
-  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded shadow-lg transition text-center block w-full md:w-auto"
->
-  Send Order via WhatsApp
-</a>
-            </div>
+  {ownerPhoneNumber ? (
+    <a
+      href={`https://wa.me/${ownerPhoneNumber}?text=${buildWhatsappMessage()}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded shadow-lg transition text-center block w-full md:w-auto"
+    >
+      Send Order via WhatsApp
+    </a>
+  ) : (
+    <button
+      className="bg-gray-500 text-white px-6 py-3 rounded shadow-lg w-full md:w-auto"
+      disabled
+    >
+      WhatsApp number not configured
+    </button>
+  )}
+</div>
+
           </div>
         )}
       </main>

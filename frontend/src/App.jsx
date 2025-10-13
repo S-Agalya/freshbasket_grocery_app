@@ -20,7 +20,7 @@ function App() {
             <Routes>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
-              <Route path="/welcome" element={<WelcomePage />} />
+              <Route path="/welcome" element={ <ProtectedRoute><WelcomePage /></ProtectedRoute>} />
               <Route
                 path="/profile"
                 element={

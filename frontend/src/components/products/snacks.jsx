@@ -75,7 +75,7 @@ export default function Snacks() {
           className="bg-white rounded-xl shadow-lg hover:shadow-xl transition overflow-hidden flex flex-col"
         >
           <img
-            src={`${API_URL}/${product.image}`}
+            src={product.image}
             alt={product.name}
             className="h-48 w-full object-contain p-2 bg-gray-50"
           />

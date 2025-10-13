@@ -34,7 +34,7 @@ export default function Groceries() {
           className="bg-white rounded-xl shadow-lg hover:shadow-xl transition overflow-hidden flex flex-col"
         >
           <img
-            src={`${API_URL}/${product.image}`} // ✅ backend image support
+            src={product.image} // ✅ backend image support
             alt={product.name}
             className="h-48 sm:h-56 md:h-48 lg:h-52 w-full object-contain p-2 bg-gray-50"
           />

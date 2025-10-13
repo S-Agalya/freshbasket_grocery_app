@@ -37,14 +37,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="orders"
-            element={
-              <ProtectedRoute>
-                <AdminOrderPage />
-              </ProtectedRoute>
-            }
-          />
+          
         </Route>
       </Routes>
     </Router>

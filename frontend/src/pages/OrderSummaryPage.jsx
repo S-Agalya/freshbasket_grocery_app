@@ -211,7 +211,7 @@ const OrderSummaryPage = () => {
             </div>
 
             {/* ✅ WhatsApp Button */}
-            {ownerPhoneNumber ? (
+            
               <div className="mt-6 flex flex-col items-center">
                 <a
                   href={`https://wa.me/${ownerPhoneNumber}?text=${buildWhatsappMessage()}`}
@@ -222,16 +222,9 @@ const OrderSummaryPage = () => {
                   Send Order via WhatsApp
                 </a>
               </div>
-            ) : (
-              <div className="mt-6 flex flex-col items-center">
-                <button
-                  className="bg-gray-500 text-white px-6 py-3 rounded shadow-lg w-full md:w-auto"
-                  disabled
-                >
-                  WhatsApp number not configured
-                </button>
-              </div>
-            )}
+         
+              
+            
           </div>
         )}
       </main>

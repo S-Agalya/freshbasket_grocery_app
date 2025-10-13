@@ -36,24 +36,18 @@
 // })
 
 
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
-
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  optimizeDeps: {
-    include: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime"],
-  },
-  build: {
-    commonjsOptions: {
-      include: [/node_modules/],
-    },
-    outDir: "dist",
-  },
+  plugins: [react()],
   resolve: {
     alias: {
-      "@": "/src",
-    },
+      'react/jsx-runtime': 'react/jsx-runtime.js',
+      'react/jsx-dev-runtime': 'react/jsx-dev-runtime.js',
+    }
+  },
+  build: {
+    outDir: 'dist',
+    rollupOptions: {
+      external: ['react/jsx-runtime', 'react/jsx-dev-runtime'],
+    }
   },
 });

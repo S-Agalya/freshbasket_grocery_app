@@ -39,7 +39,7 @@ export default function AllProducts() {
           <img
             src={product.image}
             alt={product.name}
-            className="h-48 sm:h-56 md:h-48 lg:h-52 w-full object-cover bg-gray-50"
+            className="w-full h-48 sm:h-56 md:h-48 lg:h-52 object-contain p-2 bg-gray-50"
           />
 
           <div className="p-4 flex flex-col flex-grow">

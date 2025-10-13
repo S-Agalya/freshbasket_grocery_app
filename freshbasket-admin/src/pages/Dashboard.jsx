@@ -37,7 +37,7 @@ function AdminDashboard() {
     { name: "Dashboard", icon: <FaTachometerAlt />, path: "/dashboard" },
     { name: "Products", icon: <FaBoxOpen />, path: "/dashboard/products" },
     { name: "Orders", icon: <FaShoppingCart />, path: "/dashboard/orders" },
-      { name: "Manage Orders", icon: <FaShoppingCart />, path: "/dashboard/manage-orders" },
+     
   ];
 
   return (

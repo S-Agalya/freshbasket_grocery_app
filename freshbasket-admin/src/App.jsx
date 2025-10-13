@@ -38,7 +38,7 @@ function App() {
             }
           />
           <Route
-            path="manage-orders"
+            path="orders"
             element={
               <ProtectedRoute>
                 <AdminOrderPage />

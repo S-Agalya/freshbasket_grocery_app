@@ -14,11 +14,24 @@ function App() {
         <Route path="/" element={<AdminLogin />} />
         <Route path="/register" element={<AdminRegister />} />
 
-        {/* Dashboard layout with nested routes */}
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>}>
-          <Route path="/dashboard/products" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />
-          {/* You can add more nested pages here, like orders, settings, etc. */}
-        </Route>
+        <Route
+  path="/dashboard"
+  element={
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
+  }
+>
+  <Route
+    path="products"
+    element={
+      <ProtectedRoute>
+        <AdminProducts />
+      </ProtectedRoute>
+    }
+  />
+</Route>
+
       </Routes>
     </Router>
   );

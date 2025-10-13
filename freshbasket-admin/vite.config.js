@@ -35,11 +35,27 @@
 //   },
 // })
 
+// import { defineConfig } from 'vite'
+// import react from '@vitejs/plugin-react'
+
+// export default defineConfig({
+//   plugins: [react()],
+//   base: "./",   // 👈 Add this
+//   build: { outDir: "dist" }
+// });
+
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: "./",   // 👈 Add this
-  build: { outDir: "dist" }
+  base: "./",
+  resolve: {
+    alias: {
+      "react/jsx-runtime": "react/jsx-runtime.js"
+    }
+  },
+  build: {
+    outDir: "dist"
+  }
 });

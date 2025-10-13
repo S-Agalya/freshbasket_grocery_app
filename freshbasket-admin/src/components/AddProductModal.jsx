@@ -71,7 +71,11 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
         );
       }
 
+      //onProductAdded(res.data);
+
       onProductAdded(res.data);
+if (!editProduct && onProductAdded) onProductAdded(res.data);
+
       onClose();
     } catch (err) {
       console.error(err);

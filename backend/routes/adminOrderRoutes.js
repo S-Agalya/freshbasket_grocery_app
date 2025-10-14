@@ -1,9 +1,9 @@
 import express from "express";
 import { getAllOrders, updateOrderStatus } from "../controllers/adminOrderController.js";
-import { verifyAdmin } from "../middleware/auth.js";
+
 
 const router = express.Router();
 
-router.get("/", verifyAdmin, getAllOrders);
+router.get("/",  getAllOrders);
 router.put("/:orderId/status", verifyAdmin, updateOrderStatus);
 export default router;

@@ -5,5 +5,5 @@ import { getAllOrders, updateOrderStatus } from "../controllers/adminOrderContro
 const router = express.Router();
 
 router.get("/",  getAllOrders);
-router.put("/:orderId/status", verifyAdmin, updateOrderStatus);
+router.put("/:orderId/status",  updateOrderStatus);
 export default router;

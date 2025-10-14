@@ -126,8 +126,6 @@
 // }
 
 // export default AdminDashboard;
-
-
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
@@ -165,7 +163,7 @@ function AdminDashboard() {
   ];
 
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-gray-100">
       {/* Mobile Hamburger */}
       <button
         className="md:hidden fixed top-4 left-4 z-50 bg-green-700 text-white p-2 rounded-md shadow-md"
@@ -176,14 +174,14 @@ function AdminDashboard() {
 
       {/* Sidebar (Fixed & Non-scrollable) */}
       <aside
-        className={`fixed md:static top-0 left-0 h-screen w-64 bg-green-700 text-white flex flex-col justify-between transform transition-transform duration-300 z-50 shadow-lg overflow-hidden
+        className={`fixed md:static top-0 left-0 h-full w-64 bg-green-700 text-white flex flex-col justify-between transform transition-transform duration-300 z-50 shadow-lg
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
-        <div className="flex-1 overflow-hidden">
+        <div className="flex flex-col flex-grow overflow-hidden">
           <h1 className="text-2xl font-bold text-center md:text-left p-6 border-b border-green-800">
             Admin Panel
           </h1>
-          <nav className="flex flex-col p-4 space-y-2 overflow-y-auto scrollbar-hide">
+          <nav className="flex flex-col p-4 space-y-2 overflow-y-auto md:overflow-visible">
             {menuItems.map((item) => (
               <button
                 key={item.path}
@@ -219,8 +217,8 @@ function AdminDashboard() {
         ></div>
       )}
 
-      {/* Main Content (Scrollable) */}
-      <main className="flex-1 p-6 md:ml-64 overflow-y-auto">
+      {/* Main Content (Scrollable only here) */}
+      <main className="flex-1 overflow-y-auto md:ml-64 p-6">
         {location.pathname === "/dashboard" && (
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Dashboard Overview</h2>
@@ -240,6 +238,7 @@ function AdminDashboard() {
             </div>
           </div>
         )}
+
         <Outlet context={{ fetchStats }} />
       </main>
     </div>

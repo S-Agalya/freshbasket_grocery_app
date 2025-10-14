@@ -51,15 +51,10 @@ function AdminDashboard() {
       </button>
 
       {/* Sidebar */}
-      {/* <aside
-        className={`fixed md:static top-0 left-0 h-screen w-64 bg-green-700 text-white flex flex-col justify-between transform transition-transform duration-300 z-50 shadow-lg
-        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
-      > */}
       <aside
-  className={`fixed top-0 left-0 h-screen w-64 bg-green-700 text-white flex flex-col justify-between transform transition-transform duration-300 z-50 shadow-lg
-  ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
->
-
+        className={`fixed  top-0 left-0 h-screen w-64 bg-green-700 text-white flex flex-col justify-between transform transition-transform duration-300 z-50 shadow-lg
+        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
+      >
         <div>
           <h1 className="text-2xl font-bold text-center md:text-left p-6 border-b border-green-800">
             Admin Panel

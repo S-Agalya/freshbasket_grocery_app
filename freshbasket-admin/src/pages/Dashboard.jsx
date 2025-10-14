@@ -532,76 +532,69 @@
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import {
-  FaTachometerAlt,
-  FaBoxOpen,
-  FaShoppingCart,
-  FaSignOutAlt,
-} from "react-icons/fa";
+import { FaTachometerAlt, FaBoxOpen, FaShoppingCart, FaSignOutAlt } from "react-icons/fa";
 
 function AdminDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [stats, setStats] = useState({
-    totalOrders: 0,
-    pendingOrders: 0,
-    completedOrders: 0,
-    todayOrders: 0,
-    todayPendingOrders: 0,
     products: 0,
+    todayOrders: 0,
+    pending: 0,
+    completed: 0,
     outOfStock: 0,
   });
-
   const navigate = useNavigate();
   const location = useLocation();
   const API_URL = import.meta.env.VITE_API_URL;
 
-  // ✅ Logout
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
     navigate("/");
   };
 
-  // ✅ Fetch all stats including orders & products
-  const fetchStats = async () => {
+  // ✅ Fetch today's order summary (total, pending, completed)
+  const fetchOrderSummary = async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/admin/orders/stats`, {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-        },
+      const res = await axios.get(`${API_URL}/api/admin/orders?today=true`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
       });
-      setStats(res.data);
+
+      const todayOrders = res.data.length;
+      const pending = res.data.filter((o) => o.status === "Pending").length;
+      const completed = res.data.filter((o) => o.status === "Completed").length;
+
+      setStats((prev) => ({
+        ...prev,
+        todayOrders,
+        pending,
+        completed,
+      }));
     } catch (err) {
-      console.error("Failed to fetch dashboard stats:", err);
+      console.error("Failed to fetch order summary:", err);
     }
   };
 
-  // ✅ Fetch product stats (optional)
+  // ✅ Fetch product + out-of-stock stats
   const fetchProductStats = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/admin/stats`);
-      setStats((prev) => ({
-        ...prev,
-        products: res.data.products,
-        outOfStock: res.data.outOfStock,
-      }));
+      setStats((prev) => ({ ...prev, products: res.data.products, outOfStock: res.data.outOfStock }));
     } catch (err) {
       console.error("Failed to fetch product stats:", err);
     }
   };
 
-  // ✅ Fetch when dashboard loads
   useEffect(() => {
     if (location.pathname === "/dashboard") {
-      fetchStats();
       fetchProductStats();
+      fetchOrderSummary();
     }
   }, [location.pathname]);
 
-  // ✅ Optional: Refresh stats every 30s to stay live
+  // ✅ Refresh every 30 seconds to stay live
   useEffect(() => {
     const interval = setInterval(() => {
-      if (location.pathname === "/dashboard") fetchStats();
+      if (location.pathname === "/dashboard") fetchOrderSummary();
     }, 30000);
     return () => clearInterval(interval);
   }, [location.pathname]);
@@ -673,71 +666,40 @@ function AdminDashboard() {
       <main className="flex-1 p-6 md:ml-64 transition-all duration-300">
         {location.pathname === "/dashboard" && (
           <div className="w-full max-w-5xl mx-auto">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">
-              Dashboard Overview
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Dashboard Overview</h2>
 
             {/* Dashboard cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="bg-white p-6 rounded shadow text-center">
-                <h3 className="text-lg font-semibold text-gray-700">
-                  Total Orders
-                </h3>
-                <p className="text-3xl font-bold text-green-600">
-                  {stats.totalOrders}
-                </p>
+                <h3 className="text-lg font-semibold text-gray-700">Total Products</h3>
+                <p className="text-3xl font-bold text-green-600">{stats.products}</p>
               </div>
 
               <div className="bg-white p-6 rounded shadow text-center">
-                <h3 className="text-lg font-semibold text-gray-700">
-                  Pending Orders
-                </h3>
-                <p className="text-3xl font-bold text-yellow-600">
-                  {stats.pendingOrders}
-                </p>
+                <h3 className="text-lg font-semibold text-gray-700">Today Orders</h3>
+                <p className="text-3xl font-bold text-blue-600">{stats.todayOrders}</p>
               </div>
 
               <div className="bg-white p-6 rounded shadow text-center">
-                <h3 className="text-lg font-semibold text-gray-700">
-                  Completed Orders
-                </h3>
-                <p className="text-3xl font-bold text-green-600">
-                  {stats.completedOrders}
-                </p>
+                <h3 className="text-lg font-semibold text-gray-700">Pending Orders</h3>
+                <p className="text-3xl font-bold text-yellow-500">{stats.pending}</p>
               </div>
 
               <div className="bg-white p-6 rounded shadow text-center">
-                <h3 className="text-lg font-semibold text-gray-700">
-                  Today’s Orders
-                </h3>
-                <p className="text-3xl font-bold text-blue-600">
-                  {stats.todayOrders}
-                </p>
+                <h3 className="text-lg font-semibold text-gray-700">Completed Orders</h3>
+                <p className="text-3xl font-bold text-green-600">{stats.completed}</p>
               </div>
+            </div>
 
-              <div className="bg-white p-6 rounded shadow text-center">
-                <h3 className="text-lg font-semibold text-gray-700">
-                  Today’s Pending Orders
-                </h3>
-                <p className="text-3xl font-bold text-red-500">
-                  {stats.todayPendingOrders}
-                </p>
-              </div>
-
-              <div className="bg-white p-6 rounded shadow text-center">
-                <h3 className="text-lg font-semibold text-gray-700">
-                  Out of Stock
-                </h3>
-                <p className="text-3xl font-bold text-red-600">
-                  {stats.outOfStock}
-                </p>
-              </div>
+            <div className="mt-8 bg-white p-6 rounded shadow text-center">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4">Out of Stock</h3>
+              <p className="text-3xl font-bold text-red-500">{stats.outOfStock}</p>
             </div>
           </div>
         )}
 
         {/* Nested pages */}
-        <Outlet context={{ fetchStats }} />
+        <Outlet context={{ fetchOrderSummary, fetchProductStats }} />
       </main>
     </div>
   );

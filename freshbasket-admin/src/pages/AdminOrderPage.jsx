@@ -45,6 +45,7 @@ function AdminOrderPage() {
   {/* Customer info */}
   <div className="flex-1">
     <p><span className="font-semibold">Order ID:</span> {order.id}</p>
+    <p><span className="font-semibold">Date:</span> {new Date(order.created_at).toLocaleString()}</p>
     <p><span className="font-semibold">Name:</span> {order.customer_name}</p>
     <p><span className="font-semibold">Phone:</span> {order.phone}</p>
     <p><span className="font-semibold">Address:</span> {order.address}</p>

@@ -60,7 +60,8 @@ const app = express();
 app.use(cors({
   origin: [
     "https://freshbasket-grocery-app-admin.onrender.com",
-    "http://localhost:5173"
+    "http://localhost:5173",
+    "https://greencartfrontend-grocery-app-2.onrender.com" 
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true

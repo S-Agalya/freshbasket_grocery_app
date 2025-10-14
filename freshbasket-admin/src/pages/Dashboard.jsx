@@ -101,7 +101,7 @@ function AdminDashboard() {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 p-6 md:ml-0">
+      <main className="flex-1 p-6 md:ml-64">
         {/* Dashboard stats only on main dashboard */}
         {location.pathname === "/dashboard" && (
           <div>

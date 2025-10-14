@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllOrders, updateOrderStatus } from "../controllers/adminOrders.js";
+import { getAllOrders, updateOrderStatus } from "../controllers/adminOrderController.js";
 import { verifyAdmin } from "../middleware/auth.js";
 
 const router = express.Router();

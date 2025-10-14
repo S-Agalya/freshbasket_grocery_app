@@ -4,7 +4,7 @@ import db from "../config/db.js";
 export const getAllOrders = async (req, res) => {
   try {
     // Fetch all orders
-    const ordersResult = await db.query(`SELECT * FROM orders ORDER BY created_at DESC`);
+    const ordersResult = await db.query(`SELECT id, customer_name, phone, address, comments, total_amount, status, created_at FROM orders ORDER BY created_at DESC`);
     const orders = ordersResult.rows;
 
     // For each order, fetch cart items

@@ -77,3 +77,33 @@ export const updateOrderStatus = async (req, res) => {
     res.status(500).json({ message: "Failed to update order", error: err.message });
   }
 };
+
+export const getOrderStats = async (req, res) => {
+  try {
+    const totalOrdersResult = await db.query(`SELECT COUNT(*) FROM orders`);
+    const pendingOrdersResult = await db.query(`SELECT COUNT(*) FROM orders WHERE status = 'Pending'`);
+    const completedOrdersResult = await db.query(`SELECT COUNT(*) FROM orders WHERE status = 'Completed'`);
+
+    const todayOrdersResult = await db.query(`
+      SELECT COUNT(*) 
+      FROM orders 
+      WHERE DATE(created_at) = CURRENT_DATE
+    `);
+
+    const todayPendingOrdersResult = await db.query(`
+      SELECT COUNT(*) 
+      FROM orders 
+      WHERE DATE(created_at) = CURRENT_DATE AND status = 'Pending'
+    `);
+
+    res.json({
+      totalOrders: parseInt(totalOrdersResult.rows[0].count),
+      pendingOrders: parseInt(pendingOrdersResult.rows[0].count),
+      completedOrders: parseInt(completedOrdersResult.rows[0].count),
+      todayOrders: parseInt(todayOrdersResult.rows[0].count),
+      todayPendingOrders: parseInt(todayPendingOrdersResult.rows[0].count),
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch order stats", error: err.message });
+  }
+};

@@ -101,10 +101,10 @@ function AdminDashboard() {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 p-6 md:ml-64">
+      <main className="flex-1 p-6 md:ml-64 flex justify-center items-start">
         {/* Dashboard stats only on main dashboard */}
         {location.pathname === "/dashboard" && (
-          <div>
+          <div className="w-full max-w-4xl mx-auto">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Dashboard Overview</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="bg-white p-6 rounded shadow text-center">

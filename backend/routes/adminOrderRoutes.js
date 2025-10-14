@@ -4,7 +4,6 @@ import { verifyAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.get("/orders", verifyAdmin, getAllOrders);
-router.put("/orders/:orderId/status", verifyAdmin, updateOrderStatus);
-
+router.get("/", verifyAdmin, getAllOrders);
+router.put("/:orderId/status", verifyAdmin, updateOrderStatus);
 export default router;

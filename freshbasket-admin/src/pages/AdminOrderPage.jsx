@@ -121,6 +121,8 @@ function AdminOrderPage() {
         { headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` } }
       );
       fetchOrders(); // Refresh orders
+      window.dispatchEvent(new Event("ordersUpdated"));
+
     } catch (err) {
       console.error("Failed to update status:", err);
     }

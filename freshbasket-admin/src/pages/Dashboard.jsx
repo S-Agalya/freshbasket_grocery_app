@@ -16,14 +16,26 @@ function AdminDashboard() {
   const API_URL = import.meta.env.VITE_API_URL;
 
   // Fetch product & stock stats
+  // const fetchStats = async () => {
+  //   try {
+  //     const res = await axios.get(`${API_URL}/api/admin/stats`);
+  //     setStats(res.data);
+  //   } catch (err) {
+  //     console.error("Failed to fetch stats:", err);
+  //   }
+  // };
   const fetchStats = async () => {
-    try {
-      const res = await axios.get(`${API_URL}/api/admin/stats`);
-      setStats(res.data);
-    } catch (err) {
-      console.error("Failed to fetch stats:", err);
-    }
-  };
+  try {
+    const res = await axios.get(`${API_URL}/api/admin/stats`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
+    });
+    console.log("Stats fetched:", res.data); // <-- check this
+    setStats(res.data);
+  } catch (err) {
+    console.error("Failed to fetch stats:", err);
+  }
+};
+
 
   // Fetch today's order summary
   const fetchOrderSummary = async () => {

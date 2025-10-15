@@ -31,7 +31,7 @@ export const getProductStockStats = async (req, res) => {
     const totalProducts = parseInt(totalRes.rows[0].count);
 
     // Out of stock products
-    const outOfStockRes = await db.query("SELECT COUNT(*) FROM products WHERE stocks = 0");
+    const outOfStockRes = await db.query("SELECT COUNT(*) FROM products WHERE stock = 0");
     const outOfStock = parseInt(outOfStockRes.rows[0].count);
 
     const inStock = totalProducts - outOfStock;

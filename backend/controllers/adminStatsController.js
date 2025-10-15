@@ -26,36 +26,38 @@ export const getAdminStats = async (req, res) => {
 
 
 
+
+
 export const getProductStockStats = async (req, res) => {
   try {
-    console.log("📊 Fetching product stock stats...");
+    console.log("📊 [stats] Fetching product stock stats...");
 
-    // Fetch total product count
+    // total products
     const totalRes = await db.query("SELECT COUNT(*) FROM products");
-    const totalProducts = parseInt(totalRes.rows[0].count);
+    const totalProducts = parseInt(totalRes.rows[0].count, 10);
 
-    // Fetch out-of-stock count (stock = 0)
-    const outOfStockRes = await db.query("SELECT COUNT(*) FROM products WHERE stock = 0");
-    const outOfStock = parseInt(outOfStockRes.rows[0].count);
+    // out of stock (stock = 0)
+    const outRes = await db.query("SELECT COUNT(*) FROM products WHERE stock = 0");
+    const outOfStock = parseInt(outRes.rows[0].count, 10);
 
-    // Fetch in-stock count (stock > 0)
-    const inStockRes = await db.query("SELECT COUNT(*) FROM products WHERE stock > 0");
-    const inStock = parseInt(inStockRes.rows[0].count);
+    // in stock (stock > 0)
+    const inRes = await db.query("SELECT COUNT(*) FROM products WHERE stock > 0");
+    const inStock = parseInt(inRes.rows[0].count, 10);
 
-    // Log everything for debugging
-    console.log("========== 🧾 STOCK STATS ==========");
-    console.log("Total Products :", totalProducts);
-    console.log("In Stock       :", inStock);
-    console.log("Out of Stock   :", outOfStock);
-    console.log("====================================");
+    // debug: show a few rows so we can visually verify
+    const sample = await db.query("SELECT id, name, stock FROM products ORDER BY id LIMIT 20");
 
-    res.json({
-      products: totalProducts,
-      inStock,
-      outOfStock,
-    });
+    console.log("========== STOCK STATS ==========");
+    console.log("Total products :", totalProducts);
+    console.log("In stock       :", inStock);
+    console.log("Out of stock   :", outOfStock);
+    console.log("Sample rows:");
+    console.table(sample.rows); // nice table in node console
+    console.log("=================================");
+
+    return res.json({ products: totalProducts, inStock, outOfStock });
   } catch (err) {
-    console.error("❌ Error fetching product stats:", err.message);
-    res.status(500).json({ message: "Server error", error: err.message });
+    console.error("❌ Error in getProductStockStats:", err);
+    return res.status(500).json({ message: "Server error", error: err.message });
   }
 };

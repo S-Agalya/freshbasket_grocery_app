@@ -248,7 +248,7 @@ function AdminProducts({ onProductChange }) {
         {/* 🧭 Filters */}
         <div className="flex flex-wrap items-center gap-3">
           {/* Category Filter */}
-          <select
+        Select Category <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
             className="border border-gray-300 rounded px-3 py-2"
@@ -261,7 +261,7 @@ function AdminProducts({ onProductChange }) {
           </select>
 
           {/* Stock Filter */}
-          <select
+          Stocks:<select
             value={stockFilter}
             onChange={(e) => setStockFilter(e.target.value)}
             className="border border-gray-300 rounded px-3 py-2"

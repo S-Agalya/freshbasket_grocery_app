@@ -49,7 +49,7 @@ import path from "path";
 import adminProductRoutes from "./routes/adminProductRoutes.js";
 import { fileURLToPath } from "url";
 import adminOrderRoutes from "./routes/adminOrderRoutes.js"
-
+import statsRoutes from "./routes/statsRoutes.js"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -77,6 +77,7 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/admin/products", adminProductRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
+app.use("/api/admin/stats",statsRoutes)
 app.get("/", (req, res) => {
   res.send("FreshBasket backend is running 🚀");
 });

@@ -27,10 +27,10 @@ function AdminDashboard() {
   const fetchStats = async () => {
   try {
     const res = await axios.get(`${API_URL}/api/admin/stats`);
-    console.log("Fetched stats from API:", res.data); // ✅ log here
+    console.log("✅ Stats received from API:", res.data);
     setStats(res.data);
   } catch (err) {
-    console.error("Failed to fetch stats:", err);
+    console.error("❌ Failed to fetch stats:", err);
   }
 };
 

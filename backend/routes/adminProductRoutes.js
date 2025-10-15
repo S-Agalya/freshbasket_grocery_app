@@ -13,7 +13,8 @@ const router = express.Router();
 router.post("/add", upload.single("image"), addAdminProduct);
 
 // Update product (image optional)
-router.put("/update/:id", upload.single("image"), updateAdminProduct);
+router.put("/:id", upload.single("image"), updateAdminProduct);
+
 
 // Get all products
 router.get("/", getAdminProducts);

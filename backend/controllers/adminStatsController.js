@@ -24,11 +24,13 @@ export const getAdminStats = async (req, res) => {
 };
 export const getProductStockStats = async (req, res) => {
   try {
+    // Total products
     const totalRes = await db.query("SELECT COUNT(*) FROM products");
     const totalProducts = parseInt(totalRes.rows[0].count);
 
+    // Out of stock products (using the correct column name: stocks)
     const outOfStockRes = await db.query(
-      "SELECT COUNT(*) FROM products WHERE quantity = 0"
+      "SELECT COUNT(*) FROM products WHERE stocks = 0"
     );
     const outOfStock = parseInt(outOfStockRes.rows[0].count);
 

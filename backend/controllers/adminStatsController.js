@@ -22,7 +22,7 @@ export const getAdminStats = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch stats", error: err.message });
   }
 };
-import db from "../config/db.js";
+
 
 export const getProductStockStats = async (req, res) => {
   try {

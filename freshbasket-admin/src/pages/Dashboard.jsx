@@ -230,8 +230,7 @@ import { FaTachometerAlt, FaBoxOpen, FaShoppingCart, FaSignOutAlt } from "react-
 function AdminDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [stats, setStats] = useState({ products: 0, outOfStock: 0 });
-  const [showOrdersSummary, setShowOrdersSummary] = useState(false);
-  const [showStockSummary, setShowStockSummary] = useState(false); // new state
+  const [activeSummary, setActiveSummary] = useState(null); // "orders" or "stock" or null
   const [orderSummary, setOrderSummary] = useState({ total: 0, pending: 0, completed: 0 });
   const [totalOrders, setTotalOrders] = useState(0);
   const navigate = useNavigate();
@@ -379,10 +378,9 @@ function AdminDashboard() {
 
               <div
                 className="bg-white p-6 rounded shadow text-center cursor-pointer hover:bg-green-50 transition-all"
-                onClick={() => {
-                  setShowOrdersSummary(!showOrdersSummary);
-                  if (!showOrdersSummary) fetchOrderSummary();
-                }}
+                onClick={() =>
+                  setActiveSummary(activeSummary === "orders" ? null : "orders")
+                }
               >
                 <h3 className="text-lg font-semibold text-gray-700">Today Orders</h3>
                 <p className="text-3xl font-bold text-green-600">{orderSummary.pending}</p>
@@ -391,7 +389,9 @@ function AdminDashboard() {
 
               <div
                 className="bg-white p-6 rounded shadow text-center cursor-pointer hover:bg-green-50 transition-all"
-                onClick={() => setShowStockSummary(!showStockSummary)}
+                onClick={() =>
+                  setActiveSummary(activeSummary === "stock" ? null : "stock")
+                }
               >
                 <h3 className="text-lg font-semibold text-gray-700">Out of Stock</h3>
                 <p className="text-3xl font-bold text-red-500">{stats.outOfStock}</p>
@@ -404,8 +404,8 @@ function AdminDashboard() {
               </div>
             </div>
 
-            {/* Expandable Today Order Details */}
-            {showOrdersSummary && (
+            {/* Single expandable summary box */}
+            {activeSummary === "orders" && (
               <div className="mt-8 bg-white p-6 rounded shadow-lg text-center">
                 <h3 className="text-xl font-bold text-gray-700 mb-4">
                   Today’s Order Summary
@@ -421,7 +421,6 @@ function AdminDashboard() {
                     Completed: {orderSummary.completed}
                   </div>
                 </div>
-
                 <button
                   onClick={() => navigate("/dashboard/orders")}
                   className="mt-6 bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-all"
@@ -431,21 +430,17 @@ function AdminDashboard() {
               </div>
             )}
 
-            {/* Expandable Out of Stock Details */}
-            {showStockSummary && (
+            {activeSummary === "stock" && (
               <div className="mt-8 bg-white p-6 rounded shadow-lg text-center">
-                <h3 className="text-xl font-bold text-gray-700 mb-4">
-                  Stock Summary
-                </h3>
+                <h3 className="text-xl font-bold text-gray-700 mb-4">Stock Summary</h3>
                 <div className="flex flex-col sm:flex-row justify-center gap-6">
                   <div className="bg-blue-100 text-blue-800 font-semibold py-4 px-8 rounded-lg shadow">
-                    Total Products: {stats.products}
+                    In Stock: {stats.products - stats.outOfStock}
                   </div>
                   <div className="bg-red-100 text-red-800 font-semibold py-4 px-8 rounded-lg shadow">
                     Out of Stock: {stats.outOfStock}
                   </div>
                 </div>
-
                 <button
                   onClick={() => navigate("/dashboard/products")}
                   className="mt-6 bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-all"

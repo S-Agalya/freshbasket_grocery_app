@@ -5,17 +5,17 @@ export const getAdminStats = async (req, res) => {
     console.log("Fetching admin stats...");
 
     const totalProducts = await db.query("SELECT COUNT(*) FROM products");
-    const outOfStock = await db.query("SELECT COUNT(*) FROM products WHERE quantity = 0");
+    //const outOfStock = await db.query("SELECT COUNT(*) FROM products WHERE quantity = 0");
 
     console.log("Stats fetched successfully:", {
       totalProducts: totalProducts.rows[0].count,
-      outOfStock: outOfStock.rows[0].count,
+      //outOfStock: outOfStock.rows[0].count,
     });
 
     res.json({
       products: parseInt(totalProducts.rows[0].count) || 0,
-      orders: 0,
-      outOfStock: parseInt(outOfStock.rows[0].count) || 0,
+      // orders: 0,
+      // outOfStock: parseInt(outOfStock.rows[0].count) || 0,
     });
   } catch (err) {
     console.error("❌ Error in /api/admin/stats:", err.message);

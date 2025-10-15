@@ -1,6 +1,4 @@
 
-
-
 // import { useState, useEffect } from "react";
 // import { Outlet, useNavigate, useLocation } from "react-router-dom";
 // import axios from "axios";
@@ -10,29 +8,13 @@
 //   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 //   const [stats, setStats] = useState({ products: 0, outOfStock: 0 });
 //   const [showOrdersSummary, setShowOrdersSummary] = useState(false);
-//   const [orderSummary, setOrderSummary] = useState({
-//     total: 0,
-//     pending: 0,
-//     completed: 0,
-//   });
+//   const [orderSummary, setOrderSummary] = useState({ total: 0, pending: 0, completed: 0 });
+//   const [totalOrders, setTotalOrders] = useState(0);
 //   const navigate = useNavigate();
 //   const location = useLocation();
 //   const API_URL = import.meta.env.VITE_API_URL;
-// useEffect(() => {
-//   // Listen for order updates from Orders page
-//   const updateListener = () => {
-//     fetchOrderSummary();
-//   };
-//   window.addEventListener("ordersUpdated", updateListener);
-//   return () => window.removeEventListener("ordersUpdated", updateListener);
-// }, []);
 
-//   const handleLogout = () => {
-//     localStorage.removeItem("adminToken");
-//     navigate("/");
-//   };
-
-//   // Fetch product and stock stats
+//   // Fetch product & stock stats
 //   const fetchStats = async () => {
 //     try {
 //       const res = await axios.get(`${API_URL}/api/admin/stats`);
@@ -63,21 +45,41 @@
 //     }
 //   };
 
-//   // Fetch stats + orders when on dashboard
+//   // Fetch total orders (all-time)
+//   const fetchTotalOrders = async () => {
+//     try {
+//       const res = await axios.get(`${API_URL}/api/admin/orders`, {
+//         headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
+//       });
+//       setTotalOrders(res.data.length);
+//     } catch (err) {
+//       console.error("Failed to fetch total orders:", err);
+//     }
+//   };
+
+//   // Trigger dashboard refresh when orders are updated
+//   useEffect(() => {
+//     const updateListener = () => {
+//       fetchOrderSummary();
+//       fetchTotalOrders();
+//     };
+//     window.addEventListener("ordersUpdated", updateListener);
+//     return () => window.removeEventListener("ordersUpdated", updateListener);
+//   }, []);
+
+//   // Fetch stats + orders on dashboard load
 //   useEffect(() => {
 //     if (location.pathname === "/dashboard") {
 //       fetchStats();
 //       fetchOrderSummary();
+//       fetchTotalOrders();
 //     }
 //   }, [location.pathname]);
 
-//   // Auto-refresh every 30s
-//   useEffect(() => {
-//     const interval = setInterval(() => {
-//       if (location.pathname === "/dashboard") fetchOrderSummary();
-//     }, 30000);
-//     return () => clearInterval(interval);
-//   }, [location.pathname]);
+//   const handleLogout = () => {
+//     localStorage.removeItem("adminToken");
+//     navigate("/");
+//   };
 
 //   const menuItems = [
 //     { name: "Dashboard", icon: <FaTachometerAlt />, path: "/dashboard" },
@@ -150,8 +152,8 @@
 //               Dashboard Overview
 //             </h2>
 
-//             {/* Top 3 cards */}
-//             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+//             {/* Top 4 cards */}
+//             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 //               <div className="bg-white p-6 rounded shadow text-center">
 //                 <h3 className="text-lg font-semibold text-gray-700">Total Products</h3>
 //                 <p className="text-3xl font-bold text-green-600">{stats.products}</p>
@@ -165,13 +167,19 @@
 //                 }}
 //               >
 //                 <h3 className="text-lg font-semibold text-gray-700">Today Orders</h3>
-//                 <p className="text-3xl font-bold text-green-600">{orderSummary.total}</p>
+//                 {/* Show only pending orders */}
+//                 <p className="text-3xl font-bold text-green-600">{orderSummary.pending}</p>
 //                 <p className="text-sm text-gray-500 mt-1">(Click to view details)</p>
 //               </div>
 
 //               <div className="bg-white p-6 rounded shadow text-center">
 //                 <h3 className="text-lg font-semibold text-gray-700">Out of Stock</h3>
 //                 <p className="text-3xl font-bold text-red-500">{stats.outOfStock}</p>
+//               </div>
+
+//               <div className="bg-white p-6 rounded shadow text-center">
+//                 <h3 className="text-lg font-semibold text-gray-700">Total Orders</h3>
+//                 <p className="text-3xl font-bold text-green-600">{totalOrders}</p>
 //               </div>
 //             </div>
 
@@ -205,13 +213,14 @@
 //         )}
 
 //         {/* Nested routes */}
-//         <Outlet context={{ fetchStats, fetchOrderSummary }} />
+//         <Outlet context={{ fetchStats, fetchOrderSummary, fetchTotalOrders }} />
 //       </main>
 //     </div>
 //   );
 // }
 
 // export default AdminDashboard;
+
 
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
@@ -222,6 +231,7 @@ function AdminDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [stats, setStats] = useState({ products: 0, outOfStock: 0 });
   const [showOrdersSummary, setShowOrdersSummary] = useState(false);
+  const [showStockSummary, setShowStockSummary] = useState(false); // new state
   const [orderSummary, setOrderSummary] = useState({ total: 0, pending: 0, completed: 0 });
   const [totalOrders, setTotalOrders] = useState(0);
   const navigate = useNavigate();
@@ -244,16 +254,10 @@ function AdminDashboard() {
       const res = await axios.get(`${API_URL}/api/admin/orders?today=true`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
       });
-
       const all = res.data;
       const pending = all.filter((o) => o.status === "Pending").length;
       const completed = all.filter((o) => o.status === "Completed").length;
-
-      setOrderSummary({
-        total: all.length,
-        pending,
-        completed,
-      });
+      setOrderSummary({ total: all.length, pending, completed });
     } catch (err) {
       console.error("Failed to fetch order summary:", err);
     }
@@ -381,14 +385,17 @@ function AdminDashboard() {
                 }}
               >
                 <h3 className="text-lg font-semibold text-gray-700">Today Orders</h3>
-                {/* Show only pending orders */}
                 <p className="text-3xl font-bold text-green-600">{orderSummary.pending}</p>
                 <p className="text-sm text-gray-500 mt-1">(Click to view details)</p>
               </div>
 
-              <div className="bg-white p-6 rounded shadow text-center">
+              <div
+                className="bg-white p-6 rounded shadow text-center cursor-pointer hover:bg-green-50 transition-all"
+                onClick={() => setShowStockSummary(!showStockSummary)}
+              >
                 <h3 className="text-lg font-semibold text-gray-700">Out of Stock</h3>
                 <p className="text-3xl font-bold text-red-500">{stats.outOfStock}</p>
+                <p className="text-sm text-gray-500 mt-1">(Click to view details)</p>
               </div>
 
               <div className="bg-white p-6 rounded shadow text-center">
@@ -420,6 +427,30 @@ function AdminDashboard() {
                   className="mt-6 bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-all"
                 >
                   Go to Orders Page →
+                </button>
+              </div>
+            )}
+
+            {/* Expandable Out of Stock Details */}
+            {showStockSummary && (
+              <div className="mt-8 bg-white p-6 rounded shadow-lg text-center">
+                <h3 className="text-xl font-bold text-gray-700 mb-4">
+                  Stock Summary
+                </h3>
+                <div className="flex flex-col sm:flex-row justify-center gap-6">
+                  <div className="bg-blue-100 text-blue-800 font-semibold py-4 px-8 rounded-lg shadow">
+                    Total Products: {stats.products}
+                  </div>
+                  <div className="bg-red-100 text-red-800 font-semibold py-4 px-8 rounded-lg shadow">
+                    Out of Stock: {stats.outOfStock}
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => navigate("/dashboard/products")}
+                  className="mt-6 bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-all"
+                >
+                  Go to Products Page →
                 </button>
               </div>
             )}

@@ -24,28 +24,38 @@ export const getAdminStats = async (req, res) => {
 };
 
 
+import db from "../config/db.js";
+
 export const getProductStockStats = async (req, res) => {
   try {
-    // Total products
+    console.log("📊 Fetching product stock stats...");
+
+    // Fetch total product count
     const totalRes = await db.query("SELECT COUNT(*) FROM products");
     const totalProducts = parseInt(totalRes.rows[0].count);
 
-    // Out of stock products
+    // Fetch out-of-stock count (stock = 0)
     const outOfStockRes = await db.query("SELECT COUNT(*) FROM products WHERE stock = 0");
     const outOfStock = parseInt(outOfStockRes.rows[0].count);
 
-    const inStock = totalProducts - outOfStock;
+    // Fetch in-stock count (stock > 0)
+    const inStockRes = await db.query("SELECT COUNT(*) FROM products WHERE stock > 0");
+    const inStock = parseInt(inStockRes.rows[0].count);
 
-    // ✅ Log to check
-    console.log("==== Admin Stock Stats ====");
-    console.log("Total products:", totalProducts);
-    console.log("In Stock:", inStock);
-    console.log("Out of Stock:", outOfStock);
-    console.log("==========================");
+    // Log everything for debugging
+    console.log("========== 🧾 STOCK STATS ==========");
+    console.log("Total Products :", totalProducts);
+    console.log("In Stock       :", inStock);
+    console.log("Out of Stock   :", outOfStock);
+    console.log("====================================");
 
-    res.json({ products: totalProducts, outOfStock });
+    res.json({
+      products: totalProducts,
+      inStock,
+      outOfStock,
+    });
   } catch (err) {
-    console.error("Error fetching product stats:", err);
-    res.status(500).json({ message: "Server error" });
+    console.error("❌ Error fetching product stats:", err.message);
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };

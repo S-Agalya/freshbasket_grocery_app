@@ -77,7 +77,9 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/admin/products", adminProductRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
-app.use("/api/admin/stats",statsRoutes)
+
+app.use("/api/admin/stats", statsRoutes);
+
 app.get("/", (req, res) => {
   res.send("FreshBasket backend is running 🚀");
 });

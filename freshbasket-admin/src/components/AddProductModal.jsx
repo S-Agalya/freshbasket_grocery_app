@@ -6,8 +6,8 @@
 //   const [price, setPrice] = useState("");
 //   const [unitType, setUnitType] = useState("kg");
 //   const [category, setCategory] = useState("");
-//   const [image, setImage] = useState(null);
-//   const [preview, setPreview] = useState(null);
+  // const [image, setImage] = useState(null);
+  // const [preview, setPreview] = useState(null);
 
 //   // ✅ Predefined categories
 //   const categories = [
@@ -31,14 +31,14 @@
 //       setCategory(editProduct.category);
 //       setPreview(editProduct.image || null);
 //       setImage(null);
-//     } else {
-//       setName("");
-//       setPrice("");
-//       setUnitType("kg");
-//       setCategory("");
-//       setImage(null);
-//       setPreview(null);
-//     }
+    // } else {
+    //   setName("");
+    //   setPrice("");
+    //   setUnitType("kg");
+    //   setCategory("");
+    //   setImage(null);
+    //   setPreview(null);
+    // }
 //   }, [editProduct]);
 
 //   const handleSubmit = async (e) => {
@@ -53,7 +53,7 @@
 //     formData.append("price", price);
 //     formData.append("unitType", unitType);
 //     formData.append("category", category.trim());
-//     if (image) formData.append("image", image);
+    // if (image) formData.append("image", image);
 
 //     try {
 //       let res;
@@ -132,22 +132,22 @@
 //             className="w-full border px-3 py-2 rounded"
 //           />
 
-//           <input
-//             type="file"
-//             accept="image/*"
-//             onChange={(e) => {
-//               setImage(e.target.files[0]);
-//               setPreview(URL.createObjectURL(e.target.files[0]));
-//             }}
-//           />
+          // <input
+          //   type="file"
+          //   accept="image/*"
+          //   onChange={(e) => {
+          //     setImage(e.target.files[0]);
+          //     setPreview(URL.createObjectURL(e.target.files[0]));
+          //   }}
+          // />
 
-//           {preview && (
-//             <img
-//               src={preview}
-//               alt="Preview"
-//               className="w-24 h-24 object-cover rounded mt-2"
-//             />
-//           )}
+          // {preview && (
+          //   <img
+          //     src={preview}
+          //     alt="Preview"
+          //     className="w-24 h-24 object-cover rounded mt-2"
+          //   />
+          // )}
 
 //           <div className="flex justify-end space-x-2">
 //             <button
@@ -327,7 +327,9 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState(0); // <-- stock
   const [unit, setUnit] = useState("pcs"); // <-- unit
-  const [image, setImage] = useState("");
+   const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+
 
   const categories = [
     "Fruits",
@@ -350,7 +352,16 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
       setPrice(editProduct.price);
       setStock(editProduct.stock || 0);
       setUnit(editProduct.unit || "pcs");
-      setImage(editProduct.image || "");
+       setPreview(editProduct.image || null);
+       setImage(null);
+    }else {
+      setName("");
+      setPrice("");
+      setUnitType("kg");
+      setCategory("");
+      setStock("0")
+      setImage(null);
+      setPreview(null);
     }
   }, [editProduct]);
 
@@ -430,13 +441,23 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
             </select>
           </div>
 
-          <input
-            type="text"
-            placeholder="Image URL"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
-            className="border px-3 py-2 rounded"
+           <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              setImage(e.target.files[0]);
+              setPreview(URL.createObjectURL(e.target.files[0]));
+            }}
           />
+
+          {preview && (
+            <img
+              src={preview}
+              alt="Preview"
+              className="w-24 h-24 object-cover rounded mt-2"
+            />
+          )}
+
 
           <div className="flex justify-end space-x-2 mt-3">
             <button

@@ -22,17 +22,26 @@ export const getAdminStats = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch stats", error: err.message });
   }
 };
+import db from "../config/db.js";
+
 export const getProductStockStats = async (req, res) => {
   try {
     // Total products
     const totalRes = await db.query("SELECT COUNT(*) FROM products");
     const totalProducts = parseInt(totalRes.rows[0].count);
 
-    // Out of stock products (using the correct column name: stocks)
-    const outOfStockRes = await db.query(
-      "SELECT COUNT(*) FROM products WHERE stocks = 0"
-    );
+    // Out of stock products
+    const outOfStockRes = await db.query("SELECT COUNT(*) FROM products WHERE stocks = 0");
     const outOfStock = parseInt(outOfStockRes.rows[0].count);
+
+    const inStock = totalProducts - outOfStock;
+
+    // ✅ Log to check
+    console.log("==== Admin Stock Stats ====");
+    console.log("Total products:", totalProducts);
+    console.log("In Stock:", inStock);
+    console.log("Out of Stock:", outOfStock);
+    console.log("==========================");
 
     res.json({ products: totalProducts, outOfStock });
   } catch (err) {

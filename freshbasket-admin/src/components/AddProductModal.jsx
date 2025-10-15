@@ -324,6 +324,7 @@ import axios from "axios";
 function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("Fruits");
+  
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState(0); // <-- stock
   const [unit, setUnit] = useState("pcs"); // <-- unit
@@ -357,7 +358,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
     }else {
       setName("");
       setPrice("");
-      setUnitType("kg");
+      setUnit("kg");
       setCategory("");
       setStock("0")
       setImage(null);

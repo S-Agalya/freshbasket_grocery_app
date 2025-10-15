@@ -24,19 +24,17 @@ export const getAdminStats = async (req, res) => {
 };
 export const getProductStockStats = async (req, res) => {
   try {
-    // Total products
-    const totalRes = await pool.query("SELECT COUNT(*) FROM products");
+    const totalRes = await db.query("SELECT COUNT(*) FROM products");
     const totalProducts = parseInt(totalRes.rows[0].count);
 
-    // Out of stock products
-    const outOfStockRes = await pool.query(
-      "SELECT COUNT(*) FROM products WHERE stock = 0"
+    const outOfStockRes = await db.query(
+      "SELECT COUNT(*) FROM products WHERE quantity = 0"
     );
     const outOfStock = parseInt(outOfStockRes.rows[0].count);
 
     res.json({ products: totalProducts, outOfStock });
   } catch (err) {
-    console.error(err);
+    console.error("Error fetching product stats:", err);
     res.status(500).json({ message: "Server error" });
   }
 };

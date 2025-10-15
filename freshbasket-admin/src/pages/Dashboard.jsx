@@ -7,7 +7,7 @@ import { FaTachometerAlt, FaBoxOpen, FaShoppingCart, FaSignOutAlt } from "react-
 
 function AdminDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [stats, setStats] = useState({ products: 0, outOfStock: 0 });
+  const [stats, setStats] = useState({ products: 0, outOfStock: 0, });
   const [activeSummary, setActiveSummary] = useState(null); // "orders" or "stock" or null
   const [orderSummary, setOrderSummary] = useState({ total: 0, pending: 0, completed: 0 });
   const [totalOrders, setTotalOrders] = useState(0);

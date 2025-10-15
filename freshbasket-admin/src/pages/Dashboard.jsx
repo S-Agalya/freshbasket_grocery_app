@@ -1,4 +1,5 @@
 
+
 // import { useState, useEffect } from "react";
 // import { Outlet, useNavigate, useLocation } from "react-router-dom";
 // import axios from "axios";
@@ -7,7 +8,7 @@
 // function AdminDashboard() {
 //   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 //   const [stats, setStats] = useState({ products: 0, outOfStock: 0 });
-//   const [showOrdersSummary, setShowOrdersSummary] = useState(false);
+//   const [activeSummary, setActiveSummary] = useState(null); // "orders" or "stock" or null
 //   const [orderSummary, setOrderSummary] = useState({ total: 0, pending: 0, completed: 0 });
 //   const [totalOrders, setTotalOrders] = useState(0);
 //   const navigate = useNavigate();
@@ -30,16 +31,10 @@
 //       const res = await axios.get(`${API_URL}/api/admin/orders?today=true`, {
 //         headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
 //       });
-
 //       const all = res.data;
 //       const pending = all.filter((o) => o.status === "Pending").length;
 //       const completed = all.filter((o) => o.status === "Completed").length;
-
-//       setOrderSummary({
-//         total: all.length,
-//         pending,
-//         completed,
-//       });
+//       setOrderSummary({ total: all.length, pending, completed });
 //     } catch (err) {
 //       console.error("Failed to fetch order summary:", err);
 //     }
@@ -161,20 +156,24 @@
 
 //               <div
 //                 className="bg-white p-6 rounded shadow text-center cursor-pointer hover:bg-green-50 transition-all"
-//                 onClick={() => {
-//                   setShowOrdersSummary(!showOrdersSummary);
-//                   if (!showOrdersSummary) fetchOrderSummary();
-//                 }}
+//                 onClick={() =>
+//                   setActiveSummary(activeSummary === "orders" ? null : "orders")
+//                 }
 //               >
 //                 <h3 className="text-lg font-semibold text-gray-700">Today Orders</h3>
-//                 {/* Show only pending orders */}
 //                 <p className="text-3xl font-bold text-green-600">{orderSummary.pending}</p>
 //                 <p className="text-sm text-gray-500 mt-1">(Click to view details)</p>
 //               </div>
 
-//               <div className="bg-white p-6 rounded shadow text-center">
+//               <div
+//                 className="bg-white p-6 rounded shadow text-center cursor-pointer hover:bg-green-50 transition-all"
+//                 onClick={() =>
+//                   setActiveSummary(activeSummary === "stock" ? null : "stock")
+//                 }
+//               >
 //                 <h3 className="text-lg font-semibold text-gray-700">Out of Stock</h3>
 //                 <p className="text-3xl font-bold text-red-500">{stats.outOfStock}</p>
+//                 <p className="text-sm text-gray-500 mt-1">(Click to view details)</p>
 //               </div>
 
 //               <div className="bg-white p-6 rounded shadow text-center">
@@ -183,8 +182,8 @@
 //               </div>
 //             </div>
 
-//             {/* Expandable Today Order Details */}
-//             {showOrdersSummary && (
+//             {/* Single expandable summary box */}
+//             {activeSummary === "orders" && (
 //               <div className="mt-8 bg-white p-6 rounded shadow-lg text-center">
 //                 <h3 className="text-xl font-bold text-gray-700 mb-4">
 //                   Today’s Order Summary
@@ -200,12 +199,31 @@
 //                     Completed: {orderSummary.completed}
 //                   </div>
 //                 </div>
-
 //                 <button
 //                   onClick={() => navigate("/dashboard/orders")}
 //                   className="mt-6 bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-all"
 //                 >
 //                   Go to Orders Page →
+//                 </button>
+//               </div>
+//             )}
+
+//             {activeSummary === "stock" && (
+//               <div className="mt-8 bg-white p-6 rounded shadow-lg text-center">
+//                 <h3 className="text-xl font-bold text-gray-700 mb-4">Stock Summary</h3>
+//                 <div className="flex flex-col sm:flex-row justify-center gap-6">
+//                   <div className="bg-blue-100 text-blue-800 font-semibold py-4 px-8 rounded-lg shadow">
+//                     In Stock: {stats.products - stats.outOfStock}
+//                   </div>
+//                   <div className="bg-red-100 text-red-800 font-semibold py-4 px-8 rounded-lg shadow">
+//                     Out of Stock: {stats.outOfStock}
+//                   </div>
+//                 </div>
+//                 <button
+//                   onClick={() => navigate("/dashboard/products")}
+//                   className="mt-6 bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-all"
+//                 >
+//                   Go to Products Page →
 //                 </button>
 //               </div>
 //             )}
@@ -237,11 +255,13 @@ function AdminDashboard() {
   const location = useLocation();
   const API_URL = import.meta.env.VITE_API_URL;
 
-  // Fetch product & stock stats
+  // Fetch product & stock stats dynamically from backend
   const fetchStats = async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/admin/stats`);
-      setStats(res.data);
+      const res = await axios.get(`${API_URL}/api/admin/stats`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+      });
+      setStats(res.data); // { products: totalProducts, outOfStock: outOfStockCount }
     } catch (err) {
       console.error("Failed to fetch stats:", err);
     }
@@ -274,17 +294,18 @@ function AdminDashboard() {
     }
   };
 
-  // Trigger dashboard refresh when orders are updated
+  // Trigger dashboard refresh when orders or stocks are updated
   useEffect(() => {
     const updateListener = () => {
+      fetchStats();
       fetchOrderSummary();
       fetchTotalOrders();
     };
-    window.addEventListener("ordersUpdated", updateListener);
-    return () => window.removeEventListener("ordersUpdated", updateListener);
+    window.addEventListener("dashboardUpdated", updateListener);
+    return () => window.removeEventListener("dashboardUpdated", updateListener);
   }, []);
 
-  // Fetch stats + orders on dashboard load
+  // Initial fetch on dashboard load
   useEffect(() => {
     if (location.pathname === "/dashboard") {
       fetchStats();

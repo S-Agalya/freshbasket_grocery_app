@@ -26,15 +26,14 @@ function AdminDashboard() {
   // };
   const fetchStats = async () => {
   try {
-    const res = await axios.get(`${API_URL}/api/admin/stats`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
-    });
-    console.log("Stats fetched:", res.data); // <-- check this
+    const res = await axios.get(`${API_URL}/api/admin/stats`);
+    console.log("Fetched stats from API:", res.data); // ✅ log here
     setStats(res.data);
   } catch (err) {
     console.error("Failed to fetch stats:", err);
   }
 };
+
 
 
   // Fetch today's order summary

@@ -24,7 +24,7 @@ export const getAdminStats = async (req, res) => {
 };
 
 
-import db from "../config/db.js";
+
 
 export const getProductStockStats = async (req, res) => {
   try {

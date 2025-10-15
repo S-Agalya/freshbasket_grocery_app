@@ -8,5 +8,5 @@ router.post("/register", registerAdmin);
 
 // Login admin
 router.post("/login", loginAdmin);
-router.get("/stats", getAdminStats);
+// router.get("/stats", getAdminStats);
 export default router;

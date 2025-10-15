@@ -7,7 +7,7 @@ import { FaTachometerAlt, FaBoxOpen, FaShoppingCart, FaSignOutAlt } from "react-
 
 function AdminDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [stats, setStats] = useState({ products: 0, outOfStock: 0, });
+  const [stats, setStats] = useState({ products: 0,inStock: 0, outOfStock: 0,orders: 0  });
   const [activeSummary, setActiveSummary] = useState(null); // "orders" or "stock" or null
   const [orderSummary, setOrderSummary] = useState({ total: 0, pending: 0, completed: 0 });
   const [totalOrders, setTotalOrders] = useState(0);
@@ -24,11 +24,17 @@ function AdminDashboard() {
   //     console.error("Failed to fetch stats:", err);
   //   }
   // };
-  const fetchStats = async () => {
+ const fetchStats = async () => {
   try {
     const res = await axios.get(`${API_URL}/api/admin/stats`);
-    console.log("✅ Stats received from API:", res.data);
-    setStats(res.data);
+    console.log("✅ Stats received from API:", res.data); // check this in browser console
+    // Expect res.data === { products: N, inStock: M, outOfStock: K }
+    setStats({
+      products: res.data.products ?? 0,
+      inStock: res.data.inStock ?? (res.data.products - (res.data.outOfStock ?? 0)),
+      outOfStock: res.data.outOfStock ?? 0,
+      orders: res.data.orders ?? stats.orders ?? 0,
+    });
   } catch (err) {
     console.error("❌ Failed to fetch stats:", err);
   }
@@ -224,10 +230,10 @@ function AdminDashboard() {
                 <h3 className="text-xl font-bold text-gray-700 mb-4">Stock Summary</h3>
                 <div className="flex flex-col sm:flex-row justify-center gap-6">
                   <div className="bg-blue-100 text-blue-800 font-semibold py-4 px-8 rounded-lg shadow">
-                    In Stock: {stats.products - stats.outOfStock}
+                    In Stock: {stats.inStock}
                   </div>
                   <div className="bg-red-100 text-red-800 font-semibold py-4 px-8 rounded-lg shadow">
-                    Out of Stock: {stats.outOfStock}
+                    Out of Stock:  {stats.outOfStock}
                   </div>
                 </div>
                 <button

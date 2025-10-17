@@ -182,8 +182,8 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState(0);
   const [unit, setUnit] = useState("pcs");
-  const [image, setImage] = useState(null); // File object
-  const [preview, setPreview] = useState(null); // For preview
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
 
   const categories = [
     "Fruits",
@@ -206,14 +206,14 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
       setPrice(editProduct.price);
       setStock(editProduct.stock || 0);
       setUnit(editProduct.unit || "pcs");
-      setPreview(editProduct.image || null); // URL from Cloudinary
+      setPreview(editProduct.image || null);
       setImage(null);
     } else {
       setName("");
-      setCategory("Fruits");
       setPrice("");
+      setUnit("kg");
+      setCategory("Fruits");
       setStock(0);
-      setUnit("pcs");
       setImage(null);
       setPreview(null);
     }
@@ -222,20 +222,22 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let imageUrl = editProduct ? editProduct.image : "";
+    let imageUrl = preview; // keep existing image if editing and no new image selected
 
-    // Upload to Cloudinary if new image is selected
+    // Upload new image if selected
     if (image) {
       const formData = new FormData();
-      formData.append("file", image);
-      formData.append("upload_preset", "YOUR_UPLOAD_PRESET"); // replace with your preset
+      formData.append("image", image);
 
       try {
-        const cloudRes = await axios.post(
-          "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload",
-          formData
+        const res = await axios.post(
+          `${API_URL}/api/admin/products/upload`,
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
         );
-        imageUrl = cloudRes.data.secure_url;
+        imageUrl = res.data.url;
       } catch (err) {
         console.error("Cloudinary upload failed:", err);
         return; // stop submission if upload fails
@@ -253,9 +255,12 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
 
     try {
       if (editProduct) {
-        await axios.put(`${API_URL}/api/admin/products/${editProduct.id}`, productData);
+        await axios.put(
+          `${API_URL}/api/admin/products/add${editProduct.id}`,
+          productData
+        );
       } else {
-        await axios.post(`${API_URL}/api/admin/products`, productData);
+        await axios.post(`${API_URL}/api/admin/products/add`, productData);
       }
 
       onProductAdded();

@@ -52,3 +52,9 @@ CREATE TABLE cart_items (
     FOREIGN KEY (product_id) REFERENCES products(id)
     
 );
+
+ALTER TABLE products 
+ADD COLUMN stock INTEGER DEFAULT 0,
+ADD COLUMN unit VARCHAR(50),
+ADD COLUMN unit_type VARCHAR(50);
+ALTER TABLE orders ADD COLUMN status TEXT DEFAULT 'Pending';

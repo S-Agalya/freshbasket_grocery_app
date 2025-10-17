@@ -182,8 +182,8 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState(0);
   const [unit, setUnit] = useState("pcs");
-  const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState(null);
+  const [image, setImage] = useState(null); // File object
+  const [preview, setPreview] = useState(null); // For preview
 
   const categories = [
     "Fruits",
@@ -194,7 +194,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
     "Shampoos",
     "Handwash",
     "Snacks",
-    "Soaps"
+    "Soaps",
   ];
 
   const units = ["pcs", "kg", "g", "liter", "ml"];
@@ -206,14 +206,14 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
       setPrice(editProduct.price);
       setStock(editProduct.stock || 0);
       setUnit(editProduct.unit || "pcs");
-      setPreview(editProduct.image || null);
+      setPreview(editProduct.image || null); // URL from Cloudinary
       setImage(null);
     } else {
       setName("");
-      setPrice("");
-      setUnit("kg");
       setCategory("Fruits");
+      setPrice("");
       setStock(0);
+      setUnit("pcs");
       setImage(null);
       setPreview(null);
     }
@@ -222,26 +222,40 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Use FormData to handle images
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("price", price);
-    formData.append("unit", unit);
-    formData.append("category", category);
-    formData.append("stock", stock);
-    if (image) formData.append("image", image);
+    let imageUrl = editProduct ? editProduct.image : "";
+
+    // Upload to Cloudinary if new image is selected
+    if (image) {
+      const formData = new FormData();
+      formData.append("file", image);
+      formData.append("upload_preset", "YOUR_UPLOAD_PRESET"); // replace with your preset
+
+      try {
+        const cloudRes = await axios.post(
+          "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload",
+          formData
+        );
+        imageUrl = cloudRes.data.secure_url;
+      } catch (err) {
+        console.error("Cloudinary upload failed:", err);
+        return; // stop submission if upload fails
+      }
+    }
+
+    const productData = {
+      name,
+      category,
+      price,
+      stock,
+      unit,
+      image: imageUrl,
+    };
 
     try {
       if (editProduct) {
-        // Edit product route
-        await axios.put(`${API_URL}/api/admin/products/${editProduct.id}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await axios.put(`${API_URL}/api/admin/products/${editProduct.id}`, productData);
       } else {
-        // Add product route
-        await axios.post(`${API_URL}/api/admin/products/add`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await axios.post(`${API_URL}/api/admin/products`, productData);
       }
 
       onProductAdded();
@@ -254,7 +268,9 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
-        <h2 className="text-xl font-bold mb-4">{editProduct ? "Edit" : "Add"} Product</h2>
+        <h2 className="text-xl font-bold mb-4">
+          {editProduct ? "Edit" : "Add"} Product
+        </h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col space-y-3">
           <input
@@ -273,7 +289,9 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
             required
           >
             {categories.map((cat) => (
-              <option key={cat} value={cat}>{cat}</option>
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
             ))}
           </select>
 
@@ -302,7 +320,9 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
               className="border px-3 py-2 rounded"
             >
               {units.map((u) => (
-                <option key={u} value={u}>{u}</option>
+                <option key={u} value={u}>
+                  {u}
+                </option>
               ))}
             </select>
           </div>

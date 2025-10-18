@@ -366,40 +366,39 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
     }
   }, [editProduct]);
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+const formData = new FormData();
+formData.append("name", name);
+formData.append("price", price);
+formData.append("unitType", unit);
+formData.append("category", category);
+formData.append("stock", stock);
+if (image) formData.append("image", image);
+console.log("🧾 Sending product data:", formData);
 
-  const formData = new FormData();
-  formData.append("name", name);
-  formData.append("price", price);
-  formData.append("unitType", unit);
-  formData.append("category", category);
-  formData.append("stock", stock);
-  formData.append("unit", unit);
-  if (image) formData.append("image", image);
+    const productData = { name, category, price, stock, unit, image };
 
-  try {
-    if (editProduct) {
-      await axios.put(
-        `${API_URL}/api/admin/products/${editProduct.id}`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-    } else {
-      await axios.post(
-        `${API_URL}/api/admin/products/add`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+    try {
+      if (editProduct) {
+        await axios.put(`${API_URL}/api/admin/products/${editProduct.id}`, productData);
+        console.log("🧾 Sending product data:", formData);
+
+      } else {
+        await axios.post(`${API_URL}/api/admin/products`, productData);
+        console.log("🧾 Sending product data:", formData);
+
+      }
+console.log("🧾 Sending product data:", formData);
+
+      onProductAdded();
+      console.log("🧾 Sending product data:", formData);
+
+      onClose();
+    } catch (err) {
+      console.error("Error saving product:", err);
     }
-
-    onProductAdded();
-    onClose();
-  } catch (err) {
-    console.error("Error saving product:", err.response?.data || err);
-  }
-};
-
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">

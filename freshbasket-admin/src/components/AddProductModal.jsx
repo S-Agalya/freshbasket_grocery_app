@@ -382,7 +382,7 @@ if (image) formData.append("image", image);
       if (editProduct) {
         await axios.put(`${API_URL}/api/admin/products/${editProduct.id}`, productData);
       } else {
-        await axios.post(`${API_URL}/api/admin/products`, productData);
+        await axios.post(`${API_URL}/api/admin/products/add`, productData);
       }
 
       onProductAdded();

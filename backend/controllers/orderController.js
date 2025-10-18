@@ -5,28 +5,41 @@ import db from "../config/db.js";
 export const placeOrder = async (req, res) => {
   const { customerName, customerPhone, customerAddress, comments, cartItems } = req.body;
 
-  const totalAmount = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
-
   try {
+    // ✅ Check stock availability first
+    for (const item of cartItems) {
+      const productRes = await db.query("SELECT stock, name FROM products WHERE id = $1", [item.id]);
+      if (!productRes.rows[0]) return res.status(404).json({ message: `Product ${item.name} not found` });
+      if (productRes.rows[0].stock < item.qty) {
+        return res.status(400).json({ message: `Insufficient stock for ${productRes.rows[0].name}` });
+      }
+    }
+
+    // Calculate total
+    const totalAmount = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
+
     // Insert order
     const result = await db.query(
       `INSERT INTO orders (customer_name, phone, address, comments, total_amount)
        VALUES ($1, $2, $3, $4, $5) RETURNING id`,
       [customerName, customerPhone, customerAddress, comments, totalAmount]
     );
-
     const orderId = result.rows[0].id;
 
-    // Insert cart items
+    // Insert cart items & reduce stock
     for (const item of cartItems) {
       await db.query(
         `INSERT INTO cart_items (order_id, product_id, quantity, price)
          VALUES ($1, $2, $3, $4)`,
         [orderId, item.id, item.qty, item.price]
       );
+
+      await db.query(
+        `UPDATE products SET stock = stock - $1 WHERE id = $2`,
+        [item.qty, item.id]
+      );
     }
 
-    // ✅ return only orderId + message
     res.status(201).json({ orderId, message: "Order placed successfully" });
   } catch (err) {
     res.status(500).json({ message: "Failed to place order", error: err.message });

@@ -11,84 +11,6 @@ export const getAdminProducts = async (req, res) => {
   }
 };
 
-// ✅ Add new product
-// export const addAdminProduct = async (req, res) => {
-//   try {
-//     const { name, price, unitType, category } = req.body;
-
-//     let imageUrl = null;
-//     if (req.file) {
-//       const uploaded = await cloudinary.uploader.upload_stream(
-//         { folder: "products" },
-//         async (error, result) => {
-//           if (error) throw new Error("Cloudinary upload failed");
-//           imageUrl = result.secure_url;
-
-//           const dbRes = await db.query(
-//             `INSERT INTO products (name, price, unit_type, category, image)
-//              VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-//             [name, price, unitType, category, imageUrl]
-//           );
-
-//           return res.status(201).json(dbRes.rows[0]);
-//         }
-//       );
-
-//       // Pipe buffer data
-//       uploaded.end(req.file.buffer);
-//     } else {
-//       return res.status(400).json({ message: "Image is required" });
-//     }
-//   } catch (err) {
-//     console.error("❌ Error adding product:", err);
-//     res.status(500).json({ message: "Failed to add product", error: err.message });
-//   }
-// };'''
-
-// export const addAdminProduct = async (req, res) => {
-//   try {
-//     console.log("📦 Incoming Product:", req.body);
-//     console.log("📸 File received:", req.file ? req.file.originalname : "No file");
-
-//     const { name, price, unitType, category } = req.body;
-//     if (!req.file) {
-//       return res.status(400).json({ message: "Image is required" });
-//     }
-
-//     // Upload image to Cloudinary
-//     const uploaded = await new Promise((resolve, reject) => {
-//       const stream = cloudinary.uploader.upload_stream(
-//         { folder: "products" },
-//         (error, result) => {
-//           if (error) {
-//             console.error("❌ Cloudinary upload error:", error);
-//             reject(error);
-//           } else {
-//             console.log("✅ Cloudinary uploaded:", result.secure_url);
-//             resolve(result);
-//           }
-//         }
-//       );
-//       stream.end(req.file.buffer);
-//     });
-
-//     const imageUrl = uploaded.secure_url;
-
-//     // Insert into PostgreSQL
-//     console.log("🗄️ Inserting into DB...");
-//     const dbRes = await db.query(
-//       `INSERT INTO products (name, price, unit_type, category, image)
-//        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-//       [name, price, unitType, category, imageUrl]
-//     );
-
-//     console.log("✅ Product added:", dbRes.rows[0]);
-//     res.status(201).json(dbRes.rows[0]);
-//   } catch (err) {
-//     console.error("🔥 Backend Error in addAdminProduct:", err);
-//     res.status(500).json({ message: "Failed to add product", error: err.message });
-//   }
-// };
 
 export const addAdminProduct = async (req, res) => {
   try {
@@ -139,42 +61,6 @@ export const addAdminProduct = async (req, res) => {
   }
 };
 
-// ✅ Update product
-// export const updateAdminProduct = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const { name, price, unitType, category } = req.body;
-
-//     let imageUrl = null;
-
-//     if (req.file) {
-//       const uploaded = await new Promise((resolve, reject) => {
-//         const stream = cloudinary.uploader.upload_stream(
-//           { folder: "products" },
-//           (error, result) => {
-//             if (error) reject(error);
-//             else resolve(result);
-//           }
-//         );
-//         stream.end(req.file.buffer);
-//       });
-//       imageUrl = uploaded.secure_url;
-//     }
-
-//     const result = await db.query(
-//       `
-//       UPDATE products
-//       SET name=$1, price=$2, unit_type=$3, category=$4, image=COALESCE($5, image)
-//       WHERE id=$6 RETURNING *`,
-//       [name, price, unitType, category, imageUrl, id]
-//     );
-
-//     res.json(result.rows[0]);
-//   } catch (err) {
-//     console.error("❌ Error updating product:", err);
-//     res.status(500).json({ message: "Failed to update product", error: err.message });
-//   }
-// };
 
 
 export const updateAdminProduct = async (req, res) => {

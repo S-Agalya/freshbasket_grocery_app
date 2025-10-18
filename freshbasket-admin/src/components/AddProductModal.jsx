@@ -380,9 +380,17 @@ if (image) formData.append("image", image);
 
     try {
       if (editProduct) {
-        await axios.put(`${API_URL}/api/admin/products/${editProduct.id}`, productData);
+        //await axios.put(`${API_URL}/api/admin/products/${editProduct.id}`, productData);
+        await axios.put(`${API_URL}/api/admin/products/${editProduct.id}`, formData, {
+  headers: { "Content-Type": "multipart/form-data" },
+});
+
       } else {
-        await axios.post(`${API_URL}/api/admin/products`, productData);
+        //await axios.post(`${API_URL}/api/admin/products`, productData);
+        await axios.post(`${API_URL}/api/admin/products/add`, formData, {
+  headers: { "Content-Type": "multipart/form-data" },
+});
+
       }
 
       onProductAdded();

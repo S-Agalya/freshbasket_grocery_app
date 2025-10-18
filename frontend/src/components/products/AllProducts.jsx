@@ -71,7 +71,7 @@ export default function AllProducts() {
               className={`mt-auto py-2 rounded-lg shadow text-white font-semibold transition duration-300 ${
                 product.stock === 0
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-amber-600 hover:bg-amber-700"
+                  : "bg-green-600 hover:bg-green-700"
               }`}
             >
               Add to Cart

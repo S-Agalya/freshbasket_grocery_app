@@ -1,4 +1,3 @@
-
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { CartContext } from "../../context/CartContext";
@@ -35,19 +34,40 @@ export default function AllProducts() {
           key={product.id}
           className="bg-white rounded-xl shadow-lg hover:shadow-xl transition overflow-hidden flex flex-col"
         >
-          {/* ✅ Cloudinary image directly (no local uploads path) */}
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-48 sm:h-56 md:h-48 lg:h-52 object-contain p-2 bg-gray-50"
-          />
+          <div className="relative">
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full h-48 sm:h-56 md:h-48 lg:h-52 object-contain p-2 bg-gray-50"
+            />
+            {product.stock === 0 && (
+              <span className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 text-xs rounded">
+                Out of Stock
+              </span>
+            )}
+          </div>
 
           <div className="p-4 flex flex-col flex-grow">
             <h3 className="text-lg font-semibold mb-1">{product.name}</h3>
-            <p className="text-green-700 font-bold">₹ {product.price}</p>
+            <p className="text-green-700 font-bold mb-1">₹ {product.price}</p>
+            <p className="text-gray-600 mb-2">
+              Stock: {product.stock} {product.unit}
+            </p>
+
             <button
-              onClick={() => addToCart(product)}
-              className="mt-auto bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg shadow transition"
+              onClick={() => {
+                if (product.stock === 0) {
+                  alert("❌ This product is out of stock and cannot be added to the cart.");
+                  return;
+                }
+                addToCart(product);
+              }}
+              disabled={product.stock === 0}
+              className={`mt-auto py-2 rounded-lg shadow text-white font-semibold transition ${
+                product.stock === 0
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700"
+              }`}
             >
               Add to Cart
             </button>

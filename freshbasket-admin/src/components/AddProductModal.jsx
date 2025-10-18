@@ -368,10 +368,18 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+// const formData = new FormData();
+// formData.append("name", name);
+// formData.append("price", price);
+// formData.append("unitType", unit);
+// formData.append("category", category);
+// formData.append("stock", stock);
+// if (image) formData.append("image", image);
 const formData = new FormData();
 formData.append("name", name);
 formData.append("price", price);
-formData.append("unitType", unit);
+formData.append("unitType", unit); // backend expects unitType
+formData.append("unit", unit); // also include this
 formData.append("category", category);
 formData.append("stock", stock);
 if (image) formData.append("image", image);

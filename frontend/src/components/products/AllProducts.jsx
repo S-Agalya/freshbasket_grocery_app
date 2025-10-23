@@ -51,9 +51,14 @@ export default function AllProducts() {
 
           <div className="p-4 flex flex-col flex-grow">
             <h3 className="text-lg font-semibold text-gray-800 mb-1">{product.name}</h3>
-
             <p className="text-amber-700 font-bold mb-1">₹ {product.price}</p>
-<p className="text-green-700 font-bold mb-1">${product.stock} ${product.unit}</p>
+
+            {product.stock > 0 && (
+              <p className="text-sm text-green-600 mb-3">
+                {product.stock} {product.unit} available
+              </p>
+            )}
+
             <button
               onClick={() => {
                 if (product.stock === 0) {

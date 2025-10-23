@@ -62,7 +62,7 @@ export default function AllProducts() {
             >
               {product.stock > 0
                 ? `${product.stock} ${product.stock_unit}${
-                    product.stock > 1 ? "s" : ""
+                    product.stock > 1 ? " " : ""
                   } available`
                 : "Out of Stock"}
             </p>

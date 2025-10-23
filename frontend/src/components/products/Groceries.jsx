@@ -48,13 +48,19 @@ export default function Groceries() {
             <h3 className="text-lg font-semibold mb-1">
               {product.name} <span className="text-gray-500 text-sm font-normal">({product.unit})</span>
             </h3>
+
             <p className="text-green-700 font-bold mb-1">₹ {product.price}</p>
 
-            {product.stock > 0 && (
-              <p className="text-sm text-green-600 mb-3">
-                {product.stock} {product.unit} available
-              </p>
-            )}
+            {/* ✅ Availability/Stock info always displayed */}
+            <p
+              className={`text-sm mb-3 ${
+                product.stock > 0 ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {product.stock > 0
+                ? `${product.stock} ${product.unit} available`
+                : "Out of Stock"}
+            </p>
 
             <button
               onClick={() => {

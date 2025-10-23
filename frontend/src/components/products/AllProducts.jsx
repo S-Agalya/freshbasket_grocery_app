@@ -50,14 +50,17 @@ export default function AllProducts() {
           </div>
 
           <div className="p-4 flex flex-col flex-grow">
-            <h3 className="text-lg font-semibold text-gray-800 mb-1">{product.name}</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-1">
+              {product.name} <span className="text-gray-500 text-sm font-normal">({product.unit})</span>
+            </h3>
+
             <p className="text-amber-700 font-bold mb-1">₹ {product.price}</p>
 
-            {product.stock > 0 && (
-              <p className="text-sm text-green-600 mb-3">
-                {product.stock} {product.unit} available
-              </p>
-            )}
+            <p
+              className={`text-sm mb-3 ${product.stock > 0 ? "text-green-600" : "text-red-600"}`}
+            >
+              {product.stock > 0 ? `${product.stock} ${product.unit} available` : "Out of Stock"}
+            </p>
 
             <button
               onClick={() => {
@@ -69,9 +72,7 @@ export default function AllProducts() {
               }}
               disabled={product.stock === 0}
               className={`mt-auto py-2 rounded-lg shadow text-white font-semibold transition duration-300 ${
-                product.stock === 0
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-green-600 hover:bg-green-700"
+                product.stock === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
               }`}
             >
               Add to Cart

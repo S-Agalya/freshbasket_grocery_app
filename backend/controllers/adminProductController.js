@@ -1,6 +1,7 @@
 import db from "../config/db.js";
 import cloudinary from "../config/cloudinary.js";
 
+// ✅ Get all products
 export const getAdminProducts = async (req, res) => {
   try {
     const result = await db.query("SELECT * FROM products ORDER BY id DESC");
@@ -11,35 +12,22 @@ export const getAdminProducts = async (req, res) => {
   }
 };
 
-
+// ✅ Add product
 export const addAdminProduct = async (req, res) => {
   try {
-    console.log("📦 Incoming Product:", req.body);
-    console.log("📸 File received:", req.file ? req.file.originalname : "No file");
+    const { name, price, category, stock, stock_unit, unit_quantity, unit_type } = req.body;
 
-    const { name, price, unitType, category, stock, unit } = req.body;
-
-    if (!name || !price || !unitType || !category || stock == null || !unit) {
+    if (!name || !price || !category || !stock || !stock_unit || !unit_quantity || !unit_type) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    if (!req.file) {
-      return res.status(400).json({ message: "Image is required" });
-    }
+    if (!req.file) return res.status(400).json({ message: "Image is required" });
 
     // Upload image to Cloudinary
     const uploaded = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         { folder: "products" },
-        (error, result) => {
-          if (error) {
-            console.error("❌ Cloudinary upload error:", error);
-            reject(error);
-          } else {
-            console.log("✅ Cloudinary uploaded:", result.secure_url);
-            resolve(result);
-          }
-        }
+        (error, result) => (error ? reject(error) : resolve(result))
       );
       stream.end(req.file.buffer);
     });
@@ -48,12 +36,12 @@ export const addAdminProduct = async (req, res) => {
 
     // Insert into PostgreSQL
     const dbRes = await db.query(
-      `INSERT INTO products (name, price, unit_type, category, image, stock, unit)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [name, price, unitType, category, imageUrl, stock, unit]
+      `INSERT INTO products
+      (name, price, category, image, stock, stock_unit, unit_quantity, unit_type)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
+      [name, price, category, imageUrl, stock, stock_unit, unit_quantity, unit_type]
     );
 
-    console.log("✅ Product added:", dbRes.rows[0]);
     res.status(201).json(dbRes.rows[0]);
   } catch (err) {
     console.error("🔥 Backend Error in addAdminProduct:", err);
@@ -61,23 +49,18 @@ export const addAdminProduct = async (req, res) => {
   }
 };
 
-
-
+// ✅ Update product
 export const updateAdminProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, price, unitType, category, stock, unit } = req.body;
+    const { name, price, category, stock, stock_unit, unit_quantity, unit_type } = req.body;
 
     let imageUrl = null;
-
     if (req.file) {
       const uploaded = await new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           { folder: "products" },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
+          (error, result) => (error ? reject(error) : resolve(result))
         );
         stream.end(req.file.buffer);
       });
@@ -87,12 +70,13 @@ export const updateAdminProduct = async (req, res) => {
     const result = await db.query(
       `
       UPDATE products
-      SET name=$1, price=$2, unit_type=$3, category=$4, stock=$5, unit=$6,
-          image = COALESCE($7, image)
-      WHERE id=$8
+      SET name=$1, price=$2, category=$3,
+          stock=$4, stock_unit=$5, unit_quantity=$6, unit_type=$7,
+          image=COALESCE($8, image)
+      WHERE id=$9
       RETURNING *;
       `,
-      [name, price, unitType, category, stock, unit, imageUrl, id]
+      [name, price, category, stock, stock_unit, unit_quantity, unit_type, imageUrl, id]
     );
 
     if (result.rowCount === 0)

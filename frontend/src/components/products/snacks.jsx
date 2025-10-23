@@ -40,7 +40,7 @@ export default function Snacks() {
                 product.stock > 0 ? "bg-green-600 text-white" : "bg-red-600 text-white"
               }`}
             >
-              {product.stock > 0 ? "Available" : "Out of Stock"}
+               {product.stock > 0 ? `${product.stock} ${product.unit} Available` : "Out of Stock"}
             </span>
           </div>
 

@@ -10,7 +10,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   const [category, setCategory] = useState("Fruits");
   
   const [price, setPrice] = useState("");
-  const [stock, setStock] = useState(0); // <-- stock
+  const [stock, setStock] = useState(1); // <-- stock
   const [unit, setUnit] = useState("pcs"); // <-- unit
    const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -35,7 +35,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
       setName(editProduct.name);
       setCategory(editProduct.category);
       setPrice(editProduct.price);
-      setStock(editProduct.stock || 0);
+      setStock(editProduct.stock || 1);
       setUnit(editProduct.unit || "pcs");
        setPreview(editProduct.image || null);
        setImage(null);
@@ -44,7 +44,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
       setPrice("");
       setUnit("kg");
       setCategory("");
-      setStock("0")
+      setStock("1")
       setImage(null);
       setPreview(null);
     }

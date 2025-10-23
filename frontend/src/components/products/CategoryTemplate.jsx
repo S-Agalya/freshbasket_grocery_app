@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../../context/CartContext";
 import axios from "axios";
 
-export default function Groceries() {
+export default function CategoryTemplate({ category }) {
   const { addToCart } = useContext(CartContext);
   const [products, setProducts] = useState([]);
   const API_URL = import.meta.env.VITE_API_URL;
@@ -10,9 +10,9 @@ export default function Groceries() {
   const fetchProducts = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/products`);
-      setProducts(res.data.filter((p) => p.category?.trim() === "Grocery"));
+      setProducts(res.data.filter((p) => p.category?.trim() === category));
     } catch (err) {
-      console.error("❌ Failed to fetch products:", err);
+      console.error(`❌ Failed to fetch ${category} products:`, err);
     }
   };
 
@@ -52,7 +52,6 @@ export default function Groceries() {
 
             <p className="text-green-700 font-bold mb-1">₹ {product.price}</p>
 
-            {/* ✅ Stock info at the bottom */}
             <p
               className={`text-sm mb-3 ${
                 product.stock > 0 ? "text-green-600" : "text-red-600"

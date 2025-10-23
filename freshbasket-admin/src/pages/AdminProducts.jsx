@@ -151,8 +151,9 @@ function AdminProducts({ onProductChange }) {
                     </span>
                   ) : (
                     <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
-                      In Stock: {product.stock} {product.unit || ""}
-                    </span>
+  In Stock: {product.stock} {product.stock_unit || ""} ({product.unit_quantity} {product.unit_type} each)
+</span>
+
                   )}
                 </div>
 

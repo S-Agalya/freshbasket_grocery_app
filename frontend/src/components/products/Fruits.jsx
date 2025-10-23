@@ -49,7 +49,6 @@
 //   );
 // }
 
-
 import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../../context/CartContext";
 import axios from "axios";
@@ -62,7 +61,6 @@ export default function Fruits() {
   const fetchProducts = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/products`);
-      // Filter for Fruits category
       setFruitProducts(res.data.filter((p) => p.category?.trim() === "Fruits"));
     } catch (err) {
       console.error("Failed to fetch fruit products:", err);
@@ -71,7 +69,7 @@ export default function Fruits() {
 
   useEffect(() => {
     fetchProducts();
-    const interval = setInterval(fetchProducts, 5000); // Poll every 5s
+    const interval = setInterval(fetchProducts, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -88,11 +86,9 @@ export default function Fruits() {
             className="w-full h-48 sm:h-56 md:h-48 lg:h-52 object-contain p-2 bg-gray-50"
           />
           <div className="p-4 flex flex-col flex-grow">
-           <h3 className="text-lg font-semibold mb-1">
-  {product.name}{" "}
-  <span className="text-gray-500 text-sm font-normal">({product.unit})</span>
-</h3>
-
+            <h3 className="text-lg font-semibold mb-1">
+              {product.name} <span className="text-gray-500 text-sm font-normal">({product.unit})</span>
+            </h3>
             <p className="text-green-700 font-bold">₹ {product.price}</p>
             <button
               onClick={() => addToCart(product)}

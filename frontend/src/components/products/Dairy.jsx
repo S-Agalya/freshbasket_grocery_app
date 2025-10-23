@@ -1,8 +1,6 @@
-
-
 import { useContext, useEffect, useState } from "react";
-import axios from "axios";
 import { CartContext } from "../../context/CartContext";
+import axios from "axios";
 
 export default function Dairy() {
   const { addToCart } = useContext(CartContext);
@@ -12,7 +10,6 @@ export default function Dairy() {
   const fetchProducts = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/products`);
-      // ✅ Filter only dairy products
       setDairyProducts(res.data.filter((p) => p.category?.trim() === "Dairy"));
     } catch (err) {
       console.error("Failed to fetch dairy products:", err);
@@ -38,11 +35,9 @@ export default function Dairy() {
             className="w-full h-48 sm:h-56 md:h-48 lg:h-52 object-contain p-2 bg-gray-50"
           />
           <div className="p-4 flex flex-col flex-grow">
-           <h3 className="text-lg font-semibold mb-1">
-  {product.name}{" "}
-  <span className="text-gray-500 text-sm font-normal">({product.unit})</span>
-</h3>
-
+            <h3 className="text-lg font-semibold mb-1">
+              {product.name} <span className="text-gray-500 text-sm font-normal">({product.unit})</span>
+            </h3>
             <p className="text-green-700 font-bold">₹ {product.price}</p>
             <button
               onClick={() => addToCart(product)}

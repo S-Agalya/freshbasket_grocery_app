@@ -1,4 +1,3 @@
-
 import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../../context/CartContext";
 import axios from "axios";
@@ -8,7 +7,7 @@ export default function Vegetables() {
   const [vegetableProducts, setVegetableProducts] = useState([]);
   const API_URL = import.meta.env.VITE_API_URL;
 
-  // ✅ Function to fetch products from backend
+  // Fetch products from backend
   const fetchProducts = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/products`);
@@ -20,13 +19,9 @@ export default function Vegetables() {
   };
 
   useEffect(() => {
-    // Initial fetch
     fetchProducts();
-
-    // Polling: refetch every 5 seconds to get new products
-    const interval = setInterval(fetchProducts, 5000);
-
-    return () => clearInterval(interval); // Clean up interval on unmount
+    const interval = setInterval(fetchProducts, 5000); // Poll every 5 seconds
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -37,22 +32,26 @@ export default function Vegetables() {
           className="bg-white rounded-xl shadow-lg hover:shadow-xl transition overflow-hidden flex flex-col"
         >
           <img
-            src={product.image} // Direct Cloudinary URL
+            src={product.image}
             alt={product.name}
             className="w-full h-48 sm:h-56 md:h-48 lg:h-52 object-contain p-2 bg-gray-50"
           />
           <div className="p-4 flex flex-col flex-grow">
             <h3 className="text-lg font-semibold mb-1">
-  {product.name}{" "}
-  <span className="text-gray-500 text-sm font-normal">({product.unit})</span>
-</h3>
-
+              {product.name}{" "}
+              <span className="text-gray-500 text-sm font-normal">({product.unit})</span>
+            </h3>
             <p className="text-green-700 font-bold">₹ {product.price}</p>
             <button
               onClick={() => addToCart(product)}
-              className="mt-auto bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg shadow transition"
+              disabled={product.stock === 0} // Disable if out of stock
+              className={`mt-auto py-2 rounded-lg shadow transition text-white ${
+                product.stock === 0
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700"
+              }`}
             >
-              Add to Cart
+              {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
             </button>
           </div>
         </div>

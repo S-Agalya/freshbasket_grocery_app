@@ -1,19 +1,15 @@
-
-
 import { useContext, useEffect, useState } from "react";
-import axios from "axios";
 import { CartContext } from "../../context/CartContext";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import axios from "axios";
 
 export default function Groceries() {
   const { addToCart } = useContext(CartContext);
   const [groceryProducts, setGroceryProducts] = useState([]);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const fetchProducts = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/products`);
-      // Ensure category matches backend (e.g., 'groceries' or 'Grocery')
       setGroceryProducts(res.data.filter((p) => p.category?.trim() === "Grocery"));
     } catch (err) {
       console.error("Failed to fetch grocery products:", err);
@@ -34,12 +30,14 @@ export default function Groceries() {
           className="bg-white rounded-xl shadow-lg hover:shadow-xl transition overflow-hidden flex flex-col"
         >
           <img
-            src={product.image} // ✅ backend image support
+            src={product.image}
             alt={product.name}
             className="w-full h-48 sm:h-56 md:h-48 lg:h-52 object-contain p-2 bg-gray-50"
           />
           <div className="p-4 flex flex-col flex-grow">
-            <h3 className="text-lg font-semibold mb-1">{product.name}</h3>
+            <h3 className="text-lg font-semibold mb-1">
+              {product.name} <span className="text-gray-500 text-sm font-normal">({product.unit})</span>
+            </h3>
             <p className="text-green-700 font-bold">₹ {product.price}</p>
             <button
               onClick={() => addToCart(product)}

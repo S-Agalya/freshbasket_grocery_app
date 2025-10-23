@@ -191,11 +191,11 @@ import axios from "axios";
 
 function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   const [name, setName] = useState("");
-  const [category, setCategory] = useState("Fruits");
+  const [category, setCategory] = useState("Select Category");
   const [price, setPrice] = useState("");
-  const [stock, setStock] = useState(0);
-  const [unitQuantity, setUnitQuantity] = useState(1); // ✅ default 1
+  const [stock, setStock] = useState("");
   const [unit, setUnit] = useState("pcs");
+  const [unitQuantity, setUnitQuantity] = useState(""); // ✅ Default 1
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
 
@@ -208,28 +208,28 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
     "Shampoos",
     "Handwash",
     "Snacks",
-    "Soaps"
+    "Soaps",
   ];
 
-  const units = ["pcs", "kg", "g", "liter", "ml"];
+  const units = ["pcs", "kg", "g", "liter", "ml", "others"];
 
   useEffect(() => {
     if (editProduct) {
       setName(editProduct.name);
       setCategory(editProduct.category);
       setPrice(editProduct.price);
-      setStock(editProduct.stock || 0);
-      setUnitQuantity(editProduct.unit_quantity || 1); // ✅ if editing, use existing or 1
+      setStock(editProduct.stock );
       setUnit(editProduct.unit || "pcs");
+      setUnitQuantity(editProduct.unitQuantity ); // ✅ default to 1 if missing
       setPreview(editProduct.image || null);
       setImage(null);
     } else {
       setName("");
       setPrice("");
-      setCategory("Fruits");
-      setStock(0);
-      setUnitQuantity(1); // ✅ default 1 for new
-      setUnit("pcs");
+      setUnit("kg");
+      setCategory("");
+      setStock("");
+      setUnitQuantity(""); // ✅ default to 1
       setImage(null);
       setPreview(null);
     }
@@ -243,8 +243,8 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
     formData.append("price", price);
     formData.append("category", category);
     formData.append("stock", stock);
-    formData.append("unitQuantity", unitQuantity); // ✅ new field
     formData.append("unit", unit);
+    formData.append("unitQuantity", unitQuantity); // ✅ added field
     if (image) formData.append("image", image);
 
     console.log("🧾 Sending product data:", [...formData.entries()]);
@@ -279,7 +279,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
         </h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col space-y-3">
-          {/* Name */}
+          {/* Product name */}
           <input
             type="text"
             placeholder="Product Name"
@@ -313,42 +313,49 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
             className="border px-3 py-2 rounded"
           />
 
-          {/* Stock Quantity */}
-          <input
-            type="number"
-            placeholder="Stock Quantity"
-            min="0"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
-            required
-            className="border px-3 py-2 rounded"
-          />
+          {/* ✅ Stock + Unit + Quantity */}
+          <div className="flex flex-col space-y-2">
+            <div className="flex space-x-2">
+              <input
+                type="number"
+                placeholder="Stock Quantity"
+                min="0"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                required
+                className="border px-3 py-2 rounded flex-1"
+              />
+              <select
+                value={unit}
+                onChange={(e) => setUnit(e.target.value)}
+                className="border px-3 py-2 rounded"
+              >
+                {units.map((u) => (
+                  <option key={u} value={u}>
+                    {u}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          {/* Unit Quantity + Unit */}
-          <div className="flex space-x-2">
+            {/* ✅ Unit Quantity (default 1) */}
             <input
               type="number"
-              placeholder="Unit Quantity (e.g., 1, 5, 25)"
               min="1"
+              placeholder="Unit Quantity (e.g., 1, 5, 10, 25)"
               value={unitQuantity}
               onChange={(e) => setUnitQuantity(e.target.value)}
               required
-              className="border px-3 py-2 rounded flex-1"
-            />
-            <select
-              value={unit}
-              onChange={(e) => setUnit(e.target.value)}
               className="border px-3 py-2 rounded"
-            >
-              {units.map((u) => (
-                <option key={u} value={u}>
-                  {u}
-                </option>
-              ))}
-            </select>
+            />
+
+            {/* Example preview */}
+            <p className="text-gray-500 text-sm">
+              Unit: {unitQuantity} {unit}
+            </p>
           </div>
 
-          {/* Image */}
+          {/* Image upload */}
           <input
             type="file"
             accept="image/*"

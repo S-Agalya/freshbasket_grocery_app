@@ -15,9 +15,9 @@ export const getAdminProducts = async (req, res) => {
 // ✅ Add product
 export const addAdminProduct = async (req, res) => {
   try {
-    const { name, price, category, stock, stock_unit, unit_quantity, unit_type } = req.body;
+    const { name, price, category, stock, stock_unit, unit_quantity, unit } = req.body;
 
-    if (!name || !price || !category || !stock || !stock_unit || !unit_quantity || !unit_type) {
+    if (!name || !price || !category || !stock || !stock_unit || !unit_quantity || !unit) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -34,12 +34,12 @@ export const addAdminProduct = async (req, res) => {
 
     const imageUrl = uploaded.secure_url;
 
-    // Insert into PostgreSQL
+    // ✅ Insert into PostgreSQL with correct column names
     const dbRes = await db.query(
       `INSERT INTO products
-      (name, price, category, image, stock, stock_unit, unit_quantity, unit_type)
+      (name, price, category, image, stock, stock_unit, unit_quantity, unit)
       VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
-      [name, price, category, imageUrl, stock, stock_unit, unit_quantity, unit_type]
+      [name, price, category, imageUrl, stock, stock_unit, unit_quantity, unit]
     );
 
     res.status(201).json(dbRes.rows[0]);
@@ -49,11 +49,12 @@ export const addAdminProduct = async (req, res) => {
   }
 };
 
+
 // ✅ Update product
 export const updateAdminProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, price, category, stock, stock_unit, unit_quantity, unit_type } = req.body;
+    const { name, price, category, stock, stock_unit, unit_quantity, unit } = req.body;
 
     let imageUrl = null;
     if (req.file) {
@@ -71,12 +72,12 @@ export const updateAdminProduct = async (req, res) => {
       `
       UPDATE products
       SET name=$1, price=$2, category=$3,
-          stock=$4, stock_unit=$5, unit_quantity=$6, unit_type=$7,
+          stock=$4, stock_unit=$5, unit_quantity=$6, unit=$7,
           image=COALESCE($8, image)
       WHERE id=$9
       RETURNING *;
       `,
-      [name, price, category, stock, stock_unit, unit_quantity, unit_type, imageUrl, id]
+      [name, price, category, stock, stock_unit, unit_quantity, unit, imageUrl, id]
     );
 
     if (result.rowCount === 0)
@@ -88,6 +89,7 @@ export const updateAdminProduct = async (req, res) => {
     res.status(500).json({ message: "Failed to update product", error: err.message });
   }
 };
+
 
 // ✅ Delete product
 export const deleteAdminProduct = async (req, res) => {

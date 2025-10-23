@@ -45,7 +45,7 @@ export default function AllProducts() {
                 product.stock > 0 ? "bg-green-600 text-white" : "bg-red-600 text-white"
               }`}
             >
-               {product.stock > 0 ? `${product.stock} ${product.unit} Available` : "Out of Stock"}
+              {product.stock > 0 ? "Available" : "Out of Stock"}
             </span>
           </div>
 
@@ -53,7 +53,7 @@ export default function AllProducts() {
             <h3 className="text-lg font-semibold text-gray-800 mb-1">{product.name}</h3>
 
             <p className="text-amber-700 font-bold mb-1">₹ {product.price}</p>
-
+<p className="text-green-700 font-bold mb-1">${product.stock} ${product.unit}</p>
             <button
               onClick={() => {
                 if (product.stock === 0) {

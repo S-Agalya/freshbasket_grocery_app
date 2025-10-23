@@ -38,7 +38,11 @@ export default function Dairy() {
             className="w-full h-48 sm:h-56 md:h-48 lg:h-52 object-contain p-2 bg-gray-50"
           />
           <div className="p-4 flex flex-col flex-grow">
-            <h3 className="text-lg font-semibold mb-1">{product.name}</h3>
+           <h3 className="text-lg font-semibold mb-1">
+  {product.name}{" "}
+  <span className="text-gray-500 text-sm font-normal">({product.unit})</span>
+</h3>
+
             <p className="text-green-700 font-bold">₹ {product.price}</p>
             <button
               onClick={() => addToCart(product)}

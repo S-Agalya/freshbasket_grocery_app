@@ -63,14 +63,16 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("price", price);
-    formData.append("category", category);
-    formData.append("stock", stock);
-    formData.append("stock_unit", stockUnit);
-    formData.append("unit_quantity", unitQuantity);
-    formData.append("unit_type", unitType);
+  const formData = new FormData();
+formData.append("name", name);
+formData.append("price", price);
+formData.append("category", category);
+formData.append("stock", stock);
+formData.append("stock_unit", stockUnit);
+formData.append("unit_quantity", unitQuantity);
+formData.append("unit", unit); // ✅ Correct name
+formData.append("image", imageFile);
+
 
     if (image) formData.append("image", image);
 

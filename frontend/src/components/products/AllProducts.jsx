@@ -40,32 +40,19 @@ export default function AllProducts() {
               alt={product.name}
               className="w-full h-52 object-contain p-3 bg-amber-50"
             />
-            {product.stock === 0 && (
-              <span className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 text-xs rounded">
-                Out of Stock
-              </span>
-            )}
+            <span
+              className={`absolute top-2 right-2 px-2 py-1 text-xs rounded font-semibold ${
+                product.stock > 0 ? "bg-green-600 text-white" : "bg-red-600 text-white"
+              }`}
+            >
+              {product.stock > 0 ? "Available" : "Out of Stock"}
+            </span>
           </div>
 
           <div className="p-4 flex flex-col flex-grow">
-            <h3 className="text-lg font-semibold text-gray-800 mb-1">
-              {product.name}
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-1">{product.name}</h3>
 
             <p className="text-amber-700 font-bold mb-1">₹ {product.price}</p>
-
-            {/* ✅ Show stock info properly */}
-            <p
-              className={`text-sm mb-3 ${
-                product.stock > 0 ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {product.stock > 0
-                ? `${product.stock} ${product.stock_unit}${
-                    product.stock > 1 ? " " : ""
-                  } available`
-                : "Out of Stock"}
-            </p>
 
             <button
               onClick={() => {

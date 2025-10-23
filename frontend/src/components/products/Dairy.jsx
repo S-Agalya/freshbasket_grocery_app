@@ -29,19 +29,35 @@ export default function Dairy() {
           key={product.id}
           className="bg-white rounded-xl shadow-lg hover:shadow-xl transition overflow-hidden flex flex-col"
         >
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-48 sm:h-56 md:h-48 lg:h-52 object-contain p-2 bg-gray-50"
-          />
+          <div className="relative">
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full h-48 sm:h-56 md:h-48 lg:h-52 object-contain p-2 bg-gray-50"
+            />
+            <span
+              className={`absolute top-2 right-2 px-2 py-1 text-xs rounded font-semibold ${
+                product.stock > 0 ? "bg-green-600 text-white" : "bg-red-600 text-white"
+              }`}
+            >
+              {product.stock > 0 ? "Available" : "Out of Stock"}
+            </span>
+          </div>
+
           <div className="p-4 flex flex-col flex-grow">
             <h3 className="text-lg font-semibold mb-1">
-              {product.name} <span className="text-gray-500 text-sm font-normal">({product.unit})</span>
+              {product.name}{" "}
+              <span className="text-gray-500 text-sm font-normal">({product.unit})</span>
             </h3>
             <p className="text-green-700 font-bold">₹ {product.price}</p>
             <button
               onClick={() => addToCart(product)}
-              className="mt-auto bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg shadow transition"
+              disabled={product.stock === 0}
+              className={`mt-auto py-2 rounded-lg shadow text-white font-semibold transition duration-300 ${
+                product.stock === 0
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700"
+              }`}
             >
               Add to Cart
             </button>

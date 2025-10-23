@@ -7,20 +7,18 @@ export default function Vegetables() {
   const [vegetableProducts, setVegetableProducts] = useState([]);
   const API_URL = import.meta.env.VITE_API_URL;
 
-  // Fetch products from backend
   const fetchProducts = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/products`);
-      // Filter for Vegetables category
       setVegetableProducts(res.data.filter((p) => p.category?.trim() === "Vegetables"));
     } catch (err) {
-      console.error("Failed to fetch products:", err);
+      console.error("Failed to fetch vegetable products:", err);
     }
   };
 
   useEffect(() => {
     fetchProducts();
-    const interval = setInterval(fetchProducts, 5000); // Poll every 5 seconds
+    const interval = setInterval(fetchProducts, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -31,11 +29,21 @@ export default function Vegetables() {
           key={product.id}
           className="bg-white rounded-xl shadow-lg hover:shadow-xl transition overflow-hidden flex flex-col"
         >
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-48 sm:h-56 md:h-48 lg:h-52 object-contain p-2 bg-gray-50"
-          />
+          <div className="relative">
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full h-48 sm:h-56 md:h-48 lg:h-52 object-contain p-2 bg-gray-50"
+            />
+            <span
+              className={`absolute top-2 right-2 px-2 py-1 text-xs rounded font-semibold ${
+                product.stock > 0 ? "bg-green-600 text-white" : "bg-red-600 text-white"
+              }`}
+            >
+              {product.stock > 0 ? "Available" : "Out of Stock"}
+            </span>
+          </div>
+
           <div className="p-4 flex flex-col flex-grow">
             <h3 className="text-lg font-semibold mb-1">
               {product.name}{" "}
@@ -44,14 +52,14 @@ export default function Vegetables() {
             <p className="text-green-700 font-bold">₹ {product.price}</p>
             <button
               onClick={() => addToCart(product)}
-              disabled={product.stock === 0} // Disable if out of stock
-              className={`mt-auto py-2 rounded-lg shadow transition text-white ${
+              disabled={product.stock === 0}
+              className={`mt-auto py-2 rounded-lg shadow text-white font-semibold transition duration-300 ${
                 product.stock === 0
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-green-600 hover:bg-green-700"
               }`}
             >
-              {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+              Add to Cart
             </button>
           </div>
         </div>

@@ -144,23 +144,21 @@ function AdminProducts({ onProductChange }) {
                 </p>
 
                 {/* ✅ Stock status badge */}
-                <div className="mt-2">
-                  {isOutOfStock ? (
-  <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-semibold">
-    Out of Stock
-  </span>
-) : product?.product_type === "bulk" ? (
-  <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
-    In Stock: {product?.stock} {product?.stock_unit}
-    {" (each "}{product?.unit_quantity} {product?.unit})
-  </span>
-) : (
-  <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
-    In Stock: {product?.stock} {product?.stock_unit || product?.unit}
-  </span>
-)}
+{/* ✅ Stock status badge */}
+<div className="mt-2">
+  {isOutOfStock ? (
+    <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-semibold">
+      Out of Stock
+    </span>
+  ) : (
+    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
+      {product.product_type === "bulk"
+        ? `In Stock: ${product.stock} ${product.stock_unit} (each ${product.unit_quantity} ${product.unit})`
+        : `In Stock: ${product.stock} ${product.unit || product.stock_unit}`}
+    </span>
+  )}
+</div>
 
-                </div>
 
                 {/* ✏️ Edit / 🗑️ Delete Buttons */}
                 <div className="flex space-x-3 mt-4">

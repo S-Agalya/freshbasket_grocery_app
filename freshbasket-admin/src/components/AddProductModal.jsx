@@ -3,17 +3,18 @@ import axios from "axios";
 
 function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   // Product info
+  const [productType, setProductType] = useState("normal"); // normal or bulk
   const [name, setName] = useState("");
   const [category, setCategory] = useState("Fruits");
   const [price, setPrice] = useState("");
 
   // Stock info
-  const [stock, setStock] = useState(1);
-  const [stockUnit, setStockUnit] = useState("pcs");
+  const [stock, setStock] = useState(1); // normal: total kg/pieces, bulk: number of bags/boxes
+  const [stockUnit, setStockUnit] = useState("pcs"); // normal: pcs, bulk: bags/boxes/packs
 
   // Unit info
-  const [unitQuantity, setUnitQuantity] = useState(1);
-  const [unitType, setUnitType] = useState("kg");
+  const [unitQuantity, setUnitQuantity] = useState(1); // for bulk: size per bag/box
+  const [unitType, setUnitType] = useState("kg"); // kg, g, liter, pcs, etc.
 
   // Image
   const [image, setImage] = useState(null);
@@ -23,21 +24,19 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
     "Fruits", "Vegetables", "Dairy", "Grocery",
     "Detergents", "Shampoos", "Handwash", "Snacks", "Soaps"
   ];
-  const stockUnits = ["pcs", "bags"];
-  const unitTypes = ["kg", "g", "liter", "ml"];
+  const stockUnits = ["pcs", "bags", "boxes", "packs"];
+  const unitTypes = ["kg", "g", "liter", "ml", "pcs"];
 
   useEffect(() => {
     if (editProduct) {
       setName(editProduct.name);
       setCategory(editProduct.category);
       setPrice(editProduct.price);
-
       setStock(editProduct.stock || 1);
       setStockUnit(editProduct.stock_unit || "pcs");
-
       setUnitQuantity(editProduct.unit_quantity || 1);
-      setUnitType(editProduct.unit || "kg"); // ✅ backend expects "unit"
-
+      setUnitType(editProduct.unit || "kg"); // backend expects "unit"
+      setProductType(editProduct.product_type || "normal");
       setPreview(editProduct.image || null);
       setImage(null);
     } else {
@@ -48,6 +47,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
       setStockUnit("pcs");
       setUnitQuantity(1);
       setUnitType("kg");
+      setProductType("normal");
       setPreview(null);
       setImage(null);
     }
@@ -56,7 +56,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate all required fields
+    // Validate fields
     if (!name || !price || !category || !stock || !stockUnit || !unitQuantity || !unitType) {
       alert("Please fill all fields");
       return;
@@ -69,7 +69,8 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
     formData.append("stock", stock);
     formData.append("stock_unit", stockUnit);
     formData.append("unit_quantity", unitQuantity);
-    formData.append("unit", unitType); // ✅ must match backend
+    formData.append("unit", unitType);
+    formData.append("product_type", productType); // new field
     if (image) formData.append("image", image);
 
     console.log("🧾 Sending product data:", [...formData.entries()]);
@@ -102,6 +103,28 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
       <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
         <h2 className="text-xl font-bold mb-4">{editProduct ? "Edit" : "Add"} Product</h2>
 
+        {/* Product Type */}
+        <div className="flex space-x-4 mb-2">
+          <label>
+            <input
+              type="radio"
+              value="normal"
+              checked={productType === "normal"}
+              onChange={() => setProductType("normal")}
+            />
+            Normal Product
+          </label>
+          <label>
+            <input
+              type="radio"
+              value="bulk"
+              checked={productType === "bulk"}
+              onChange={() => setProductType("bulk")}
+            />
+            Bulk Product
+          </label>
+        </div>
+
         <form onSubmit={handleSubmit} className="flex flex-col space-y-3">
           {/* Name */}
           <input
@@ -128,7 +151,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
           {/* Price */}
           <input
             type="number"
-            placeholder="Price"
+            placeholder="Price per unit"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             min="0"
@@ -137,49 +160,70 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
             className="border px-3 py-2 rounded"
           />
 
-          {/* Stock */}
-          <div className="flex space-x-2">
-            <input
-              type="number"
-              placeholder="Stock Quantity"
-              min="0"
-              value={stock}
-              onChange={(e) => setStock(e.target.value)}
-              required
-              className="border px-3 py-2 rounded flex-1"
-            />
-            <select
-              value={stockUnit}
-              onChange={(e) => setStockUnit(e.target.value)}
-              className="border px-3 py-2 rounded"
-            >
-              {stockUnits.map((u) => (
-                <option key={u} value={u}>{u}</option>
-              ))}
-            </select>
-          </div>
+          {/* Conditional Fields */}
+          {productType === "normal" ? (
+            <div className="flex space-x-2">
+              <input
+                type="number"
+                placeholder="Stock Quantity (kg/liter/pcs)"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                min="0"
+                className="border px-3 py-2 rounded flex-1"
+              />
+              <select
+                value={unitType}
+                onChange={(e) => setUnitType(e.target.value)}
+                className="border px-3 py-2 rounded"
+              >
+                {["kg", "g", "liter", "ml", "pcs"].map((u) => (
+                  <option key={u} value={u}>{u}</option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <>
+              <div className="flex space-x-2">
+                <input
+                  type="number"
+                  placeholder="Number of bags/boxes/packs"
+                  value={stock}
+                  onChange={(e) => setStock(e.target.value)}
+                  min="1"
+                  className="border px-3 py-2 rounded flex-1"
+                />
+                <select
+                  value={stockUnit}
+                  onChange={(e) => setStockUnit(e.target.value)}
+                  className="border px-3 py-2 rounded"
+                >
+                  {["bags", "boxes", "packs"].map((u) => (
+                    <option key={u} value={u}>{u}</option>
+                  ))}
+                </select>
+              </div>
 
-          {/* Unit */}
-          <div className="flex space-x-2">
-            <input
-              type="number"
-              placeholder="Unit Quantity"
-              min="1"
-              value={unitQuantity}
-              onChange={(e) => setUnitQuantity(e.target.value)}
-              required
-              className="border px-3 py-2 rounded flex-1"
-            />
-            <select
-              value={unitType}
-              onChange={(e) => setUnitType(e.target.value)}
-              className="border px-3 py-2 rounded"
-            >
-              {unitTypes.map((u) => (
-                <option key={u} value={u}>{u}</option>
-              ))}
-            </select>
-          </div>
+              <div className="flex space-x-2 mt-2">
+                <input
+                  type="number"
+                  placeholder="Unit Quantity per bag/box"
+                  value={unitQuantity}
+                  onChange={(e) => setUnitQuantity(e.target.value)}
+                  min="1"
+                  className="border px-3 py-2 rounded flex-1"
+                />
+                <select
+                  value={unitType}
+                  onChange={(e) => setUnitType(e.target.value)}
+                  className="border px-3 py-2 rounded"
+                >
+                  {["kg", "g", "liter", "ml", "pcs"].map((u) => (
+                    <option key={u} value={u}>{u}</option>
+                  ))}
+                </select>
+              </div>
+            </>
+          )}
 
           {/* Image */}
           <input

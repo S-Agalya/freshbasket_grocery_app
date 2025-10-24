@@ -150,10 +150,12 @@ function AdminProducts({ onProductChange }) {
                       Out of Stock
                     </span>
                   ) : (
-                    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
-                      In Stock: {product.stock} {product.stock_unit}
-                      
-                    </span>
+                   <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
+  {product.product_type === "bulk"
+    ? `In Stock: ${product.stock} ${product.stock_unit} (each ${product.unit_quantity} ${product.unit})`
+    : `In Stock: ${product.stock} ${product.unit}`}
+</span>
+
                     
                   )}
                 </div>

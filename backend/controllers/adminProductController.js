@@ -15,9 +15,9 @@ export const getAdminProducts = async (req, res) => {
 // ✅ Add product
 export const addAdminProduct = async (req, res) => {
   try {
-    const { name, price, category, stock, stock_unit, unit_quantity, unit } = req.body;
+    const { name, price, category, stock, stock_unit, unit_quantity, unit,product_type } = req.body;
 
-    if (!name || !price || !category || !stock || !stock_unit || !unit_quantity || !unit) {
+    if (!name || !price || !category || !stock || !stock_unit || !unit_quantity || !unit ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -35,12 +35,13 @@ export const addAdminProduct = async (req, res) => {
     const imageUrl = uploaded.secure_url;
 
     // ✅ Insert into PostgreSQL with correct column names
-    const dbRes = await db.query(
-      `INSERT INTO products
-      (name, price, category, image, stock, stock_unit, unit_quantity, unit)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
-      [name, price, category, imageUrl, stock, stock_unit, unit_quantity, unit]
-    );
+   const dbRes = await db.query(
+  `INSERT INTO products
+  (name, price, category, image, stock, stock_unit, unit_quantity, unit, product_type)
+  VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+  RETURNING *`,
+  [name, price, category, imageUrl, stock, stock_unit, unit_quantity, unit, product_type]
+);
 
     res.status(201).json(dbRes.rows[0]);
   } catch (err) {
@@ -54,7 +55,7 @@ export const addAdminProduct = async (req, res) => {
 export const updateAdminProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, price, category, stock, stock_unit, unit_quantity, unit } = req.body;
+    const { name, price, category, stock, stock_unit, unit_quantity, unit, product_type } = req.body;
 
     let imageUrl = null;
     if (req.file) {
@@ -69,16 +70,15 @@ export const updateAdminProduct = async (req, res) => {
     }
 
     const result = await db.query(
-      `
-      UPDATE products
-      SET name=$1, price=$2, category=$3,
-          stock=$4, stock_unit=$5, unit_quantity=$6, unit=$7,
-          image=COALESCE($8, image)
-      WHERE id=$9
-      RETURNING *;
-      `,
-      [name, price, category, stock, stock_unit, unit_quantity, unit, imageUrl, id]
-    );
+  `UPDATE products
+   SET name=$1, price=$2, category=$3,
+       stock=$4, stock_unit=$5, unit_quantity=$6, unit=$7,
+       product_type=$8,
+       image=COALESCE($9, image)
+   WHERE id=$10
+   RETURNING *`,
+  [name, price, category, stock, stock_unit, unit_quantity, unit, product_type, imageUrl, id]
+);
 
     if (result.rowCount === 0)
       return res.status(404).json({ message: "Product not found" });

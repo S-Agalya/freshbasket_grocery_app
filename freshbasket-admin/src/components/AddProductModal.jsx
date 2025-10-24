@@ -23,7 +23,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
     "Detergents", "Shampoos", "Handwash", "Snacks", "Soaps"
   ];
 
-  const stockUnits = ["pcs", "bags"];
+  const stockUnits = ["pcs", "bags","kg","liter"];
   const unitTypes = ["kg", "g", "liter", "ml"];
 
   useEffect(() => {

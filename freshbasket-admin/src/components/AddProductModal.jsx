@@ -19,15 +19,8 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   const [preview, setPreview] = useState(null);
 
   const categories = [
-    "Fruits",
-    "Vegetables",
-    "Dairy",
-    "Grocery",
-    "Detergents",
-    "Shampoos",
-    "Handwash",
-    "Snacks",
-    "Soaps"
+    "Fruits", "Vegetables", "Dairy", "Grocery",
+    "Detergents", "Shampoos", "Handwash", "Snacks", "Soaps"
   ];
 
   const stockUnits = ["pcs", "bags"];
@@ -49,7 +42,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
       setImage(null);
     } else {
       setName("");
-      setCategory("");
+      setCategory("Fruits");
       setPrice("");
       setStock(1);
       setStockUnit("pcs");
@@ -63,17 +56,14 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-  const formData = new FormData();
-formData.append("name", name);
-formData.append("price", price);
-formData.append("category", category);
-formData.append("stock", stock);
-formData.append("stock_unit", stockUnit);
-formData.append("unit_quantity", unitQuantity);
-formData.append("unit", unit); // ✅ Correct name
-formData.append("image", imageFile);
-
-
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("price", price);
+    formData.append("category", category);
+    formData.append("stock", stock);
+    formData.append("stock_unit", stockUnit);
+    formData.append("unit_quantity", unitQuantity); // Correct field
+    formData.append("unit_type", unitType); // Correct field
     if (image) formData.append("image", image);
 
     console.log("🧾 Sending product data:", [...formData.entries()]);

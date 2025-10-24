@@ -40,7 +40,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: "/", // ✅ FIXED: Always load assets from root
+  base: "/", 
   build: {
     outDir: "dist",
   },

@@ -1,13 +1,21 @@
-
-
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 
 export const CartContext = createContext();
 
-export function CartProvider(props) {
-  const [cartItems, setCartItems] = useState([]);
+export const CartProvider = ({ children }) => {
+  const [cartItems, setCartItems] = useState(() => {
+    // ✅ Load from localStorage if exists
+    const storedCart = localStorage.getItem("cartItems");
+    return storedCart ? JSON.parse(storedCart) : [];
+  });
 
-  function addToCart(product) {
+  // ✅ Save cart to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  }, [cartItems]);
+
+  // Your existing functions
+  const addToCart = (product) => {
     setCartItems((prevItems) => {
       const existing = prevItems.find((item) => item.id === product.id);
       if (existing) {
@@ -18,47 +26,40 @@ export function CartProvider(props) {
         return [...prevItems, { ...product, qty: 1 }];
       }
     });
-  }
+  };
 
-  function increaseQty(id) {
+  const removeFromCart = (id) => {
+    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  };
+
+  const increaseQty = (id) => {
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         item.id === id ? { ...item, qty: item.qty + 1 } : item
       )
     );
-  }
+  };
 
-  function decreaseQty(id) {
+  const decreaseQty = (id) => {
     setCartItems((prevItems) =>
-      prevItems
-        .map((item) =>
-          item.id === id ? { ...item, qty: item.qty - 1 } : item
-        )
-        .filter((item) => item.qty > 0)
+      prevItems.map((item) =>
+        item.id === id && item.qty > 1
+          ? { ...item, qty: item.qty - 1 }
+          : item
+      )
     );
-  }
+  };
 
-  function removeFromCart(id) {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-  }
-
-  // ✅ Add this function
-  function clearCart() {
+  const clearCart = () => {
     setCartItems([]);
-  }
+    localStorage.removeItem("cartItems"); // ✅ clear from localStorage after placing order
+  };
 
   return (
     <CartContext.Provider
-      value={{
-        cartItems,
-        addToCart,
-        increaseQty,
-        decreaseQty,
-        removeFromCart,
-        clearCart, // ✅ expose it here
-      }}
+      value={{ cartItems, addToCart, removeFromCart, increaseQty, decreaseQty, clearCart }}
     >
-      {props.children}
+      {children}
     </CartContext.Provider>
   );
-}
+};

@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { CartContext } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 
@@ -6,15 +6,31 @@ const OrderSummaryPage = () => {
   const { cartItems, clearCart } = useContext(CartContext);
   const navigate = useNavigate();
 
-  const [customerName, setCustomerName] = useState("");
-  const [customerPhone, setCustomerPhone] = useState("");
-  const [customerAddress, setCustomerAddress] = useState("");
-  const [comments, setComments] = useState("");
-  const [orderId, setOrderId] = useState(null);
+  // ✅ Load values from localStorage initially
+  const [customerName, setCustomerName] = useState(
+    localStorage.getItem("customerName") || ""
+  );
+  const [customerPhone, setCustomerPhone] = useState(
+    localStorage.getItem("customerPhone") || ""
+  );
+  const [customerAddress, setCustomerAddress] = useState(
+    localStorage.getItem("customerAddress") || ""
+  );
+  const [comments, setComments] = useState(
+    localStorage.getItem("comments") || ""
+  );
 
-  // ✅ Keep snapshot of ordered items
+  const [orderId, setOrderId] = useState(null);
   const [orderedItems, setOrderedItems] = useState([]);
   const [orderedTotal, setOrderedTotal] = useState(0);
+
+  // ✅ Save to localStorage whenever details change
+  useEffect(() => {
+    localStorage.setItem("customerName", customerName);
+    localStorage.setItem("customerPhone", customerPhone);
+    localStorage.setItem("customerAddress", customerAddress);
+    localStorage.setItem("comments", comments);
+  }, [customerName, customerPhone, customerAddress, comments]);
 
   const totalAmount = cartItems.reduce(
     (sum, item) => sum + item.price * item.qty,
@@ -56,22 +72,24 @@ const OrderSummaryPage = () => {
       const formattedOrderId = String(data.orderId).padStart(4, "0");
       setOrderId(formattedOrderId);
 
-      // ✅ Save ordered items before clearing cart
+      // ✅ Save ordered items before clearing
       setOrderedItems(cartItems);
       setOrderedTotal(totalAmount);
 
+      // ✅ Clear everything after successful order
       clearCart();
+      localStorage.removeItem("customerName");
+      localStorage.removeItem("customerPhone");
+      localStorage.removeItem("customerAddress");
+      localStorage.removeItem("comments");
 
-      alert(
-        `🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`
-      );
+      alert(`🎉 Order placed successfully!\nYour order ID is: ORD_ID ${formattedOrderId}`);
     } catch (error) {
       console.error("Error placing order:", error);
       alert("Failed to place order. Please try again!");
     }
   };
 
-  // ✅ WhatsApp message uses orderedItems and ensures safe strings
   const buildWhatsappMessage = () => {
     const name = customerName || "N/A";
     const phone = customerPhone || "N/A";
@@ -117,13 +135,11 @@ const OrderSummaryPage = () => {
       </header>
 
       <main className="flex-1 p-4 md:p-8 max-w-2xl mx-auto w-full">
-        {/* Before placing order */}
         {!orderId && cartItems.length > 0 && (
           <>
+            {/* Cart Summary */}
             <div className="mb-6">
-              <h2 className="text-xl font-bold mb-4 text-green-700">
-                Your Items:
-              </h2>
+              <h2 className="text-xl font-bold mb-4 text-green-700">Your Items:</h2>
               <ul className="space-y-2">
                 {cartItems.map((item, index) => (
                   <li
@@ -144,11 +160,9 @@ const OrderSummaryPage = () => {
               </div>
             </div>
 
-            {/* Customer form */}
+            {/* Customer Details */}
             <div className="bg-white p-4 rounded shadow space-y-4">
-              <h2 className="text-lg font-bold text-green-700">
-                Customer Details
-              </h2>
+              <h2 className="text-lg font-bold text-green-700">Customer Details</h2>
               <input
                 type="text"
                 placeholder="Name"
@@ -185,12 +199,9 @@ const OrderSummaryPage = () => {
           </>
         )}
 
-        {/* After placing order */}
         {orderId && (
           <div className="mt-6">
-            <h2 className="text-xl font-bold mb-4 text-green-700">
-              ✅ Order Placed
-            </h2>
+            <h2 className="text-xl font-bold mb-4 text-green-700">✅ Order Placed</h2>
             <ul className="space-y-2">
               {orderedItems.map((item, index) => (
                 <li
@@ -210,21 +221,16 @@ const OrderSummaryPage = () => {
               Total: ₹ {orderedTotal}
             </div>
 
-            {/* ✅ WhatsApp Button */}
-            
-              <div className="mt-6 flex flex-col items-center">
-                <a
-                  href={`https://wa.me/${ownerPhoneNumber}?text=${buildWhatsappMessage()}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded shadow-lg transition text-center block w-full md:w-auto"
-                >
-                  Send Order via WhatsApp
-                </a>
-              </div>
-         
-              
-            
+            <div className="mt-6 flex flex-col items-center">
+              <a
+                href={`https://wa.me/${ownerPhoneNumber}?text=${buildWhatsappMessage()}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded shadow-lg transition text-center block w-full md:w-auto"
+              >
+                Send Order via WhatsApp
+              </a>
+            </div>
           </div>
         )}
       </main>

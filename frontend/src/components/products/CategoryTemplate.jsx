@@ -26,7 +26,11 @@ export default function CategoryTemplate({ category }) {
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {products.map((product) => {
         const unitDisplay = product.unit || "unit";
-        const stockUnitDisplay = product.stock_unit || unitDisplay;
+const stockUnitDisplay =
+  product.product_type === "bulk"
+    ? `${product.stock} ${product.stock_unit}` // e.g., 10 kg or 4 bags
+    : product.stock_unit || unitDisplay;
+
 
         return (
           <div
@@ -56,14 +60,17 @@ export default function CategoryTemplate({ category }) {
               <p className="text-green-700 font-bold mb-1">₹ {product.price}</p>
 
               <p
-                className={`text-sm mb-3 ${
-                  product.stock > 0 ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                {product.stock > 0
-                  ? `${product.stock} ${stockUnitDisplay} available`
-                  : "Out of Stock"}
-              </p>
+  className={`text-sm mb-3 ${
+    product.stock > 0 ? "text-green-600" : "text-red-600"
+  }`}
+>
+  {product.stock > 0
+    ? product.product_type === "bulk"
+      ? `${product.stock} ${product.stock_unit} available`
+      : `${product.stock} ${unitDisplay} available`
+    : "Out of Stock"}
+</p>
+
 
               <button
                 onClick={() => {

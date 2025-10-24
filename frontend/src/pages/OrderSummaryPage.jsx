@@ -3,10 +3,10 @@ import { CartContext } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 
 const OrderSummaryPage = () => {
-  const { cartItems, clearCart } = useContext(CartContext);
+  const { cartItems, increaseQty, decreaseQty, removeFromCart, clearCart } =
+    useContext(CartContext);
   const navigate = useNavigate();
 
-  // ✅ Load values from localStorage initially
   const [customerName, setCustomerName] = useState(
     localStorage.getItem("customerName") || ""
   );
@@ -24,7 +24,7 @@ const OrderSummaryPage = () => {
   const [orderedItems, setOrderedItems] = useState([]);
   const [orderedTotal, setOrderedTotal] = useState(0);
 
-  // ✅ Save to localStorage whenever details change
+  // Save form values in localStorage
   useEffect(() => {
     localStorage.setItem("customerName", customerName);
     localStorage.setItem("customerPhone", customerPhone);
@@ -52,31 +52,24 @@ const OrderSummaryPage = () => {
         cartItems,
       };
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/orders`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
 
-      let data;
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        data = await response.json();
-      } else {
-        throw new Error("Server returned unexpected response");
-      }
-
+      const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Failed to place order");
       if (!data.orderId) throw new Error("Order ID missing in response");
 
       const formattedOrderId = String(data.orderId).padStart(4, "0");
       setOrderId(formattedOrderId);
-
-      // ✅ Save ordered items before clearing
       setOrderedItems(cartItems);
       setOrderedTotal(totalAmount);
 
-      // ✅ Clear everything after successful order
       clearCart();
       localStorage.removeItem("customerName");
       localStorage.removeItem("customerPhone");
@@ -97,26 +90,22 @@ const OrderSummaryPage = () => {
     const commentsText = comments || "None";
 
     let message = `🛒 *New Order*\n\n`;
-
     if (orderId) message += `📦 *Order ID:* ORD_ID ${orderId}\n`;
 
-    message += `👤 *Name:* ${name}\n`;
-    message += `📞 *Phone:* ${phone}\n`;
-    message += `🏠 *Address:* ${address}\n\n`;
-
+    message += `👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n🏠 *Address:* ${address}\n\n`;
     message += `🗒️ *Order List:*\n`;
+
     if (orderedItems.length === 0) message += `- No items\n`;
     else
       orderedItems.forEach(
         (item, index) =>
-          (message += `${index + 1}. ${item.name} x ${item.qty} = ₹${
+          (message += `${index + 1}. ${item.name} x ${item.qty} ${item.unit} = ₹${
             item.price * item.qty
           }\n`)
       );
 
     message += `\n💰 *Total Amount:* ₹${orderedTotal}\n\n`;
     message += `📝 *Additional Comments:*\n${commentsText}`;
-
     return encodeURIComponent(message);
   };
 
@@ -141,17 +130,41 @@ const OrderSummaryPage = () => {
             <div className="mb-6">
               <h2 className="text-xl font-bold mb-4 text-green-700">Your Items:</h2>
               <ul className="space-y-2">
-                {cartItems.map((item, index) => (
+                {cartItems.map((item) => (
                   <li
-                    key={index}
-                    className="bg-white p-3 rounded shadow flex justify-between items-center"
+                    key={item.id}
+                    className="flex justify-between items-center bg-white p-3 rounded shadow"
                   >
-                    <span>
-                      {item.name} x {item.qty}
-                    </span>
-                    <span className="font-bold text-green-700">
-                      ₹ {item.price * item.qty}
-                    </span>
+                    <div className="flex items-center space-x-2">
+                      <span className="font-semibold">{item.name}</span>
+                      <span>
+                        x {item.qty} {item.unit} {/* ✅ Fixed unit displayed */}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <span className="font-bold text-green-700">
+                        ₹ {item.price * item.qty}
+                      </span>
+                      <button
+                        onClick={() => decreaseQty(item.id)}
+                        className="px-2 py-1 bg-gray-200 rounded"
+                      >
+                        -
+                      </button>
+                      <button
+                        onClick={() => increaseQty(item.id)}
+                        className="px-2 py-1 bg-gray-200 rounded"
+                      >
+                        +
+                      </button>
+                      <button
+                        onClick={() => removeFromCart(item.id)}
+                        className="px-2 py-1 bg-red-500 text-white rounded"
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -209,7 +222,7 @@ const OrderSummaryPage = () => {
                   className="bg-white p-3 rounded shadow flex justify-between items-center"
                 >
                   <span>
-                    {item.name} x {item.qty}
+                    {item.name} x {item.qty} {item.unit} {/* ✅ Fixed unit */}
                   </span>
                   <span className="font-bold text-green-700">
                     ₹ {item.price * item.qty}

@@ -8,13 +8,14 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   const [price, setPrice] = useState("");
 
   // Stock info
-  const [stock, setStock] = useState(1); // Default stock = 1
-  const [stockUnit, setStockUnit] = useState("pcs"); // pcs or bags
+  const [stock, setStock] = useState(1);
+  const [stockUnit, setStockUnit] = useState("pcs");
 
   // Unit info
-  const [unitQuantity, setUnitQuantity] = useState(1); // Default unit = 1
-  const [unitType, setUnitType] = useState("kg"); // kg, g, liter, ml
+  const [unitQuantity, setUnitQuantity] = useState(1);
+  const [unitType, setUnitType] = useState("kg");
 
+  // Image
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
 
@@ -22,8 +23,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
     "Fruits", "Vegetables", "Dairy", "Grocery",
     "Detergents", "Shampoos", "Handwash", "Snacks", "Soaps"
   ];
-
-  const stockUnits = ["pcs", "bags","kg","liter"];
+  const stockUnits = ["pcs", "bags"];
   const unitTypes = ["kg", "g", "liter", "ml"];
 
   useEffect(() => {
@@ -56,14 +56,20 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Basic validation
+    if (!name || !price || !category || !stock || !stockUnit || !unitQuantity || !unitType) {
+      alert("Please fill all fields");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("name", name);
-    formData.append("price", price);
+    formData.append("price", Number(price));
     formData.append("category", category);
-    formData.append("stock", stock);
+    formData.append("stock", Number(stock));
     formData.append("stock_unit", stockUnit);
-    formData.append("unit_quantity", unitQuantity); // Correct field
-    formData.append("unit_type", unitType); // Correct field
+    formData.append("unit_quantity", Number(unitQuantity));
+    formData.append("unit_type", unitType);
     if (image) formData.append("image", image);
 
     console.log("🧾 Sending product data:", [...formData.entries()]);
@@ -87,6 +93,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
       onClose();
     } catch (err) {
       console.error("❌ Error saving product:", err.response?.data || err.message);
+      alert(err.response?.data?.message || "Failed to save product");
     }
   };
 
@@ -124,11 +131,13 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
             placeholder="Price"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
+            min="0"
+            step="0.01"
             required
             className="border px-3 py-2 rounded"
           />
 
-          {/* Stock quantity & stock unit */}
+          {/* Stock */}
           <div className="flex space-x-2">
             <input
               type="number"
@@ -150,7 +159,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
             </select>
           </div>
 
-          {/* Unit quantity & unit type */}
+          {/* Unit */}
           <div className="flex space-x-2">
             <input
               type="number"

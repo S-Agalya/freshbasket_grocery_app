@@ -6,7 +6,6 @@ const CartPage = () => {
   const { cartItems, increaseQty, decreaseQty, removeFromCart } = useContext(CartContext);
   const navigate = useNavigate();
 
-  // Calculate total
   const totalAmount = cartItems.reduce(
     (sum, item) => sum + item.price * item.qty,
     0
@@ -31,53 +30,52 @@ const CartPage = () => {
           <>
             <ul className="space-y-4">
               {cartItems.map((item, index) => (
-               <li
-  key={index}
-  className="bg-white p-4 rounded-xl shadow grid grid-cols-1 md:grid-cols-[1fr_auto_auto] items-center gap-4"
->
-  {/* LEFT SECTION: Image and Product Info */}
-  <div className="flex items-center gap-4">
-    <img
-      src={item.image}
-      alt={item.name}
-      className="w-20 h-20 object-cover rounded"
-    />
-    <div>
-      <h3 className="text-lg font-semibold">{item.name}</h3>
-      <p className="text-green-700 font-bold">₹ {item.price}</p>
-    </div>
-  </div>
+                <li
+                  key={index}
+                  className="bg-white p-4 rounded-xl shadow grid grid-cols-1 md:grid-cols-[1fr_auto_auto] items-center gap-4"
+                >
+                  {/* LEFT: Image & Info */}
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-20 h-20 object-cover rounded"
+                    />
+                    <div>
+                      <h3 className="text-lg font-semibold">{item.name}</h3>
+                      <p className="text-green-700 font-bold">₹ {item.price}</p>
+                    </div>
+                  </div>
 
-  {/* CENTER SECTION: Quantity Controls */}
-  <div className="flex justify-center items-center gap-2">
-    <button
-      onClick={() => decreaseQty(item.id)}
-      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-    >
-      -
-    </button>
-    <span className="min-w-[2rem] text-center font-semibold">
-      {item.qty}
-    </span>
-    <button
-      onClick={() => increaseQty(item.id)}
-      className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
-    >
-      +
-    </button>
-  </div>
+                  {/* CENTER: Quantity */}
+                  <div className="flex justify-center items-center gap-2">
+                    <button
+                      onClick={() => decreaseQty(item.id)}
+                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                    >
+                      -
+                    </button>
+                    <span className="min-w-[2rem] text-center font-semibold">
+                      {item.qty} {item.unit} {/* ✅ Display unit */}
+                    </span>
+                    <button
+                      onClick={() => increaseQty(item.id)}
+                      className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
+                    >
+                      +
+                    </button>
+                  </div>
 
-  {/* RIGHT SECTION: Remove Button */}
-  <div className="flex justify-end">
-    <button
-      onClick={() => removeFromCart(item.id)}
-      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow"
-    >
-      Remove
-    </button>
-  </div>
-</li>
-
+                  {/* RIGHT: Remove */}
+                  <div className="flex justify-end">
+                    <button
+                      onClick={() => removeFromCart(item.id)}
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </li>
               ))}
             </ul>
 
@@ -87,11 +85,10 @@ const CartPage = () => {
               </h3>
               <button
                 onClick={() =>
-  navigate("/summary", {
-    state: { items: cartItems, total: totalAmount },
-  })
-}
-
+                  navigate("/summary", {
+                    state: { items: cartItems, total: totalAmount },
+                  })
+                }
                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded shadow-lg transition"
               >
                 Proceed to Checkout

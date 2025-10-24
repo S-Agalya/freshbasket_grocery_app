@@ -36,7 +36,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
       setStockUnit(editProduct.stock_unit || "pcs");
 
       setUnitQuantity(editProduct.unit_quantity || 1);
-      setUnitType(editProduct.unit_type || "kg");
+      setUnitType(editProduct.unit || "kg"); // ✅ backend expects "unit"
 
       setPreview(editProduct.image || null);
       setImage(null);
@@ -56,7 +56,7 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
+    // Validate all required fields
     if (!name || !price || !category || !stock || !stockUnit || !unitQuantity || !unitType) {
       alert("Please fill all fields");
       return;
@@ -64,12 +64,12 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
 
     const formData = new FormData();
     formData.append("name", name);
-    formData.append("price", Number(price));
+    formData.append("price", price);
     formData.append("category", category);
-    formData.append("stock", Number(stock));
+    formData.append("stock", stock);
     formData.append("stock_unit", stockUnit);
-    formData.append("unit_quantity", Number(unitQuantity));
-    formData.append("unit_type", unitType);
+    formData.append("unit_quantity", unitQuantity);
+    formData.append("unit", unitType); // ✅ must match backend
     if (image) formData.append("image", image);
 
     console.log("🧾 Sending product data:", [...formData.entries()]);

@@ -1,12 +1,8 @@
 import express from "express";
-import { registerAdmin, loginAdmin } from "../controllers/adminController.js";
 import { getAdminStats } from "../controllers/adminStatsController.js";
 const router = express.Router();
 
-// Register new admin
-router.post("/register", registerAdmin);
+// ✅ Use /api/auth/register-admin and /api/auth/login instead
+// Admin authentication routes are now in authRoutes.js
 
-// Login admin
-router.post("/login", loginAdmin);
-// router.get("/stats", getAdminStats);
 export default router;

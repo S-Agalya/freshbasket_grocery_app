@@ -22,11 +22,19 @@ const LoginPage = () => {
       console.log("Login response:", response);
       console.log("FormData:", formData);
 
+      // ✅ Check if user is customer (not admin)
+      if (response.role !== 'customer') {
+        alert("Access denied! Customer account only.");
+        return;
+      }
+
       // Save login info in localStorage
       localStorage.setItem("username", response.name || "");
       localStorage.setItem("email", formData.email || "");
       localStorage.setItem("password", formData.password || "");
       localStorage.setItem("userId", response.userId || "");
+      localStorage.setItem("token", response.token || "");
+      localStorage.setItem("role", response.role || "");
 
       // ✅ Navigate to welcome page after login
       navigate("/welcome");

@@ -31,7 +31,10 @@ function AdminProducts({ onProductChange }) {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/admin/products`);
+      const token = localStorage.getItem("adminToken");
+      const res = await axios.get(`${API_URL}/api/admin/products`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
       setProducts(res.data || []);
       if (onProductChange) onProductChange();
     } catch (err) {
@@ -46,7 +49,10 @@ function AdminProducts({ onProductChange }) {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     try {
-      await axios.delete(`${API_URL}/api/admin/products/${id}`);
+      const token = localStorage.getItem("adminToken");
+      await axios.delete(`${API_URL}/api/admin/products/${id}`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
       await fetchProducts();
       if (onProductChange) onProductChange();
     } catch (err) {

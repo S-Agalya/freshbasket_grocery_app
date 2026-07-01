@@ -26,7 +26,10 @@ function AdminDashboard() {
   // };
  const fetchStats = async () => {
   try {
-    const res = await axios.get(`${API_URL}/api/admin/stats`);
+    const token = localStorage.getItem("adminToken");
+    const res = await axios.get(`${API_URL}/api/admin/stats`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
     console.log("✅ Stats received from API:", res.data); // check this in browser console
     // Expect res.data === { products: N, inStock: M, outOfStock: K }
     setStats({

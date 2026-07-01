@@ -76,17 +76,24 @@ function AddProductModal({ onClose, onProductAdded, editProduct, API_URL }) {
     console.log("🧾 Sending product data:", [...formData.entries()]);
 
     try {
+      // Get token from localStorage
+      const token = localStorage.getItem("adminToken");
+      const headers = {
+        "Content-Type": "multipart/form-data",
+        "Authorization": `Bearer ${token}`
+      };
+
       if (editProduct) {
         await axios.put(
           `${API_URL}/api/admin/products/${editProduct.id}`,
           formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
+          { headers }
         );
       } else {
         await axios.post(
           `${API_URL}/api/admin/products/add`,
           formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
+          { headers }
         );
       }
 

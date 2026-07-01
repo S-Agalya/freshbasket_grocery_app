@@ -39,7 +39,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { register, login } from "./controllers/authController.js";
+import { registerCustomer, login } from "./controllers/authController.js";
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";

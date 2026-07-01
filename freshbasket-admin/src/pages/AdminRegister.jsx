@@ -7,14 +7,16 @@ function AdminRegister() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/admin/register`,
-        { name, email, password }
+        `${import.meta.env.VITE_API_URL}/api/auth/register-admin`,
+        { name, email, password, phone, address }
       );
 
       alert(res.data.message || "Registration successful!");
@@ -79,6 +81,36 @@ function AdminRegister() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-2 py-2 outline-none"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Phone
+            </label>
+            <div className="flex items-center border rounded-lg px-3 focus-within:ring-2 focus-within:ring-green-500">
+              <input
+                type="tel"
+                placeholder="Enter your phone number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full px-2 py-2 outline-none"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Address
+            </label>
+            <div className="flex items-center border rounded-lg px-3 focus-within:ring-2 focus-within:ring-green-500">
+              <input
+                type="text"
+                placeholder="Enter your address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
                 className="w-full px-2 py-2 outline-none"
               />
             </div>

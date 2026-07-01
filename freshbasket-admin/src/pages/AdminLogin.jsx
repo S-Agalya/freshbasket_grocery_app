@@ -19,15 +19,24 @@ function AdminLogin() {
     e.preventDefault();
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/admin/login`,
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
         { email, password }
       );
 
+      // ✅ Check if user is admin
+      if (res.data.role !== 'admin') {
+        alert("Access denied! Admin account only.");
+        return;
+      }
+
       localStorage.setItem("adminToken", res.data.token);
+      localStorage.setItem("adminEmail", res.data.email);
+      localStorage.setItem("adminName", res.data.name);
+      localStorage.setItem("adminId", res.data.userId);
       alert("Login successful!");
       navigate("/dashboard");
     } catch (err) {
-      alert("Login failed: " + err.response?.data?.message || err.message);
+      alert("Login failed: " + (err.response?.data?.message || err.message));
     }
   };
 

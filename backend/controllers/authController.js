@@ -2,19 +2,41 @@ import db from "../config/db.js"
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-export const register = async (req, res) => {
-  const { name, email, password } = req.body;
+// ✅ Register as Customer
+export const registerCustomer = async (req, res) => {
+  const { name, email, password, phone, address } = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await db.query(
-      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *",
-      [name, email, hashedPassword]
+      "INSERT INTO users (name, email, password, phone, address, role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, name, email, phone, address, role",
+      [name, email, hashedPassword, phone || null, address || null, 'customer']
     );
 
     res.status(201).json({
-      message: "User registered successfully",
+      message: "Customer registered successfully",
+      user: result.rows[0],
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Registration failed", details: err.message });
+  }
+};
+
+// ✅ Register as Admin
+export const registerAdmin = async (req, res) => {
+  const { name, email, password, phone, address } = req.body;
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await db.query(
+      "INSERT INTO users (name, email, password, phone, address, role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, name, email, phone, address, role",
+      [name, email, hashedPassword, phone || null, address || null, 'admin']
+    );
+
+    res.status(201).json({
+      message: "Admin registered successfully",
       user: result.rows[0],
     });
   } catch (err) {
@@ -43,23 +65,27 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid password" });
     }
 
-    // 3. Create a JWT token
-    const token = jwt.sign({ userId: user.id, name: user.name }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    // 3. Create a JWT token with role
+    const token = jwt.sign(
+      { 
+        userId: user.id, 
+        name: user.name, 
+        email: user.email,
+        role: user.role 
+      }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: "1h" }
+    );
 
     // 4. Send success response
-    // res.json({
-    //   message: "Login successful",
-    //   token,
-    //   name: user.name, // 🟢 send name to frontend
-    // });
     res.json({
-  message: "Login successful",
-  token,
-  name: user.name,
-  userId: user.id // ✅ Add this!
-});
+      message: "Login successful",
+      token,
+      name: user.name,
+      userId: user.id,
+      email: user.email,
+      role: user.role // ✅ Send role to frontend
+    });
 
   } catch (err) {
     res.status(500).json({ message: "Login failed", error: err.message });

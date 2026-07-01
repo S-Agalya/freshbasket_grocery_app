@@ -30,10 +30,11 @@ export const registerAdmin = async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
+    const avatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`;
 
     const result = await db.query(
-      "INSERT INTO users (name, email, password, phone, address, role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, name, email, phone, address, role",
-      [name, email, hashedPassword, phone || null, address || null, 'admin']
+      "INSERT INTO users (name, avatar, email, password, phone, address, role) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, name, avatar, email, phone, address, role",
+      [name, avatar, email, hashedPassword, phone || null, address || null, 'admin']
     );
 
     res.status(201).json({

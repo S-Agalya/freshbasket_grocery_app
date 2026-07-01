@@ -4,7 +4,7 @@ const API_BASE = import.meta.env.VITE_API_URL;
 
 
 export const registerUser = async (formData) => {
-  const res = await fetch(`${API_BASE}/api/auth/register`,{
+  const res = await fetch(`${API_BASE}/api/auth/register-customer`,{
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(formData),

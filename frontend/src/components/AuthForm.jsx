@@ -6,6 +6,8 @@ const AuthForm = ({ type = "login", onSubmit }) => {
     name: "",
     email: "",
     password: "",
+    phone: "",
+    address: "",
   });
 
   const handleChange = (e) => {
@@ -57,6 +59,32 @@ const AuthForm = ({ type = "login", onSubmit }) => {
               required
             />
           </div>
+
+          {type === "register" && (
+            <>
+              <div>
+                <label className="block mb-1 text-sm font-medium text-gray-700">Phone</label>
+                <input
+                  type="tel"
+                  name="phone"
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                  placeholder="Your phone number"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-sm font-medium text-gray-700">Address</label>
+                <input
+                  type="text"
+                  name="address"
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                  placeholder="Your address"
+                />
+              </div>
+            </>
+          )}
 
           <button
             type="submit"

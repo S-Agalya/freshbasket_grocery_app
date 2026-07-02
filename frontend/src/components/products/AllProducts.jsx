@@ -21,7 +21,7 @@ export default function AllProducts() {
       }
     };
     fetchProducts();
-  });
+  }, []);
 
   if (loading) {
     return <p className="text-center text-gray-600 mt-6">Loading products...</p>;

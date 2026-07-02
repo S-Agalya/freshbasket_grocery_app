@@ -114,3 +114,39 @@ export const deleteAdminProduct = async (req, res) => {
     res.status(500).json({ message: "Failed to delete product", error: err.message });
   }
 };
+
+
+
+// ✅ Bulk add products from CSV (no image upload)
+export const bulkAddProducts = async (req, res) => {
+  const { products } = req.body;
+  if (!Array.isArray(products) || products.length === 0) {
+    return res.status(400).json({ message: "No products provided" });
+  }
+  try {
+    let inserted = 0;
+    for (const p of products) {
+      if (!p.name || !p.price || !p.category) continue; // skip invalid rows
+      await db.query(
+        `INSERT INTO products (name, price, category, stock, stock_unit, unit_quantity, unit, product_type, image)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+        [
+          p.name.trim(),
+          parseFloat(p.price),
+          p.category.trim(),
+          parseInt(p.stock) || 0,
+          p.stock_unit?.trim() || 'pcs',
+          parseFloat(p.unit_quantity) || 1,
+          p.unit?.trim() || 'pcs',
+          p.product_type?.trim() || 'normal',
+          p.image?.trim() || null,
+        ]
+      );
+      inserted++;
+    }
+    res.status(201).json({ inserted });
+  } catch (err) {
+    console.error("❌ Bulk upload error:", err);
+    res.status(500).json({ message: "Bulk upload failed", error: err.message });
+  }
+};

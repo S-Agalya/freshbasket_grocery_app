@@ -61,3 +61,65 @@ export const getProductStockStats = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
+
+
+// ✅ Low stock alert — products at or below threshold
+export const getLowStockProducts = async (req, res) => {
+  const threshold = parseInt(req.query.threshold) || 5;
+  try {
+    const result = await db.query(
+      "SELECT id, name, category, stock, stock_unit FROM products WHERE stock <= $1 ORDER BY stock ASC",
+      [threshold]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error("❌ Error fetching low stock:", err);
+    res.status(500).json({ message: "Failed to fetch low stock", error: err.message });
+  }
+};
+
+// ✅ Sales report — daily revenue (last 30 days) + revenue by category
+export const getSalesReport = async (req, res) => {
+  try {
+    const daily = await db.query(`
+      SELECT DATE(created_at) as date,
+             COALESCE(SUM(total_amount), 0)::numeric as revenue,
+             COUNT(*) as orders
+      FROM orders
+      WHERE status NOT IN ('Cancelled')
+      GROUP BY DATE(created_at)
+      ORDER BY date ASC
+      LIMIT 30
+    `);
+
+    const byCategory = await db.query(`
+      SELECT p.category,
+             COALESCE(SUM(ci.price * ci.quantity), 0)::numeric as revenue
+      FROM cart_items ci
+      JOIN products p ON p.id = ci.product_id
+      JOIN orders o ON o.id = ci.order_id
+      WHERE o.status NOT IN ('Cancelled')
+      GROUP BY p.category
+      ORDER BY revenue DESC
+    `);
+
+    const totals = await db.query(`
+      SELECT
+        COUNT(*) as total_orders,
+        COALESCE(SUM(total_amount), 0)::numeric as total_revenue
+      FROM orders
+      WHERE status NOT IN ('Cancelled')
+    `);
+
+    res.json({
+      daily: daily.rows,
+      byCategory: byCategory.rows,
+      totalOrders: parseInt(totals.rows[0].total_orders),
+      totalRevenue: parseFloat(totals.rows[0].total_revenue),
+    });
+  } catch (err) {
+    console.error("❌ Error fetching sales report:", err);
+    res.status(500).json({ message: "Failed to fetch sales report", error: err.message });
+  }
+};

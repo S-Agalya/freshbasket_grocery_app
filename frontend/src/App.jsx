@@ -8,6 +8,8 @@ import { CartProvider } from './context/CartContext';
 import CartPage from './pages/CartPage';
 import OrderSummaryPage from './pages/OrderSummaryPage';
 import ProfilePage from './pages/ProfilePage';
+import ProductDetailPage from './pages/ProductDetailPage';
+import MyOrdersPage from './pages/MyOrdersPage';
 import Footer from './components/Footer';
 import './App.css';
 
@@ -21,38 +23,12 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/welcome" element={ <ProtectedRoute><WelcomePage /></ProtectedRoute>} />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <ProfilePage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/order"
-                element={
-                  <ProtectedRoute>
-                    <PlaceOrderPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/cart"
-                element={
-                  <ProtectedRoute>
-                    <CartPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/summary"
-                element={
-                  <ProtectedRoute>
-                    <OrderSummaryPage />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/product/:id" element={<ProtectedRoute><ProductDetailPage /></ProtectedRoute>} />
+              <Route path="/my-orders" element={<ProtectedRoute><MyOrdersPage /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+              <Route path="/order" element={<ProtectedRoute><PlaceOrderPage /></ProtectedRoute>} />
+              <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+              <Route path="/summary" element={<ProtectedRoute><OrderSummaryPage /></ProtectedRoute>} />
               <Route path="*" element={<LoginPage />} />
             </Routes>
           </div>

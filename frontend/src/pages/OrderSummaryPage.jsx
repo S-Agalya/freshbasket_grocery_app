@@ -1,6 +1,11 @@
 import { useContext, useState, useEffect } from "react";
 import { CartContext } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
+import { FaPlus, FaTrash } from "react-icons/fa";
+
+const getSavedAddresses = () => {
+  try { return JSON.parse(localStorage.getItem("savedAddresses") || "[]"); } catch { return []; }
+};
 
 const OrderSummaryPage = () => {
   const { cartItems, increaseQty, decreaseQty, removeFromCart, clearCart } =
@@ -8,10 +13,10 @@ const OrderSummaryPage = () => {
   const navigate = useNavigate();
 
   const [customerName, setCustomerName] = useState(
-    localStorage.getItem("customerName") || ""
+    localStorage.getItem("customerName") || localStorage.getItem("username") || ""
   );
   const [customerPhone, setCustomerPhone] = useState(
-    localStorage.getItem("customerPhone") || ""
+    localStorage.getItem("customerPhone") || localStorage.getItem("phone") || ""
   );
   const [customerAddress, setCustomerAddress] = useState(
     localStorage.getItem("customerAddress") || ""
@@ -19,6 +24,9 @@ const OrderSummaryPage = () => {
   const [comments, setComments] = useState(
     localStorage.getItem("comments") || ""
   );
+  const [savedAddresses, setSavedAddresses] = useState(getSavedAddresses);
+  const [newAddressInput, setNewAddressInput] = useState("");
+  const [showSavePrompt, setShowSavePrompt] = useState(false);
 
   const [orderId, setOrderId] = useState(null);
   const [orderedItems, setOrderedItems] = useState([]);
@@ -31,6 +39,23 @@ const OrderSummaryPage = () => {
     localStorage.setItem("customerAddress", customerAddress);
     localStorage.setItem("comments", comments);
   }, [customerName, customerPhone, customerAddress, comments]);
+
+  const persistAddresses = (list) => {
+    setSavedAddresses(list);
+    localStorage.setItem("savedAddresses", JSON.stringify(list));
+  };
+
+  const handleSaveAddress = () => {
+    const addr = newAddressInput.trim() || customerAddress.trim();
+    if (!addr || savedAddresses.includes(addr)) return;
+    persistAddresses([...savedAddresses, addr]);
+    setNewAddressInput("");
+    setShowSavePrompt(false);
+  };
+
+  const handleDeleteAddress = (addr) => {
+    persistAddresses(savedAddresses.filter((a) => a !== addr));
+  };
 
   const totalAmount = cartItems.reduce(
     (sum, item) => sum + item.price * item.qty,
@@ -196,6 +221,39 @@ const OrderSummaryPage = () => {
                 onChange={(e) => setCustomerAddress(e.target.value)}
                 className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-300"
               ></textarea>
+
+              {/* Saved addresses */}
+              {savedAddresses.length > 0 && (
+                <div className="bg-gray-50 border rounded-lg p-3 space-y-2">
+                  <p className="text-sm font-medium text-gray-600">📍 Saved Addresses</p>
+                  {savedAddresses.map((addr, i) => (
+                    <div key={i} className="flex items-center justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setCustomerAddress(addr)}
+                        className={`flex-1 text-left text-sm px-3 py-1.5 rounded-lg border transition
+                          ${customerAddress === addr ? "border-green-500 bg-green-50 text-green-700 font-medium" : "border-gray-200 hover:border-green-300 text-gray-700"}`}
+                      >
+                        {addr}
+                      </button>
+                      <button onClick={() => handleDeleteAddress(addr)} className="text-red-400 hover:text-red-600 shrink-0">
+                        <FaTrash size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Save current address button */}
+              {customerAddress.trim() && !savedAddresses.includes(customerAddress.trim()) && (
+                <button
+                  type="button"
+                  onClick={handleSaveAddress}
+                  className="flex items-center gap-1 text-xs text-green-600 hover:text-green-800 border border-green-300 px-3 py-1 rounded-full"
+                >
+                  <FaPlus size={10} /> Save this address
+                </button>
+              )}
               <textarea
                 placeholder="Additional Comments (e.g. items not listed)"
                 value={comments}

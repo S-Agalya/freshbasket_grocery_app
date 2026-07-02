@@ -1,12 +1,14 @@
 import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../../context/CartContext";
 import axios from "axios";
+import useNavigate from "react-router-dom";
+
 
 export default function CategoryTemplate({ category }) {
   const { addToCart } = useContext(CartContext);
   const [products, setProducts] = useState([]);
   const API_URL = import.meta.env.VITE_API_URL;
-
+const navigate=useNavigate()
   const fetchProducts = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/products`);
@@ -41,7 +43,8 @@ const stockUnitDisplay =
               <img
                 src={product.image}
                 alt={product.name}
-                className="w-full h-48 sm:h-56 md:h-48 lg:h-52 object-contain p-2 bg-gray-50"
+                 onClick={() => navigate(`/product/${product.id}`)}
+                className="w-full h-48 sm:h-56 md:h-48 lg:h-52 object-contain p-2 bg-gray-50 cursor-pointer"
               />
               <span
                 className={`absolute top-2 right-2 px-2 py-1 text-xs rounded font-semibold ${
@@ -53,7 +56,9 @@ const stockUnitDisplay =
             </div>
 
             <div className="p-4 flex flex-col flex-grow">
-              <h3 className="text-lg font-semibold mb-1">
+              <h3 
+               onClick={() => navigate(`/product/${product.id}`)}
+                className="text-lg font-semibold mb-1 cursor-pointer hover:text-green-700 ">
                 {product.name} {unitDisplay ? `(${unitDisplay})` : ""}
               </h3>
 

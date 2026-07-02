@@ -2,7 +2,8 @@ import { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { CartContext } from "../context/CartContext";
-import { FaArrowLeft, FaShoppingCart, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { FaArrowLeft, FaShoppingCart, FaCheckCircle, FaTimesCircle, FaHeart } from "react-icons/fa";
+import { addRecentlyViewed, getRecentlyViewed, isWishlisted, toggleWishlist } from "../utils/wishlist";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -11,11 +12,25 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [added, setAdded] = useState(false);
+  const [wishlisted, setWishlisted] = useState(false);
+  const [recommended, setRecommended] = useState([]);
+  const [recentlyViewed, setRecentlyViewed] = useState([]);
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
+    setLoading(true);
     axios.get(`${API_URL}/api/products/${id}`)
-      .then((res) => setProduct(res.data))
+      .then((res) => {
+        setProduct(res.data);
+        setWishlisted(isWishlisted(res.data.id));
+        addRecentlyViewed(res.data);
+        setRecentlyViewed(getRecentlyViewed().filter(p => p.id !== res.data.id).slice(0, 5));
+        // Fetch recommended (same category)
+        return axios.get(`${API_URL}/api/products`).then(all => {
+          const recs = all.data.filter(p => p.category === res.data.category && p.id !== res.data.id).slice(0, 4);
+          setRecommended(recs);
+        });
+      })
       .catch(() => setProduct(null))
       .finally(() => setLoading(false));
   }, [id, API_URL]);
@@ -25,6 +40,11 @@ export default function ProductDetailPage() {
     addToCart({ ...product, qty: 1 });
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
+  };
+
+  const handleWishlist = () => {
+    toggleWishlist(product);
+    setWishlisted(isWishlisted(product.id));
   };
 
   if (loading) return (
@@ -43,10 +63,7 @@ export default function ProductDetailPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-yellow-50 to-blue-50 p-4 md:p-8">
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-green-700 hover:text-green-900 mb-6 font-medium"
-      >
+      <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-green-700 hover:text-green-900 mb-6 font-medium">
         <FaArrowLeft /> Back
       </button>
 
@@ -63,55 +80,33 @@ export default function ProductDetailPage() {
         {/* Details */}
         <div className="md:w-1/2 p-6 md:p-8 flex flex-col justify-between">
           <div>
-            <span className="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full mb-3">
-              {product.category}
-            </span>
+            <div className="flex items-center justify-between mb-3">
+              <span className="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
+                {product.category}
+              </span>
+              <button onClick={handleWishlist} className="flex items-center gap-1 text-sm font-medium" title="Wishlist">
+                <FaHeart size={18} className={wishlisted ? "text-red-500" : "text-gray-300"} />
+                <span className={wishlisted ? "text-red-500" : "text-gray-400"}>{wishlisted ? "Wishlisted" : "Wishlist"}</span>
+              </button>
+            </div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
               {product.name}
               {unitDisplay ? <span className="text-base font-normal text-gray-500 ml-2">({unitDisplay})</span> : ""}
             </h1>
-
             <p className="text-3xl font-bold text-green-600 mb-4">₹{product.price}</p>
-
-            {/* Stock status */}
             <div className="flex items-center gap-2 mb-4">
               {inStock ? (
-                <>
-                  <FaCheckCircle className="text-green-500" />
-                  <span className="text-green-700 font-medium">
-                    {product.product_type === "bulk"
-                      ? `${product.stock} ${product.stock_unit} available`
-                      : `${product.stock} ${unitDisplay} in stock`}
-                  </span>
-                </>
+                <><FaCheckCircle className="text-green-500" /><span className="text-green-700 font-medium">{product.product_type === "bulk" ? `${product.stock} ${product.stock_unit} available` : `${product.stock} ${unitDisplay} in stock`}</span></>
               ) : (
-                <>
-                  <FaTimesCircle className="text-red-500" />
-                  <span className="text-red-600 font-medium">Out of Stock</span>
-                </>
+                <><FaTimesCircle className="text-red-500" /><span className="text-red-600 font-medium">Out of Stock</span></>
               )}
             </div>
-
-            {/* Product info table */}
             <div className="bg-gray-50 rounded-xl p-4 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-500">Category</span>
-                <span className="font-medium">{product.category}</span>
-              </div>
-              {product.unit_quantity && (
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Pack Size</span>
-                  <span className="font-medium">{product.unit_quantity} {unitDisplay}</span>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <span className="text-gray-500">Type</span>
-                <span className="font-medium capitalize">{product.product_type || "Normal"}</span>
-              </div>
+              <div className="flex justify-between"><span className="text-gray-500">Category</span><span className="font-medium">{product.category}</span></div>
+              {product.unit_quantity && <div className="flex justify-between"><span className="text-gray-500">Pack Size</span><span className="font-medium">{product.unit_quantity} {unitDisplay}</span></div>}
+              <div className="flex justify-between"><span className="text-gray-500">Type</span><span className="font-medium capitalize">{product.product_type || "Normal"}</span></div>
             </div>
           </div>
-
-          {/* Add to cart */}
           <button
             onClick={handleAddToCart}
             disabled={!inStock}
@@ -123,6 +118,39 @@ export default function ProductDetailPage() {
           </button>
         </div>
       </div>
+
+      {/* You May Also Like */}
+      {recommended.length > 0 && (
+        <div className="max-w-4xl mx-auto mt-10">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">You May Also Like</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {recommended.map(p => (
+              <div key={p.id} onClick={() => navigate(`/product/${p.id}`)} className="bg-white rounded-xl shadow p-3 cursor-pointer hover:shadow-lg transition">
+                <img src={p.image} alt={p.name} className="w-full h-28 object-contain mb-2 bg-amber-50 rounded-lg" />
+                <p className="text-sm font-semibold text-gray-800 truncate">{p.name}</p>
+                <p className="text-green-600 font-bold text-sm">₹{p.price}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recently Viewed */}
+      {recentlyViewed.length > 0 && (
+        <div className="max-w-4xl mx-auto mt-8 mb-4">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Recently Viewed</h2>
+          <div className="flex gap-4 overflow-x-auto pb-2">
+            {recentlyViewed.map(p => (
+              <div key={p.id} onClick={() => navigate(`/product/${p.id}`)} className="bg-white rounded-xl shadow p-3 cursor-pointer hover:shadow-lg transition shrink-0 w-32">
+                <img src={p.image} alt={p.name} className="w-full h-20 object-contain mb-2 bg-amber-50 rounded" />
+                <p className="text-xs font-semibold text-gray-800 truncate">{p.name}</p>
+                <p className="text-green-600 font-bold text-xs">₹{p.price}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

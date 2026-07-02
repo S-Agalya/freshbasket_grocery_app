@@ -27,6 +27,23 @@ const OrderSummaryPage = () => {
   const [savedAddresses, setSavedAddresses] = useState(getSavedAddresses);
   const [newAddressInput, setNewAddressInput] = useState("");
   const [showSavePrompt, setShowSavePrompt] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoApplied, setPromoApplied] = useState(null); // { label, discount }
+
+  const PROMO_CODES = {
+    FRESH10:  { label: "10% off",   type: "percent", value: 10 },
+    SAVE50:   { label: "₹50 off",   type: "flat",    value: 50 },
+    NEWUSER:  { label: "₹100 off",  type: "flat",    value: 100 },
+    GREEN20:  { label: "20% off",   type: "percent", value: 20 },
+  };
+
+  const applyPromo = () => {
+    const code = PROMO_CODES[promoCode.trim().toUpperCase()];
+    if (!code) { alert("Invalid promo code."); return; }
+    setPromoApplied({ ...code, code: promoCode.trim().toUpperCase() });
+  };
+
+  const removePromo = () => { setPromoApplied(null); setPromoCode(""); };
 
   const [orderId, setOrderId] = useState(null);
   const [orderedItems, setOrderedItems] = useState([]);
@@ -57,10 +74,11 @@ const OrderSummaryPage = () => {
     persistAddresses(savedAddresses.filter((a) => a !== addr));
   };
 
-  const totalAmount = cartItems.reduce(
-    (sum, item) => sum + item.price * item.qty,
-    0
-  );
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const discount = promoApplied
+    ? promoApplied.type === "percent" ? Math.round(subtotal * promoApplied.value / 100) : Math.min(promoApplied.value, subtotal)
+    : 0;
+  const totalAmount = subtotal - discount;
 
   const handlePlaceOrder = async () => {
     if (!customerName || !customerPhone || !customerAddress) {
@@ -260,6 +278,34 @@ const OrderSummaryPage = () => {
                 onChange={(e) => setComments(e.target.value)}
                 className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-300"
               ></textarea>
+              {/* Promo code */}
+              <div className="border rounded-lg p-3 space-y-2">
+                <p className="text-sm font-medium text-gray-600">🎟 Promo Code</p>
+                {promoApplied ? (
+                  <div className="flex items-center justify-between bg-green-50 border border-green-300 rounded-lg px-3 py-2">
+                    <span className="text-green-700 font-semibold text-sm">{promoApplied.code} — {promoApplied.label} applied!</span>
+                    <button onClick={removePromo} className="text-red-400 hover:text-red-600 text-xs ml-2">Remove</button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Enter code (e.g. FRESH10)"
+                      value={promoCode}
+                      onChange={e => setPromoCode(e.target.value)}
+                      className="flex-1 border rounded p-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 uppercase"
+                    />
+                    <button onClick={applyPromo} className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700">Apply</button>
+                  </div>
+                )}
+              </div>
+
+              {/* Total with discount */}
+              <div className="text-right space-y-1">
+                {promoApplied && <p className="text-sm text-gray-500">Subtotal: ₹{subtotal} &nbsp;|&nbsp; <span className="text-green-600">-₹{discount}</span></p>}
+                <p className="text-lg font-bold text-green-800">Total: ₹{totalAmount}</p>
+              </div>
+
               <button
                 onClick={handlePlaceOrder}
                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded shadow-lg transition w-full"

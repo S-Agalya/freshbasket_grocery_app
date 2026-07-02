@@ -10,6 +10,7 @@ import OrderSummaryPage from './pages/OrderSummaryPage';
 import ProfilePage from './pages/ProfilePage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import MyOrdersPage from './pages/MyOrdersPage';
+import WishlistPage from "./pages/WishlistPage";
 import Footer from './components/Footer';
 import './App.css';
 
@@ -25,6 +26,7 @@ function App() {
               <Route path="/welcome" element={ <ProtectedRoute><WelcomePage /></ProtectedRoute>} />
               <Route path="/product/:id" element={<ProtectedRoute><ProductDetailPage /></ProtectedRoute>} />
               <Route path="/my-orders" element={<ProtectedRoute><MyOrdersPage /></ProtectedRoute>} />
+              <Route path="/wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
               <Route path="/order" element={<ProtectedRoute><PlaceOrderPage /></ProtectedRoute>} />
               <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />

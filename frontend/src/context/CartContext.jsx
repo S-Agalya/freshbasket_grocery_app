@@ -50,6 +50,15 @@ export const CartProvider = ({ children }) => {
     );
   };
 
+  const setItemQty = (id, qty) => {
+    const n = parseInt(qty);
+    if (isNaN(n) || n < 1) return; // Ignore invalid values
+    setCartItems(prev =>
+      prev.map(item =>
+        item.id === id ? { ...item, qty: n } : item
+      )
+    );
+  }
   const clearCart = () => {
     setCartItems([]);
     localStorage.removeItem("cartItems"); // ✅ clear from localStorage after placing order
@@ -57,7 +66,7 @@ export const CartProvider = ({ children }) => {
 
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, increaseQty, decreaseQty, clearCart }}
+      value={{ cartItems, addToCart, removeFromCart, increaseQty, decreaseQty, setItemQty, clearCart }}
     >
       {children}
     </CartContext.Provider>

@@ -3,7 +3,7 @@ import { CartContext } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 
 const CartPage = () => {
-  const { cartItems, increaseQty, decreaseQty, removeFromCart } = useContext(CartContext);
+  const { cartItems, increaseQty, decreaseQty, removeFromCart, setItemQty } = useContext(CartContext);
   const navigate = useNavigate();
 
   const totalAmount = cartItems.reduce(
@@ -49,21 +49,16 @@ const CartPage = () => {
 
                   {/* CENTER: Quantity */}
                   <div className="flex justify-center items-center gap-2">
-                    <button
-                      onClick={() => decreaseQty(item.id)}
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                    >
-                      -
-                    </button>
-                    <span className="min-w-[2rem] text-center font-semibold">
-                      {item.qty} {item.unit} {/* ✅ Display unit */}
-                    </span>
-                    <button
-                      onClick={() => increaseQty(item.id)}
-                      className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
-                    >
-                      +
-                    </button>
+                    <button onClick={() => decreaseQty(item.id)} className="bg-red-500 hover:bg-red-600 text-white w-8 h-8 rounded font-bold">-</button>
+                    <input
+                      type="number"
+                      min="1"
+                      value={item.qty}
+                      onChange={e => setItemQty(item.id, e.target.value)}
+                      className="w-14 text-center border border-gray-300 rounded py-1 font-semibold focus:outline-none focus:ring-2 focus:ring-green-300"
+                    />
+                    <span className="text-gray-500 text-sm">{item.unit}</span>
+                    <button onClick={() => increaseQty(item.id)} className="bg-green-500 hover:bg-green-600 text-white w-8 h-8 rounded font-bold">+</button>
                   </div>
 
                   {/* RIGHT: Remove */}

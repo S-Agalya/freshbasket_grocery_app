@@ -1,8 +1,9 @@
 import { useContext, useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaShoppingCart, FaUserCircle, FaBell, FaSearch, FaTimes } from "react-icons/fa";
+import { FaShoppingCart, FaUserCircle, FaBell, FaSearch, FaTimes, FaHeart } from "react-icons/fa";
 import { CartContext } from "../context/CartContext";
 import axios from "axios";
+import { getWishlist } from "../utils/wishlist";
 
 const STATUS_COLORS = {
   Pending:   "text-yellow-600",
@@ -72,6 +73,7 @@ const Header = ({ username = "User", onMenuToggle }) => {
   }, []);
 
   const unreadCount = orders.filter(o => seenStatuses[o.id] !== o.status).length;
+  const wishlistCount = getWishlist().length;
 
   const handleOpenNotif = () => {
     setShowNotif(v => !v);
@@ -172,6 +174,14 @@ const Header = ({ username = "User", onMenuToggle }) => {
           </div>
         )}
 
+        {/* Wishlist */}
+        <button onClick={() => navigate("/wishlist")} className="relative text-gray-600 hover:text-red-500 p-2" title="Wishlist">
+          <FaHeart size={20} />
+          {wishlistCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">{wishlistCount}</span>
+          )}
+        </button>
+
         {/* Cart */}
         <button onClick={() => navigate("/cart")} className="relative bg-green-600 hover:bg-green-700 text-white p-2 rounded-full shadow transition" aria-label="Cart">
           <FaShoppingCart className="w-5 h-5" />
@@ -191,7 +201,4 @@ const Header = ({ username = "User", onMenuToggle }) => {
 };
 
 export default Header;
-
-
-
 

@@ -2,13 +2,23 @@ import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { CartContext } from "../../context/CartContext";
 import { useNavigate } from "react-router-dom";
+import { FaHeart } from "react-icons/fa";
+import { isWishlisted, toggleWishlist } from "../../utils/wishlist";
 
 export default function AllProducts() {
   const { addToCart } = useContext(CartContext);
+  const navigate = useNavigate();
+  const [wishlist, setWishlist] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("fb_wishlist") || "[]"); } catch { return []; }
+  });
+  const handleWishlist = (product) => {
+    toggleWishlist(product);
+    setWishlist(JSON.parse(localStorage.getItem("fb_wishlist") || "[]"));
+  };
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const API_URL = import.meta.env.VITE_API_URL;
-const navigate=useNavigate()
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -21,9 +31,9 @@ const navigate=useNavigate()
         setLoading(false);
       }
     };
-    const interval = setInterval(fetchProducts, 1000);
-    return () => clearInterval(interval);
     fetchProducts();
+    const interval = setInterval(fetchProducts, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) {
@@ -59,12 +69,20 @@ const stockUnitDisplay =
               >
                 {product.stock > 0 ? "Available" : "Out of Stock"}
               </span>
+              <button
+                onClick={() => handleWishlist(product)}
+                className="absolute top-2 left-2 bg-white rounded-full p-1.5 shadow hover:scale-110 transition"
+                title={wishlist.some(w => w.id === product.id) ? "Remove from wishlist" : "Add to wishlist"}
+              >
+                <FaHeart size={14} className={wishlist.some(w => w.id === product.id) ? "text-red-500" : "text-gray-300"} />
+              </button>
             </div>
 
             <div className="p-4 flex flex-col flex-grow">
               <h3
-              onClick={()=>navigate(`/product/${product.id}`)} 
-              className="text-lg font-semibold text-gray-800 mb-1 cursor-pointer hover:text-green-700">
+                onClick={() => navigate(`/product/${product.id}`)}
+                className="text-lg font-semibold text-gray-800 mb-1 cursor-pointer hover:text-green-700"
+              >
                 {product.name} {unitDisplay ? `(${unitDisplay})` : ""}
               </h3>
 

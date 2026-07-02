@@ -1,14 +1,23 @@
 import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../../context/CartContext";
 import axios from "axios";
-import {useNavigate} from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
+import { FaHeart } from "react-icons/fa";
+import { toggleWishlist } from "../../utils/wishlist";
 
 export default function CategoryTemplate({ category }) {
   const { addToCart } = useContext(CartContext);
+  const navigate = useNavigate();
+  const [wishlist, setWishlist] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("fb_wishlist") || "[]"); } catch { return []; }
+  });
+  const handleWishlist = (product) => {
+    toggleWishlist(product);
+    setWishlist(JSON.parse(localStorage.getItem("fb_wishlist") || "[]"));
+  };
   const [products, setProducts] = useState([]);
   const API_URL = import.meta.env.VITE_API_URL;
-const navigate=useNavigate()
+
   const fetchProducts = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/products`);
@@ -43,7 +52,7 @@ const stockUnitDisplay =
               <img
                 src={product.image}
                 alt={product.name}
-                 onClick={() => navigate(`/product/${product.id}`)}
+                onClick={() => navigate(`/product/${product.id}`)}
                 className="w-full h-48 sm:h-56 md:h-48 lg:h-52 object-contain p-2 bg-gray-50 cursor-pointer"
               />
               <span
@@ -53,12 +62,20 @@ const stockUnitDisplay =
               >
                 {product.stock > 0 ? "Available" : "Out of Stock"}
               </span>
+              <button
+                onClick={() => handleWishlist(product)}
+                className="absolute top-2 left-2 bg-white rounded-full p-1.5 shadow hover:scale-110 transition"
+                title={wishlist.some(w => w.id === product.id) ? "Remove from wishlist" : "Add to wishlist"}
+              >
+                <FaHeart size={14} className={wishlist.some(w => w.id === product.id) ? "text-red-500" : "text-gray-300"} />
+              </button>
             </div>
 
             <div className="p-4 flex flex-col flex-grow">
-              <h3 
-               onClick={() => navigate(`/product/${product.id}`)}
-                className="text-lg font-semibold mb-1 cursor-pointer hover:text-green-700 ">
+              <h3
+                onClick={() => navigate(`/product/${product.id}`)}
+                className="text-lg font-semibold mb-1 cursor-pointer hover:text-green-700"
+              >
                 {product.name} {unitDisplay ? `(${unitDisplay})` : ""}
               </h3>
 

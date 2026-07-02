@@ -20,7 +20,7 @@ export default function AllProducts() {
         setLoading(false);
       }
     };
-    const interval = setInterval(fetchProducts, 5000);
+    const interval = setInterval(fetchProducts, 1000);
     return () => clearInterval(interval);
     fetchProducts();
   }, []);

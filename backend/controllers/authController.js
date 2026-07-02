@@ -86,6 +86,7 @@ export const login = async (req, res) => {
       name: user.name,
       userId: user.id,
       email: user.email,
+      phone:user.phone,
       role: user.role // ✅ Send role to frontend
     });
 

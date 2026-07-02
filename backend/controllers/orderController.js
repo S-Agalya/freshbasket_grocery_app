@@ -57,7 +57,7 @@ export const getOrdersByPhone = async (req, res) => {
     const orders = ordersResult.rows;
     for (const order of orders) {
       const itemsResult = await db.query(
-        `SELECT ci.quantity, ci.price, p.name, p.image
+        `SELECT ci.quantity, ci.price,p.id, p.name,p.unit,p.stock, p.image
          FROM cart_items ci
          JOIN products p ON p.id = ci.product_id
          WHERE ci.order_id = $1`,

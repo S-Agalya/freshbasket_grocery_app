@@ -35,6 +35,7 @@ const LoginPage = () => {
       localStorage.setItem("userId", response.userId || "");
       localStorage.setItem("token", response.token || "");
       localStorage.setItem("role", response.role || "");
+ localStorage.setItem("phone", response.phone || "");
 
       // ✅ Navigate to welcome page after login
       navigate("/welcome");

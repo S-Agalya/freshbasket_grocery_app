@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../../context/CartContext";
 import axios from "axios";
-import useNavigate from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 
 export default function CategoryTemplate({ category }) {

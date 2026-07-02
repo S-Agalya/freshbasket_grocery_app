@@ -46,7 +46,31 @@ export const placeOrder = async (req, res) => {
   }
 };
 
-export const getOrderById = async (req, res) => {
+export const getOrdersByPhone = async (req, res) => {
+  const { phone } = req.params;
+  try {
+    const ordersResult = await db.query(
+      `SELECT id, customer_name, phone, address, total_amount, status, created_at
+       FROM orders WHERE phone = $1 ORDER BY created_at DESC`,
+      [phone]
+    );
+    const orders = ordersResult.rows;
+    for (const order of orders) {
+      const itemsResult = await db.query(
+        `SELECT ci.quantity, ci.price, p.name, p.image
+         FROM cart_items ci
+         JOIN products p ON p.id = ci.product_id
+         WHERE ci.order_id = $1`,
+        [order.id]
+      );
+      order.items = itemsResult.rows;
+    }
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch orders", error: err.message });
+  }
+};
+
   const { id } = req.params;
 
   try {
@@ -74,4 +98,4 @@ export const getOrderById = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch order", error: err.message });
   }
-};
+;

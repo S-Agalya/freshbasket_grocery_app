@@ -43,6 +43,8 @@ function AdminProducts({ onProductChange }) {
   };
 
   useEffect(() => {
+     const interval = setInterval(fetchProducts, 5000);
+    return () => clearInterval(interval);
     fetchProducts();
   }, []);
 

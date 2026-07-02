@@ -11,6 +11,7 @@ export const toggleWishlist = (product) => {
   const exists = list.some(p => p.id === product.id);
   const updated = exists ? list.filter(p => p.id !== product.id) : [...list, product];
   localStorage.setItem("fb_wishlist", JSON.stringify(updated));
+  window.dispatchEvent(new Event("fb-wishlist-changed")); // Notify other components
   return !exists; // returns new state (true = added)
 };
 

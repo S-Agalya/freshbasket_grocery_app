@@ -73,7 +73,13 @@ const Header = ({ username = "User", onMenuToggle }) => {
   }, []);
 
   const unreadCount = orders.filter(o => seenStatuses[o.id] !== o.status).length;
-  const wishlistCount = getWishlist().length;
+
+  const [wishlistCount, setWishlistCount] = useState(() => getWishlist().length);
+  useEffect(() => {
+    const handler = () => setWishlistCount(getWishlist().length);
+    window.addEventListener("fb-wishlist-changed", handler);
+    return () => window.removeEventListener("fb-wishlist-changed", handler);
+  }, []);
 
   const handleOpenNotif = () => {
     setShowNotif(v => !v);

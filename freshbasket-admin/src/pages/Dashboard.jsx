@@ -3,28 +3,28 @@
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import { FaTachometerAlt, FaBoxOpen, FaShoppingCart, FaSignOutAlt } from "react-icons/fa";
+import { FaTachometerAlt, FaBoxOpen, FaShoppingCart, FaSignOutAlt, FaChartBar, FaExclamationTriangle } from "react-icons/fa";
 
 function AdminDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [stats, setStats] = useState({ products: 0,inStock: 0, outOfStock: 0,orders: 0  });
-  const [activeSummary, setActiveSummary] = useState(null); // "orders" or "stock" or null
+  const [activeSummary, setActiveSummary] = useState(null);
   const [orderSummary, setOrderSummary] = useState({ total: 0, pending: 0, completed: 0 });
   const [totalOrders, setTotalOrders] = useState(0);
+  const [lowStockProducts, setLowStockProducts] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
   const API_URL = import.meta.env.VITE_API_URL;
 
   // Fetch product & stock stats
   // const fetchStats = async () => {
-  //   try {
   //     const res = await axios.get(`${API_URL}/api/admin/stats`);
   //     setStats(res.data);
   //   } catch (err) {
   //     console.error("Failed to fetch stats:", err);
   //   }
   // };
- const fetchStats = async () => {
+  const fetchStats = async () => {
   try {
     const token = localStorage.getItem("adminToken");
     const res = await axios.get(`${API_URL}/api/admin/stats`, {
@@ -44,6 +44,18 @@ function AdminDashboard() {
 };
 
 
+
+  const fetchLowStock = async () => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const res = await axios.get(`${API_URL}/api/admin/stats/low-stock?threshold=5`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setLowStockProducts(res.data);
+    } catch (err) {
+      console.error("Failed to fetch low stock:", err);
+    }
+  };
 
   // Fetch today's order summary
   const fetchOrderSummary = async () => {
@@ -88,6 +100,7 @@ function AdminDashboard() {
       fetchStats();
       fetchOrderSummary();
       fetchTotalOrders();
+      fetchLowStock();
     }
   }, [location.pathname]);
 
@@ -100,6 +113,7 @@ function AdminDashboard() {
     { name: "Dashboard", icon: <FaTachometerAlt />, path: "/dashboard" },
     { name: "Products", icon: <FaBoxOpen />, path: "/dashboard/products" },
     { name: "Orders", icon: <FaShoppingCart />, path: "/dashboard/orders" },
+    { name: "Sales Report", icon: <FaChartBar />, path: "/dashboard/sales" },
   ];
 
   return (
@@ -201,6 +215,34 @@ function AdminDashboard() {
                 <p className="text-3xl font-bold text-green-600">{totalOrders}</p>
               </div>
             </div>
+
+            {/* Low stock alert banner */}
+            {lowStockProducts.length > 0 && (
+              <div className="mt-6 bg-red-50 border border-red-300 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <FaExclamationTriangle className="text-red-500" />
+                  <h3 className="font-semibold text-red-700">
+                    Low Stock Alert — {lowStockProducts.length} product{lowStockProducts.length > 1 ? "s" : ""} need restocking
+                  </h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {lowStockProducts.map((p) => (
+                    <span
+                      key={p.id}
+                      className="bg-red-100 text-red-700 text-sm px-3 py-1 rounded-full font-medium"
+                    >
+                      {p.name} — {p.stock} {p.stock_unit} left
+                    </span>
+                  ))}
+                </div>
+                <button
+                  onClick={() => navigate("/dashboard/products")}
+                  className="mt-3 text-sm text-red-600 underline hover:text-red-800"
+                >
+                  Go to Products →
+                </button>
+              </div>
+            )}
 
             {/* Single expandable summary box */}
             {activeSummary === "orders" && (

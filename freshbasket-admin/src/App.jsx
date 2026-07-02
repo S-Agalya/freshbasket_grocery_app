@@ -5,6 +5,8 @@ import Dashboard from "./pages/Dashboard";
 import AdminProducts from "./pages/AdminProducts";
 import AdminOrderPage from "./pages/AdminOrderPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import SalesReport from "./pages/SalesReport";
+
 
 function App() {
   return (
@@ -37,7 +39,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          
+          <Route path="sales" element={ <ProtectedRoute><SalesReport /></ProtectedRoute> } />
         </Route>
       </Routes>
     </Router>

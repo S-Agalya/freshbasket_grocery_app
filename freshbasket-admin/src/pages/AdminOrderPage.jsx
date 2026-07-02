@@ -96,7 +96,15 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-
+const ALL_STATUSES = ["Pending", "Confirmed", "Packed", "Shipped", "Delivered", "Cancelled"];
+const STATUS_COLORS = {
+  Pending:   "bg-yellow-100 text-yellow-800",
+  Confirmed: "bg-blue-100 text-blue-800",
+  Packed:    "bg-purple-100 text-purple-800",
+  Shipped:   "bg-indigo-100 text-indigo-800",
+  Delivered: "bg-green-100 text-green-800",
+  Cancelled: "bg-red-100 text-red-800",
+};
 function AdminOrderPage() {
   const [orders, setOrders] = useState([]);
   const [filter, setFilter] = useState("All"); // <-- filter state
@@ -143,8 +151,8 @@ function AdminOrderPage() {
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Manage Orders</h2>
 
       {/* Filter buttons */}
-      <div className="mb-6 flex space-x-4">
-        {["All", "Pending", "Completed"].map((status) => (
+      <div className="mb-6 flex flex-wrap gap-2">
+        {["All", ...ALL_STATUSES].map((status) => (
           <button
             key={status}
             onClick={() => setFilter(status)}
@@ -193,22 +201,19 @@ function AdminOrderPage() {
               </div>
 
               {/* Status */}
-              <div className="flex flex-col space-y-2">
-                <p className="font-semibold">Status: {order.status}</p>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => handleStatusChange(order.id, "Completed")}
-                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
-                  >
-                    Mark Completed
-                  </button>
-                  <button
-                    onClick={() => handleStatusChange(order.id, "Pending")}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
-                  >
-                    Mark Pending
-                  </button>
-                </div>
+              <div className="flex flex-col space-y-2 min-w-[160px]">
+                <span className={`text-xs font-semibold px-2 py-1 rounded-full text-center ${STATUS_COLORS[order.status] || "bg-gray-100 text-gray-700"}`}>
+                  {order.status}
+                </span>
+                <select
+                  value={order.status}
+                  onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                  className="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  {ALL_STATUSES.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
               </div>
             </div>
           ))}

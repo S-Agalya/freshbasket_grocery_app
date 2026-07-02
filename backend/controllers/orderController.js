@@ -71,6 +71,7 @@ export const getOrdersByPhone = async (req, res) => {
   }
 };
 
+export const getOrderById = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -98,4 +99,4 @@ export const getOrdersByPhone = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch order", error: err.message });
   }
-;
+};

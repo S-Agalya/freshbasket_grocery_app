@@ -8,6 +8,7 @@ import { isWishlisted, toggleWishlist } from "../../utils/wishlist";
 export default function AllProducts() {
   const { addToCart } = useContext(CartContext);
   const navigate = useNavigate();
+  const [page, setPage] = useState(1);
   const [wishlist, setWishlist] = useState(() => {
     try { return JSON.parse(localStorage.getItem("fb_wishlist") || "[]"); } catch { return []; }
   });
@@ -40,9 +41,13 @@ export default function AllProducts() {
     return <p className="text-center text-gray-600 mt-6">Loading products...</p>;
   }
 
+  const PAGE_SIZE = 12;
+  const totalPages = Math.ceil(products.length / PAGE_SIZE);
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      {products.map((product) => {
+    <div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {products.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((product) => {
         const unitDisplay = product.unit || "unit";
 const stockUnitDisplay =
   product.product_type === "bulk"
@@ -59,6 +64,7 @@ const stockUnitDisplay =
               <img
                 src={product.image}
                 alt={product.name}
+                loading="lazy"
                 onClick={() => navigate(`/product/${product.id}`)}
                 className="w-full h-52 object-contain p-3 bg-amber-50 cursor-pointer"
               />
@@ -122,6 +128,29 @@ const stockUnitDisplay =
           </div>
         );
       })}
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-3 mt-8">
+          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+            className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-700 hover:bg-green-50 disabled:opacity-40 font-medium">
+            ← Prev
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
+            <button key={n} onClick={() => setPage(n)}
+              className={`w-9 h-9 rounded-full font-semibold text-sm transition ${
+                n === page ? "bg-green-600 text-white shadow" : "bg-white border border-gray-300 text-gray-600 hover:bg-green-50"
+              }`}>
+              {n}
+            </button>
+          ))}
+          <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+            className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-700 hover:bg-green-50 disabled:opacity-40 font-medium">
+            Next →
+          </button>
+        </div>
+      )}
     </div>
   );
 }

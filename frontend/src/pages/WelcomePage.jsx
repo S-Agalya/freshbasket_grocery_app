@@ -1,10 +1,11 @@
 
 
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
+import { CartContext } from "../context/CartContext";
 
 import vegetablesImage from "../assets/vegetables.jpg";
 import fruitsImage from "../assets/fruits.jpg";
@@ -33,9 +34,35 @@ const images = [
 
 export default function WelcomePage() {
   const navigate = useNavigate();
+  const { addToCart } = useContext(CartContext);
   const username = localStorage.getItem("username") || "User";
   const [slide, setSlide] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [buyAgainItems, setBuyAgainItems] = useState([]);
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    const phone = localStorage.getItem("phone") || localStorage.getItem("customerPhone");
+    if (!phone) return;
+    fetch(`${API_URL}/api/orders/by-phone/${encodeURIComponent(phone)}`)
+      .then(r => r.ok ? r.json() : [])
+      .then(orders => {
+        if (Array.isArray(orders) && orders.length > 0) {
+          // Unique products from the most recent order
+          const seen = new Set();
+          const items = [];
+          for (const order of orders) {
+            for (const item of (order.items || [])) {
+              if (!seen.has(item.id)) { seen.add(item.id); items.push(item); }
+              if (items.length >= 10) break;
+            }
+            if (items.length >= 10) break;
+          }
+          setBuyAgainItems(items);
+        }
+      })
+      .catch(() => {});
+  }, [API_URL]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -127,6 +154,34 @@ export default function WelcomePage() {
   >
     Are you ready to place your order?
   </button>
+
+  {/* Buy it Again */}
+  {buyAgainItems.length > 0 && (
+    <div className="w-full max-w-5xl mx-auto mt-8 px-2">
+      <h2 className="text-xl font-semibold text-green-700 mb-3">🔁 Buy it Again</h2>
+      <div className="flex gap-4 overflow-x-auto pb-3">
+        {buyAgainItems.map((item) => (
+          <div key={item.id} className="bg-white rounded-2xl shadow p-3 shrink-0 w-36 flex flex-col items-center border border-gray-100">
+            {item.image && (
+              <img src={item.image} alt={item.name} loading="lazy"
+                className="w-20 h-20 object-contain mb-2 cursor-pointer"
+                onClick={() => navigate(`/product/${item.id}`)} />
+            )}
+            <p className="text-xs font-semibold text-center text-gray-700 mb-1 line-clamp-2 w-full">{item.name}</p>
+            <p className="text-green-600 font-bold text-sm mb-2">₹{item.price}</p>
+            <button
+              onClick={() => { addToCart({ ...item, qty: 1 }); }}
+              disabled={item.stock <= 0}
+              className={`text-white text-xs py-1.5 px-3 rounded-full w-full font-medium transition
+                ${item.stock > 0 ? "bg-green-600 hover:bg-green-700" : "bg-gray-300 cursor-not-allowed"}`}
+            >
+              {item.stock > 0 ? "Add to Cart" : "Out of Stock"}
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
 </main>
 
     </div>

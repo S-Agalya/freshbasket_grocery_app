@@ -64,11 +64,11 @@
 
 // export default Header;
 
-// import { useContext, useState, useEffect, useRef, useCallback } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { FaShoppingCart, FaUserCircle, FaBell, FaSearch, FaTimes } from "react-icons/fa";
-// import { CartContext } from "../context/CartContext";
-// import axios from "axios";
+import { useContext, useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaShoppingCart, FaUserCircle, FaBell, FaSearch, FaTimes } from "react-icons/fa";
+import { CartContext } from "../context/CartContext";
+import axios from "axios";
 
 // const STATUS_COLORS = {
 //   Pending:   "text-yellow-600",

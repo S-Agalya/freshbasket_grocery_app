@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaEye, FaEyeSlash, FaLeaf } from "react-icons/fa";
 import { MdEmail, MdLock, MdPerson, MdPhone, MdLocationOn } from "react-icons/md";
-
+//
 const AuthForm = ({ type = "login", onSubmit }) => {
   const [formData, setFormData] = useState({ name: "", email: "", password: "", phone: "", address: "" });
   const [showPassword, setShowPassword] = useState(false);

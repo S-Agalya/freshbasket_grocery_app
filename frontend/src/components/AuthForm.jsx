@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaEye, FaEyeSlash, FaLeaf } from "react-icons/fa";
 
+import { MdEmail, MdLock, MdPerson, MdPhone, MdLocationOn } from "react-icons/md";
 const inputClass = "w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent focus:bg-white transition";
 
 const AuthForm = ({ type = "login", onSubmit }) => {

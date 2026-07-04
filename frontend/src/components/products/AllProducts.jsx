@@ -58,71 +58,58 @@ const stockUnitDisplay =
         return (
           <div
             key={product.id}
-            className="bg-gradient-to-b from-white to-amber-50 rounded-2xl shadow-md hover:shadow-2xl transition duration-300 overflow-hidden flex flex-col"
+            className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col group"
           >
-            <div className="relative">
+            <div className="relative overflow-hidden bg-gray-50">
               <img
                 src={product.image}
                 alt={product.name}
                 loading="lazy"
                 onClick={() => navigate(`/product/${product.id}`)}
-                className="w-full h-52 object-contain p-3 bg-amber-50 cursor-pointer"
+                className="w-full h-48 object-contain p-4 cursor-pointer group-hover:scale-105 transition-transform duration-300"
               />
-              <span
-                className={`absolute top-2 right-2 px-2 py-1 text-xs rounded font-semibold ${
-                  product.stock > 0 ? "bg-green-600 text-white" : "bg-red-600 text-white"
-                }`}
-              >
-                {product.stock > 0 ? "Available" : "Out of Stock"}
+              <span className={`absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
+                product.stock > 0 ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"
+              }`}>
+                {product.stock > 0 ? "In Stock" : "Out of Stock"}
               </span>
               <button
                 onClick={() => handleWishlist(product)}
                 className="absolute top-2 left-2 bg-white rounded-full p-1.5 shadow hover:scale-110 transition"
-                title={wishlist.some(w => w.id === product.id) ? "Remove from wishlist" : "Add to wishlist"}
               >
-                <FaHeart size={14} className={wishlist.some(w => w.id === product.id) ? "text-red-500" : "text-gray-300"} />
+                <FaHeart size={13} className={wishlist.some(w => w.id === product.id) ? "text-red-500" : "text-gray-300"} />
               </button>
             </div>
 
             <div className="p-4 flex flex-col flex-grow">
               <h3
                 onClick={() => navigate(`/product/${product.id}`)}
-                className="text-lg font-semibold text-gray-800 mb-1 cursor-pointer hover:text-green-700"
+                className="text-sm font-semibold text-gray-800 mb-1 cursor-pointer hover:text-green-600 line-clamp-2"
               >
                 {product.name} {unitDisplay ? `(${unitDisplay})` : ""}
               </h3>
-
-              <p className="text-amber-700 font-bold mb-1">₹ {product.price}</p>
-
-             <p
-  className={`text-sm mb-3 ${
-    product.stock > 0 ? "text-green-600" : "text-red-600"
-  }`}
->
-  {product.stock > 0
-    ? product.product_type === "bulk"
-      ? `${product.stock} ${product.stock_unit} available`
-      : `${product.stock} ${unitDisplay} available`
-    : "Out of Stock"}
-</p>
-
-
+              <p className="text-xs text-gray-400 mb-2">{product.category}</p>
+              <p className="text-green-600 font-bold text-base mb-1">₹ {product.price}</p>
+              <p className={`text-xs mb-3 ${product.stock > 0 ? "text-gray-500" : "text-red-500"}`}>
+                {product.stock > 0
+                  ? product.product_type === "bulk"
+                    ? `${product.stock} ${product.stock_unit} available`
+                    : `${product.stock} ${unitDisplay} available`
+                  : "Currently unavailable"}
+              </p>
               <button
                 onClick={() => {
-                  if (product.stock === 0) {
-                    alert("❌ This product is out of stock and cannot be added to the cart.");
-                    return;
-                  }
+                  if (product.stock === 0) { alert("❌ This product is out of stock."); return; }
                   addToCart(product);
                 }}
                 disabled={product.stock === 0}
-                className={`mt-auto py-2 rounded-lg shadow text-white font-semibold transition duration-300 ${
+                className={`mt-auto py-2 rounded-xl text-sm font-semibold transition ${
                   product.stock === 0
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-green-600 hover:bg-green-700"
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700 text-white"
                 }`}
               >
-                Add to Cart
+                {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
               </button>
             </div>
           </div>

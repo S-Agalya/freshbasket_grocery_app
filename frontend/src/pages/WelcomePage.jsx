@@ -1,6 +1,3 @@
-
-
-
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
@@ -79,8 +76,17 @@ export default function WelcomePage() {
     navigate(`/order?category=${encodeURIComponent(category)}`);
   };
 
+  const categoryCards = [
+    { label: "Vegetables", emoji: "🥦", color: "bg-green-50 border-green-200 hover:bg-green-100" },
+    { label: "Fruits", emoji: "🍎", color: "bg-red-50 border-red-200 hover:bg-red-100" },
+    { label: "Groceries", emoji: "🛒", color: "bg-yellow-50 border-yellow-200 hover:bg-yellow-100" },
+    { label: "Dairy", emoji: "🥛", color: "bg-blue-50 border-blue-200 hover:bg-blue-100" },
+    { label: "Soaps & Detergents", emoji: "🧴", color: "bg-purple-50 border-purple-200 hover:bg-purple-100" },
+    { label: "Snacks", emoji: "🍪", color: "bg-orange-50 border-orange-200 hover:bg-orange-100" },
+  ];
+
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-yellow-50 to-blue-50">
+    <div className="min-h-screen bg-slate-50">
       <Header username={username} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
 
       <Sidebar
@@ -91,99 +97,74 @@ export default function WelcomePage() {
         onClose={() => setSidebarOpen(false)}
       />
 
-      {/* <main className="flex-1 flex flex-col items-center justify-center px-4 md:px-8 py-6">
-        <div className="flex items-center justify-center gap-4 md:gap-8 w-full max-w-5xl mx-auto">
+      <main className="md:ml-72 px-4 md:px-8 py-6">
+        {/* Hero Banner */}
+        <div className="bg-gradient-to-r from-green-600 to-emerald-500 rounded-2xl p-6 md:p-8 mb-8 text-white relative overflow-hidden">
+          <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-20 flex items-center justify-end pr-6">
+            <span className="text-8xl">🛒</span>
+          </div>
+          <p className="text-green-100 text-sm font-medium mb-1">Hello, {username}! 👋</p>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2 leading-tight">
+            What would you like<br />to order today?
+          </h1>
+          <p className="text-green-100 text-sm mb-5">Fresh groceries, delivered fast to your door.</p>
           <button
-            onClick={goPrev}
-            className="bg-green-700 hover:bg-green-800 text-white rounded-full shadow-lg flex items-center justify-center w-12 md:w-16 aspect-square text-2xl md:text-3xl transition"
+            onClick={() => navigate("/order")}
+            className="bg-white text-green-700 font-semibold px-6 py-2.5 rounded-xl hover:bg-green-50 transition text-sm shadow-sm"
           >
-            &#8592;
-          </button>
-
-          <img
-            src={images[slide]}
-            alt={categories[slide]}
-            className="flex-1 max-h-96 object-cover rounded-3xl shadow-xl border"
-          />
-
-          <button
-            onClick={goNext}
-            className="bg-green-700 hover:bg-green-800 text-white rounded-full shadow-lg flex items-center justify-center w-12 md:w-16 aspect-square text-2xl md:text-3xl transition"
-          >
-            &#8594;
+            Shop Now →
           </button>
         </div>
 
-        <h3 className="text-2xl font-semibold mt-6 text-green-700">{categories[slide]}</h3>
-
-        <button
-          onClick={() => navigate("/order")}
-          className="mt-8 bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full text-lg shadow-lg transition"
-        >
-          Are you ready to place your order?
-        </button>
-      </main> */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 md:px-8 py-6 md:ml-72">
-  <div className="flex items-center justify-center gap-4 md:gap-8 w-full max-w-5xl mx-auto">
-    <button
-      onClick={goPrev}
-      className="bg-green-700 hover:bg-green-800 text-white rounded-full shadow-lg flex items-center justify-center w-12 md:w-16 aspect-square text-2xl md:text-3xl transition"
-    >
-      &#8592;
-    </button>
-
-    <img
-      src={images[slide]}
-      alt={categories[slide]}
-      className="flex-1 max-h-96 object-cover rounded-3xl shadow-xl border"
-    />
-
-    <button
-      onClick={goNext}
-      className="bg-green-700 hover:bg-green-800 text-white rounded-full shadow-lg flex items-center justify-center w-12 md:w-16 aspect-square text-2xl md:text-3xl transition"
-    >
-      &#8594;
-    </button>
-  </div>
-
-  <h3 className="text-2xl font-semibold mt-6 text-green-700">{categories[slide]}</h3>
-
-  <button
-    onClick={() => navigate("/order")}
-    className="mt-8 bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full text-lg shadow-lg transition"
-  >
-    Are you ready to place your order?
-  </button>
-
-  {/* Buy it Again */}
-  {buyAgainItems.length > 0 && (
-    <div className="w-full max-w-5xl mx-auto mt-8 px-2">
-      <h2 className="text-xl font-semibold text-green-700 mb-3">🔁 Buy it Again</h2>
-      <div className="flex gap-4 overflow-x-auto pb-3">
-        {buyAgainItems.map((item) => (
-          <div key={item.id} className="bg-white rounded-2xl shadow p-3 shrink-0 w-36 flex flex-col items-center border border-gray-100">
-            {item.image && (
-              <img src={item.image} alt={item.name} loading="lazy"
-                className="w-20 h-20 object-contain mb-2 cursor-pointer"
-                onClick={() => navigate(`/product/${item.id}`)} />
-            )}
-            <p className="text-xs font-semibold text-center text-gray-700 mb-1 line-clamp-2 w-full">{item.name}</p>
-            <p className="text-green-600 font-bold text-sm mb-2">₹{item.price}</p>
-            <button
-              onClick={() => { addToCart({ ...item, qty: 1 }); }}
-              disabled={item.stock <= 0}
-              className={`text-white text-xs py-1.5 px-3 rounded-full w-full font-medium transition
-                ${item.stock > 0 ? "bg-green-600 hover:bg-green-700" : "bg-gray-300 cursor-not-allowed"}`}
-            >
-              {item.stock > 0 ? "Add to Cart" : "Out of Stock"}
-            </button>
+        {/* Category Grid */}
+        <div className="mb-8">
+          <h2 className="text-lg font-bold text-gray-800 mb-4">Shop by Category</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {categoryCards.map(({ label, emoji, color }) => (
+              <button
+                key={label}
+                onClick={() => handleCategoryClick(label)}
+                className={`${color} border rounded-2xl p-4 flex flex-col items-center gap-2 transition cursor-pointer`}
+              >
+                <span className="text-3xl">{emoji}</span>
+                <span className="text-xs font-semibold text-gray-700 text-center leading-tight">{label}</span>
+              </button>
+            ))}
           </div>
-        ))}
-      </div>
-    </div>
-  )}
-</main>
+        </div>
 
+        {/* Buy it Again */}
+        {buyAgainItems.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-gray-800">🔁 Buy it Again</h2>
+              <button onClick={() => navigate("/my-orders")} className="text-sm text-green-600 font-medium hover:underline">View orders →</button>
+            </div>
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {buyAgainItems.map((item) => (
+                <div key={item.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 shrink-0 w-36 flex flex-col items-center hover:shadow-md transition">
+                  {item.image && (
+                    <img src={item.image} alt={item.name} loading="lazy"
+                      className="w-20 h-20 object-contain mb-2 cursor-pointer"
+                      onClick={() => navigate(`/product/${item.id}`)} />
+                  )}
+                  <p className="text-xs font-semibold text-center text-gray-700 mb-1 line-clamp-2 w-full">{item.name}</p>
+                  <p className="text-green-600 font-bold text-sm mb-2">₹{item.price}</p>
+                  <button
+                    onClick={() => addToCart({ ...item, qty: 1 })}
+                    disabled={item.stock <= 0}
+                    className={`text-white text-xs py-1.5 px-3 rounded-xl w-full font-medium transition
+                      ${item.stock > 0 ? "bg-green-600 hover:bg-green-700" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
+                  >
+                    {item.stock > 0 ? "Add to Cart" : "Out of Stock"}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
+

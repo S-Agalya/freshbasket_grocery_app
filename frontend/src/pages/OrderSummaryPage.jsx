@@ -113,6 +113,9 @@ const OrderSummaryPage = () => {
       setOrderedItems(cartItems);
       setOrderedTotal(totalAmount);
 
+      // Persist phone permanently so "Buy Again" works on the home page
+      if (customerPhone) localStorage.setItem("phone", customerPhone);
+
       clearCart();
       localStorage.removeItem("customerName");
       localStorage.removeItem("customerPhone");
@@ -155,204 +158,166 @@ const OrderSummaryPage = () => {
   const ownerPhoneNumber = import.meta.env.VITE_OWNER_PHONE;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-yellow-50 to-blue-50 flex flex-col">
-      <header className="flex items-center justify-between px-6 py-4 shadow bg-white">
-        <h1 className="text-3xl font-bold text-green-700">Order Summary</h1>
-        <button
-          onClick={() => navigate("/order")}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
-        >
-          Go & Select More Products
-        </button>
-      </header>
+    <div className="min-h-screen bg-slate-50">
+      {/* Header */}
+      <div className="sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm flex items-center justify-between px-6 py-4">
+        <div className="flex items-center gap-2">
+          <button onClick={() => navigate(-1)} className="text-gray-500 hover:text-emerald-600 p-1 rounded-lg hover:bg-gray-100 transition">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          </button>
+          <h1 className="text-lg font-bold text-gray-900">Checkout</h1>
+        </div>
+        <button onClick={() => navigate("/order")} className="text-sm text-emerald-600 font-medium hover:underline">+ Add items</button>
+      </div>
 
-      <main className="flex-1 p-4 md:p-8 max-w-2xl mx-auto w-full">
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
         {!orderId && cartItems.length > 0 && (
           <>
-            {/* Cart Summary */}
-            <div className="mb-6">
-              <h2 className="text-xl font-bold mb-4 text-green-700">Your Items:</h2>
-              <ul className="space-y-2">
+            {/* Cart items */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <h2 className="font-bold text-gray-800 mb-3">Order Items</h2>
+              <div className="divide-y divide-gray-50">
                 {cartItems.map((item) => (
-                  <li
-                    key={item.id}
-                    className="flex justify-between items-center bg-white p-3 rounded shadow"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <span className="font-semibold">{item.name}</span>
-                      <span>
-                        x {item.qty} {item.unit} {/* ✅ Fixed unit displayed */}
-                      </span>
+                  <div key={item.id} className="flex items-center justify-between py-3 gap-4">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      {item.image && <img src={item.image} alt={item.name} className="w-10 h-10 object-contain rounded-lg bg-gray-50 shrink-0" />}
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-gray-800 truncate">{item.name}</p>
+                        <p className="text-xs text-gray-400">x{item.qty} {item.unit}</p>
+                      </div>
                     </div>
-
-                    <div className="flex items-center space-x-2">
-                      <span className="font-bold text-green-700">
-                        ₹ {item.price * item.qty}
-                      </span>
-                      <button
-                        onClick={() => decreaseQty(item.id)}
-                        className="px-2 py-1 bg-gray-200 rounded"
-                      >
-                        -
-                      </button>
-                      <button
-                        onClick={() => increaseQty(item.id)}
-                        className="px-2 py-1 bg-gray-200 rounded"
-                      >
-                        +
-                      </button>
-                      <button
-                        onClick={() => removeFromCart(item.id)}
-                        className="px-2 py-1 bg-red-500 text-white rounded"
-                      >
-                        Remove
-                      </button>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-sm font-bold text-emerald-600">₹{item.price * item.qty}</span>
+                      <button onClick={() => decreaseQty(item.id)} className="w-6 h-6 rounded bg-gray-100 text-gray-600 text-xs font-bold hover:bg-gray-200 flex items-center justify-center">-</button>
+                      <button onClick={() => increaseQty(item.id)} className="w-6 h-6 rounded bg-emerald-100 text-emerald-700 text-xs font-bold hover:bg-emerald-200 flex items-center justify-center">+</button>
+                      <button onClick={() => removeFromCart(item.id)} className="w-6 h-6 rounded bg-red-50 text-red-400 text-xs hover:bg-red-100 flex items-center justify-center">×</button>
                     </div>
-                  </li>
+                  </div>
                 ))}
-              </ul>
-              <div className="mt-4 text-right text-lg font-bold text-green-800">
-                Total: ₹ {totalAmount}
+              </div>
+              <div className="border-t border-gray-100 pt-3 mt-1 flex justify-between">
+                <span className="text-sm text-gray-500">Subtotal ({cartItems.length} items)</span>
+                <span className="font-bold text-gray-800">₹{subtotal}</span>
               </div>
             </div>
 
             {/* Customer Details */}
-            <div className="bg-white p-4 rounded shadow space-y-4">
-              <h2 className="text-lg font-bold text-green-700">Customer Details</h2>
-              <input
-                type="text"
-                placeholder="Name"
-                value={customerName}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
+              <h2 className="font-bold text-gray-800">Delivery Details</h2>
+              <input type="text" placeholder="Full Name" value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
-                className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-300"
-              />
-              <input
-                type="text"
-                placeholder="Phone"
-                value={customerPhone}
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" />
+              <input type="text" placeholder="Phone Number" value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
-                className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-300"
-              />
-              <textarea
-                placeholder="Address"
-                value={customerAddress}
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" />
+              <textarea rows={2} placeholder="Delivery Address" value={customerAddress}
                 onChange={(e) => setCustomerAddress(e.target.value)}
-                className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-300"
-              ></textarea>
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none" />
 
               {/* Saved addresses */}
               {savedAddresses.length > 0 && (
-                <div className="bg-gray-50 border rounded-lg p-3 space-y-2">
-                  <p className="text-sm font-medium text-gray-600">📍 Saved Addresses</p>
+                <div className="bg-gray-50 rounded-xl p-3 space-y-2">
+                  <p className="text-xs font-semibold text-gray-500">Saved Addresses</p>
                   {savedAddresses.map((addr, i) => (
-                    <div key={i} className="flex items-center justify-between gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setCustomerAddress(addr)}
-                        className={`flex-1 text-left text-sm px-3 py-1.5 rounded-lg border transition
-                          ${customerAddress === addr ? "border-green-500 bg-green-50 text-green-700 font-medium" : "border-gray-200 hover:border-green-300 text-gray-700"}`}
-                      >
-                        {addr}
-                      </button>
-                      <button onClick={() => handleDeleteAddress(addr)} className="text-red-400 hover:text-red-600 shrink-0">
-                        <FaTrash size={12} />
-                      </button>
+                    <div key={i} className="flex items-center gap-2">
+                      <button type="button" onClick={() => setCustomerAddress(addr)}
+                        className={`flex-1 text-left text-xs px-3 py-2 rounded-lg border transition ${
+                          customerAddress === addr
+                            ? "border-emerald-400 bg-emerald-50 text-emerald-700 font-semibold"
+                            : "border-gray-200 text-gray-600 hover:border-emerald-300"
+                        }`}>{addr}</button>
+                      <button onClick={() => handleDeleteAddress(addr)} className="text-red-400 hover:text-red-600 text-xs p-1">×</button>
                     </div>
                   ))}
                 </div>
               )}
-
-              {/* Save current address button */}
               {customerAddress.trim() && !savedAddresses.includes(customerAddress.trim()) && (
-                <button
-                  type="button"
-                  onClick={handleSaveAddress}
-                  className="flex items-center gap-1 text-xs text-green-600 hover:text-green-800 border border-green-300 px-3 py-1 rounded-full"
-                >
-                  <FaPlus size={10} /> Save this address
+                <button type="button" onClick={handleSaveAddress}
+                  className="text-xs text-emerald-600 border border-emerald-300 px-3 py-1 rounded-full hover:bg-emerald-50">
+                  + Save this address
                 </button>
               )}
-              <textarea
-                placeholder="Additional Comments (e.g. items not listed)"
-                value={comments}
+
+              <textarea rows={2} placeholder="Additional comments (optional)" value={comments}
                 onChange={(e) => setComments(e.target.value)}
-                className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-300"
-              ></textarea>
-              {/* Promo code */}
-              <div className="border rounded-lg p-3 space-y-2">
-                <p className="text-sm font-medium text-gray-600">🎟 Promo Code</p>
-                {promoApplied ? (
-                  <div className="flex items-center justify-between bg-green-50 border border-green-300 rounded-lg px-3 py-2">
-                    <span className="text-green-700 font-semibold text-sm">{promoApplied.code} — {promoApplied.label} applied!</span>
-                    <button onClick={removePromo} className="text-red-400 hover:text-red-600 text-xs ml-2">Remove</button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Enter code (e.g. FRESH10)"
-                      value={promoCode}
-                      onChange={e => setPromoCode(e.target.value)}
-                      className="flex-1 border rounded p-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 uppercase"
-                    />
-                    <button onClick={applyPromo} className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700">Apply</button>
-                  </div>
-                )}
-              </div>
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none" />
+            </div>
 
-              {/* Total with discount */}
-              <div className="text-right space-y-1">
-                {promoApplied && <p className="text-sm text-gray-500">Subtotal: ₹{subtotal} &nbsp;|&nbsp; <span className="text-green-600">-₹{discount}</span></p>}
-                <p className="text-lg font-bold text-green-800">Total: ₹{totalAmount}</p>
-              </div>
+            {/* Promo code */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <h2 className="font-bold text-gray-800 mb-3">Promo Code</h2>
+              {promoApplied ? (
+                <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">
+                  <span className="text-sm font-semibold text-emerald-700">{promoApplied.code} — {promoApplied.label} applied!</span>
+                  <button onClick={removePromo} className="text-red-400 hover:text-red-600 text-xs font-medium">Remove</button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input type="text" placeholder="Enter code (e.g. FRESH10)" value={promoCode}
+                    onChange={e => setPromoCode(e.target.value)}
+                    className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 uppercase" />
+                  <button onClick={applyPromo} className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 rounded-xl text-sm font-semibold transition">Apply</button>
+                </div>
+              )}
+            </div>
 
-              <button
-                onClick={handlePlaceOrder}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded shadow-lg transition w-full"
-              >
-                Place Order
+            {/* Order Total + Place Order */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="space-y-2 mb-4">
+                <div className="flex justify-between text-sm text-gray-600"><span>Subtotal</span><span>₹{subtotal}</span></div>
+                {promoApplied && <div className="flex justify-between text-sm text-emerald-600"><span>Discount ({promoApplied.label})</span><span>-₹{discount}</span></div>}
+                <div className="flex justify-between font-bold text-gray-900 border-t border-gray-100 pt-3">
+                  <span>Total</span>
+                  <span className="text-emerald-600 text-lg">₹{totalAmount}</span>
+                </div>
+              </div>
+              <button onClick={handlePlaceOrder}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold text-sm transition shadow-sm">
+                Place Order →
               </button>
             </div>
           </>
         )}
 
-        {orderId && (
-          <div className="mt-6">
-            <h2 className="text-xl font-bold mb-4 text-green-700">✅ Order Placed</h2>
-            <ul className="space-y-2">
-              {orderedItems.map((item, index) => (
-                <li
-                  key={index}
-                  className="bg-white p-3 rounded shadow flex justify-between items-center"
-                >
-                  <span>
-                    {item.name} x {item.qty} {item.unit} {/* ✅ Fixed unit */}
-                  </span>
-                  <span className="font-bold text-green-700">
-                    ₹ {item.price * item.qty}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-4 text-right text-lg font-bold text-green-800">
-              Total: ₹ {orderedTotal}
-            </div>
-
-            <div className="mt-6 flex flex-col items-center">
-              <a
-                href={`https://wa.me/${ownerPhoneNumber}?text=${buildWhatsappMessage()}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded shadow-lg transition text-center block w-full md:w-auto"
-              >
-                Send Order via WhatsApp
-              </a>
-            </div>
+        {/* Empty cart */}
+        {!orderId && cartItems.length === 0 && (
+          <div className="text-center py-20">
+            <div className="text-5xl mb-4">🛒</div>
+            <p className="text-gray-500 font-medium mb-4">Your cart is empty</p>
+            <button onClick={() => navigate("/order")} className="bg-emerald-600 text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-emerald-700 transition">Browse Products</button>
           </div>
         )}
-      </main>
+
+        {/* Order placed confirmation */}
+        {orderId && (
+          <div className="bg-white rounded-2xl border border-emerald-100 shadow-sm p-6 text-center">
+            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+            </div>
+            <h2 className="text-xl font-bold text-gray-800 mb-1">Order Placed!</h2>
+            <p className="text-gray-500 text-sm mb-1">Order ID: <span className="font-bold text-emerald-600">#{orderId}</span></p>
+            <p className="text-gray-400 text-xs mb-6">Total: ₹{orderedTotal}</p>
+
+            <div className="space-y-2 text-sm text-left bg-gray-50 rounded-xl p-4 mb-5">
+              {orderedItems.map((item, i) => (
+                <div key={i} className="flex justify-between">
+                  <span className="text-gray-600">{item.name} × {item.qty}</span>
+                  <span className="font-medium">₹{item.price * item.qty}</span>
+                </div>
+              ))}
+            </div>
+
+            <a href={`https://wa.me/${ownerPhoneNumber}?text=${buildWhatsappMessage()}`}
+              target="_blank" rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-semibold text-sm transition">
+              📱 Send Order via WhatsApp
+            </a>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
 export default OrderSummaryPage;
+

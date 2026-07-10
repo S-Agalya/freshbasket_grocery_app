@@ -51,6 +51,7 @@ import { fileURLToPath } from "url";
 import adminOrderRoutes from "./routes/adminOrderRoutes.js"
 import statsRoutes from "./routes/statsRoutes.js"
 
+import aiRoutes from "./routes/aiRoutes.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config();
@@ -87,5 +88,6 @@ app.get("/", (req, res) => {
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+app.use("/api/ai", aiRoutes);
 const PORT = process.env.PORT ;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

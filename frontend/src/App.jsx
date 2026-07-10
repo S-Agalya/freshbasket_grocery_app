@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import WelcomePage from './pages/WelcomePage';
@@ -10,10 +10,18 @@ import OrderSummaryPage from './pages/OrderSummaryPage';
 import ProfilePage from './pages/ProfilePage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import MyOrdersPage from './pages/MyOrdersPage';
-import WishlistPage from "./pages/WishlistPage";
+import WishlistPage from './pages/WishlistPage';
 import Footer from './components/Footer';
+import BottomNav from './components/BottomNav';
 import './App.css';
-import BottomNav from "./components/BottomNav";
+
+// Hide footer on browse/auth pages where a fixed sidebar exists or there's no need
+function ConditionalFooter() {
+  const { pathname } = useLocation();
+  const noFooter = ["/login", "/register", "/order"];
+  if (noFooter.some(p => pathname === p || pathname.startsWith("/order"))) return null;
+  return <Footer />;
+}
 
 function App() {
   return (
@@ -35,8 +43,8 @@ function App() {
               <Route path="*" element={<LoginPage />} />
             </Routes>
           </div>
-          <Footer />
-          <BottomNav/>
+          <ConditionalFooter />
+          <BottomNav />
         </div>
       </Router>
     </CartProvider>

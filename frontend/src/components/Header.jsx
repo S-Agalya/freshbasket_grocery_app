@@ -132,21 +132,21 @@ const Header = ({ username = "User", onMenuToggle }) => {
           </div>
 
           {showResults && results.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl z-50 max-h-80 overflow-y-auto"
+            <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-2xl z-50 max-h-52 sm:max-h-72 overflow-y-auto"
               style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.06)" }}>
               {results.map((p) => (
                 <div key={p.id}
                   onClick={() => { navigate(`/product/${p.id}`); setShowResults(false); setQuery(""); }}
-                  className="flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-gray-50 last:border-0 hover:bg-green-50 transition">
-                  {p.image && <img src={p.image} alt={p.name} className="w-10 h-10 object-contain rounded-xl bg-gray-50" />}
+                  className="flex items-center gap-2.5 px-3 py-2 sm:px-4 sm:py-2.5 cursor-pointer border-b border-gray-50 last:border-0 hover:bg-green-50 transition">
+                  {p.image && <img src={p.image} alt={p.name} className="w-8 h-8 sm:w-10 sm:h-10 object-contain rounded-lg bg-gray-50 flex-shrink-0" />}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-800 truncate">{p.name}</p>
-                    <p className="text-xs text-gray-400">{p.category}</p>
+                    <p className="text-xs sm:text-sm font-semibold text-gray-800 truncate">{p.name}</p>
+                    <p className="text-[10px] sm:text-xs text-gray-400">{p.category}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-bold text-green-700">₹{p.price}</p>
-                    <span className={`text-xs ${p.stock > 0 ? "text-emerald-500" : "text-red-400"}`}>
-                      {p.stock > 0 ? "In Stock" : "Out of Stock"}
+                    <p className="text-xs sm:text-sm font-bold text-green-700">₹{p.price}</p>
+                    <span className={`text-[10px] sm:text-xs ${p.stock > 0 ? "text-emerald-500" : "text-red-400"}`}>
+                      {p.stock > 0 ? "In Stock" : "Out"}
                     </span>
                   </div>
                 </div>
@@ -154,7 +154,7 @@ const Header = ({ username = "User", onMenuToggle }) => {
             </div>
           )}
           {showResults && results.length === 0 && query.trim() && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl z-50 px-4 py-4 text-sm text-gray-400 text-center"
+            <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-2xl z-50 px-4 py-3 text-xs sm:text-sm text-gray-400 text-center"
               style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.1)", border: "1px solid rgba(0,0,0,0.06)" }}>
               No results for "<span className="text-gray-700 font-medium">{query}</span>"
             </div>
@@ -176,27 +176,33 @@ const Header = ({ username = "User", onMenuToggle }) => {
                 )}
               </button>
               {showNotif && (
-                <div className="absolute right-0 top-12 w-80 bg-white rounded-2xl z-50 overflow-hidden"
-                  style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.14)", border: "1px solid rgba(0,0,0,0.07)" }}>
-                  <div className="px-4 py-3 flex justify-between items-center"
+                <div
+                  className="absolute right-0 top-12 bg-white rounded-2xl z-50 overflow-hidden"
+                  style={{
+                    width: "min(300px, calc(100vw - 1rem))",
+                    boxShadow: "0 8px 40px rgba(0,0,0,0.14)",
+                    border: "1px solid rgba(0,0,0,0.07)",
+                  }}
+                >
+                  <div className="px-3 py-2.5 flex justify-between items-center"
                     style={{ background: "linear-gradient(90deg,#f0fdf4,#ecfdf5)", borderBottom: "1px solid #d1fae5" }}>
-                    <span className="font-bold text-gray-800 text-sm">My Orders</span>
+                    <span className="font-bold text-gray-800 text-xs sm:text-sm">My Orders</span>
                     <button onClick={() => { navigate("/my-orders"); setShowNotif(false); }}
-                      className="text-xs text-green-700 font-semibold hover:underline">View all →</button>
+                      className="text-[11px] sm:text-xs text-green-700 font-semibold hover:underline">View all →</button>
                   </div>
                   {orders.length === 0 ? (
-                    <p className="text-sm text-gray-400 p-4 text-center">No orders yet.</p>
+                    <p className="text-xs text-gray-400 p-3 text-center">No orders yet.</p>
                   ) : (
-                    <div className="max-h-72 overflow-y-auto">
+                    <div className="max-h-52 sm:max-h-64 overflow-y-auto">
                       {orders.slice(0, 5).map((o) => (
                         <div key={o.id}
                           onClick={() => { navigate("/my-orders"); setShowNotif(false); }}
-                          className="px-4 py-3 hover:bg-green-50 cursor-pointer border-b border-gray-50 last:border-0 transition">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-semibold text-gray-700">Order #{o.id}</span>
-                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 ${STATUS_COLORS[o.status] || "text-gray-600"}`}>{o.status}</span>
+                          className="px-3 py-2.5 hover:bg-green-50 cursor-pointer border-b border-gray-50 last:border-0 transition">
+                          <div className="flex justify-between items-center gap-2">
+                            <span className="text-xs font-semibold text-gray-700">Order #{o.id}</span>
+                            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-gray-100 whitespace-nowrap ${STATUS_COLORS[o.status] || "text-gray-600"}`}>{o.status}</span>
                           </div>
-                          <p className="text-xs text-gray-400 mt-0.5">₹{o.total_amount} · {new Date(o.created_at).toLocaleDateString("en-IN")}</p>
+                          <p className="text-[10px] text-gray-400 mt-0.5">₹{o.total_amount} · {new Date(o.created_at).toLocaleDateString("en-IN")}</p>
                         </div>
                       ))}
                     </div>

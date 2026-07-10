@@ -2,17 +2,24 @@ import { createContext, useState, useEffect } from "react";
 
 export const CartContext = createContext();
 
+const getCartKey = () => `cartItems_${localStorage.getItem("userId") || "guest"}`;
+
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(() => {
-    // ✅ Load from localStorage if exists
-    const storedCart = localStorage.getItem("cartItems");
+    const storedCart = localStorage.getItem(getCartKey());
     return storedCart ? JSON.parse(storedCart) : [];
   });
 
-  // ✅ Save cart to localStorage whenever it changes
+  // Save cart to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+    localStorage.setItem(getCartKey(), JSON.stringify(cartItems));
   }, [cartItems]);
+
+  // Call this after login to load the newly logged-in user's cart
+  const loadUserCart = (userId) => {
+    const stored = localStorage.getItem(`cartItems_${userId}`);
+    setCartItems(stored ? JSON.parse(stored) : []);
+  };
 
   // Your existing functions
   const addToCart = (product) => {
@@ -52,21 +59,18 @@ export const CartProvider = ({ children }) => {
 
   const setItemQty = (id, qty) => {
     const n = parseInt(qty);
-    if (isNaN(n) || n < 1) return; // Ignore invalid values
-    setCartItems(prev =>
-      prev.map(item =>
-        item.id === id ? { ...item, qty: n } : item
-      )
-    );
-  }
+    if (isNaN(n) || n < 1) return;
+    setCartItems(prev => prev.map(item => item.id === id ? { ...item, qty: n } : item));
+  };
+
   const clearCart = () => {
     setCartItems([]);
-    localStorage.removeItem("cartItems"); // ✅ clear from localStorage after placing order
+    localStorage.removeItem(getCartKey());
   };
 
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, increaseQty, decreaseQty, setItemQty, clearCart }}
+      value={{ cartItems, addToCart, removeFromCart, increaseQty, decreaseQty, setItemQty, clearCart, loadUserCart }}
     >
       {children}
     </CartContext.Provider>

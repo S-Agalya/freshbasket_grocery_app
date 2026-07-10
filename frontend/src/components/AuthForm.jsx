@@ -11,7 +11,7 @@ const AuthForm = ({ type = "login", onSubmit }) => {
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
   const isLogin = type === "login";
-
+//abi
   return (
     <div className="min-h-screen flex">
       {/* LEFT — Brand Panel */}

@@ -1,11 +1,13 @@
 
 import { loginUser } from "../api/auth";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 import AuthForm from "../components/AuthForm";
+import { CartContext } from "../context/CartContext";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { loadUserCart } = useContext(CartContext);
 
   // ✅ Top-level effect to redirect if already logged in
   useEffect(() => {
@@ -35,7 +37,10 @@ const LoginPage = () => {
       localStorage.setItem("userId", response.userId || "");
       localStorage.setItem("token", response.token || "");
       localStorage.setItem("role", response.role || "");
- localStorage.setItem("phone", response.phone || "");
+      localStorage.setItem("phone", response.phone || "");
+
+      // Load this user's cart (empty for new users)
+      loadUserCart(response.userId);
 
       // ✅ Navigate to welcome page after login
       navigate("/welcome");

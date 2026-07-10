@@ -16,7 +16,7 @@ const STATUS_COLORS = {
 
 const Header = ({ username = "User", onMenuToggle }) => {
   const navigate = useNavigate();
-  const { cartItems } = useContext(CartContext);
+  const { cartItems ,clearCart} = useContext(CartContext);
   const totalQty = cartItems.reduce((sum, item) => sum + item.qty, 0);
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -82,7 +82,7 @@ const Header = ({ username = "User", onMenuToggle }) => {
     localStorage.setItem("seenOrderStatuses", JSON.stringify(updated));
   };
 
-  const handleLogout = () => { localStorage.removeItem("username"); navigate("/login"); };
+  const handleLogout = () => {clearCart(); localStorage.clear(); navigate("/login"); };
   const handleProfile = () => navigate("/profile");
 
   return (

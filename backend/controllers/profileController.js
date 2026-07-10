@@ -94,29 +94,16 @@ export const updateProfile = async (req, res) => {
   const { username, email, password, phone, address } = req.body;
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 1️⃣ Update users table
-    await db.query(
-      `UPDATE users SET name = $1, email = $2, password = $3 WHERE id = $4`,
-      [username, email, hashedPassword, userId]
-    );
-
-    // 2️⃣ Insert or update user_profiles
-    const profileCheck = await db.query(
-      `SELECT * FROM user_profiles WHERE user_id = $1`,
-      [userId]
-    );
-
-    if (profileCheck.rows.length === 0) {
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
       await db.query(
-        `INSERT INTO user_profiles (user_id, phone, address) VALUES ($1, $2, $3)`,
-        [userId, phone, address]
+        `UPDATE users SET name = $1, email = $2, password = $3, phone = $4, address = $5 WHERE id = $6`,
+        [username, email, hashedPassword, phone || null, address || null, userId]
       );
     } else {
       await db.query(
-        `UPDATE user_profiles SET phone = $1, address = $2 WHERE user_id = $3`,
-        [phone, address, userId]
+        `UPDATE users SET name = $1, email = $2, phone = $3, address = $4 WHERE id = $5`,
+        [username, email, phone || null, address || null, userId]
       );
     }
 
@@ -133,7 +120,7 @@ export const getProfile = async (req, res) => {
 
   try {
     const userResult = await db.query(
-      `SELECT name, email FROM users WHERE id = $1`,
+      `SELECT name, email, phone, address FROM users WHERE id = $1`,
       [userId]
     );
 
@@ -143,18 +130,11 @@ export const getProfile = async (req, res) => {
 
     const user = userResult.rows[0];
 
-    const profileResult = await db.query(
-      `SELECT phone, address FROM user_profiles WHERE user_id = $1`,
-      [userId]
-    );
-
-    const profile = profileResult.rows[0] || {};
-
     res.json({
       username: user.name,
       email: user.email,
-      phone: profile.phone || "",
-      address: profile.address || ""
+      phone: user.phone || "",
+      address: user.address || ""
     });
   } catch (err) {
     console.error(err);

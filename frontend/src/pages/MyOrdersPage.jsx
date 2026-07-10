@@ -68,85 +68,131 @@ export default function MyOrdersPage() {
   const filtered = filter === "All" ? orders : orders.filter(o => o.status === filter);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-yellow-50 to-blue-50 p-4 md:p-8">
-      <div className="max-w-3xl mx-auto">
-        <button onClick={() => navigate(-1)} className="text-green-700 hover:underline mb-4 flex items-center gap-1 font-medium">
-          ← Back
-        </button>
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">My Orders</h1>
+    <div className="min-h-screen pb-24 md:pb-8" style={{ background: "#f5f7f5" }}>
+      {/* Header */}
+      <div className="bg-white sticky top-0 z-30"
+        style={{ boxShadow: "0 1px 0 rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.04)" }}>
+        <div className="max-w-screen-xl mx-auto flex items-center gap-3 px-4 py-3.5">
+          <button onClick={() => navigate(-1)}
+            className="w-8 h-8 flex items-center justify-center rounded-xl text-gray-500 hover:bg-gray-100 transition">
+            <span className="text-sm">←</span>
+          </button>
+          <div>
+            <h1 className="text-base font-extrabold text-gray-900 leading-none">My Orders</h1>
+            {orders.length > 0 && (
+              <p className="text-xs text-gray-400 mt-0.5">{orders.length} order{orders.length > 1 ? "s" : ""}</p>
+            )}
+          </div>
+        </div>
+      </div>
 
+      <div className="max-w-screen-xl mx-auto px-3 py-4 md:px-6">
         {!phone && (
-          <p className="text-gray-500">No phone number found. Please place an order first.</p>
+          <p className="text-gray-500 text-sm">No phone number found. Please place an order first.</p>
         )}
 
         {/* Filter pills */}
         {orders.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex flex-wrap gap-2 mb-4">
             {filterOptions.map(s => (
-              <button
-                key={s}
-                onClick={() => setFilter(s)}
-                className={`px-3 py-1 rounded-full text-sm font-medium border transition
-                  ${filter === s ? "bg-green-600 text-white border-green-600" : "bg-white text-gray-600 border-gray-300 hover:border-green-400"}`}
-              >
+              <button key={s} onClick={() => setFilter(s)}
+                className={`px-3 py-1 rounded-full text-xs font-semibold border transition ${
+                  filter === s
+                    ? "text-white border-transparent"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-green-400"
+                }`}
+                style={filter === s ? { background: "linear-gradient(135deg,#16a34a,#059669)" } : {}}>
                 {s}
               </button>
             ))}
           </div>
         )}
 
-        {loading && <p className="text-gray-500">Loading your orders...</p>}
+        {loading && (
+          <div className="space-y-3">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="bg-white rounded-2xl h-28 animate-pulse"
+                style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }} />
+            ))}
+          </div>
+        )}
 
         {!loading && filtered.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-5xl mb-4">🛒</p>
-            <p className="text-gray-500 text-lg">No orders found.</p>
-            <button onClick={() => navigate("/welcome")} className="mt-4 bg-green-600 text-white px-6 py-2 rounded-xl hover:bg-green-700">
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="text-5xl mb-4">📦</div>
+            <p className="text-gray-800 font-bold mb-1">No orders yet</p>
+            <p className="text-gray-400 text-sm mb-6">Your placed orders will appear here.</p>
+            <button onClick={() => navigate("/order")}
+              className="text-white font-bold px-7 py-2.5 rounded-2xl text-sm shadow-md"
+              style={{ background: "linear-gradient(135deg,#16a34a,#059669)" }}>
               Start Shopping
             </button>
           </div>
         )}
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {filtered.map((order) => (
-            <div key={order.id} className="bg-white rounded-2xl shadow p-5">
-              {/* Header row */}
-              <div className="flex flex-wrap justify-between items-start gap-2 mb-3">
-                <div>
-                  <span className="text-xs text-gray-400">Order ID</span>
-                  <p className="font-bold text-gray-800">#{order.id}</p>
+            <div key={order.id} className="bg-white rounded-2xl overflow-hidden"
+              style={{ boxShadow: "0 2px 10px rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.04)" }}>
+              {/* Card header */}
+              <div className="flex items-center justify-between px-4 py-3"
+                style={{ borderBottom: "1px solid #f3f4f6" }}>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg"
+                    style={{ background: "#f0fdf4" }}>
+                    📦
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-gray-800">Order #{order.id}</p>
+                    <p className="text-xs text-gray-400">
+                      {new Date(order.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                    </p>
+                  </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs text-gray-400">Date</span>
-                  <p className="text-sm text-gray-600">{new Date(order.created_at).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" })}</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-xs text-gray-400">Total</span>
-                  <p className="font-bold text-green-600">₹{order.total_amount}</p>
+                  <p className="text-sm font-extrabold" style={{ color: "#0f3d22" }}>₹{order.total_amount}</p>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 ${
+                    order.status === "Delivered" ? "text-green-600" :
+                    order.status === "Cancelled" ? "text-red-500" :
+                    order.status === "Shipped"   ? "text-blue-600" : "text-yellow-600"
+                  }`}>
+                    {order.status}
+                  </span>
                 </div>
               </div>
 
               {/* Tracking timeline */}
-              <TrackingTimeline status={order.status} />
+              <div className="px-4 pb-1">
+                <TrackingTimeline status={order.status} />
+              </div>
 
               {/* Items */}
-              <div className="mt-4 border-t pt-3 space-y-2">
-                {order.items?.map((item, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    {item.image && <img src={item.image} alt={item.name} className="w-10 h-10 object-cover rounded-lg" />}
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-700">{item.name}</p>
-                      <p className="text-xs text-gray-500">x{item.quantity} · ₹{item.price} each</p>
+              {order.items?.length > 0 && (
+                <div className="px-4 pb-3 pt-2 space-y-2" style={{ borderTop: "1px solid #f3f4f6" }}>
+                  {order.items.map((item, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      {item.image && (
+                        <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0 bg-gray-50">
+                          <img src={item.image} alt={item.name} className="w-full h-full object-contain p-0.5" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-gray-800 truncate">{item.name}</p>
+                        <p className="text-[10px] text-gray-400">×{item.quantity} · ₹{item.price} each</p>
+                      </div>
+                      <p className="text-xs font-bold text-gray-700 flex-shrink-0">₹{item.price * item.quantity}</p>
                     </div>
-                    <p className="text-sm font-semibold text-gray-700">₹{item.price * item.quantity}</p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
 
-              {/* Delivery address */}
-              <div className="mt-3 text-xs text-gray-500 border-t pt-2">
-                📍 {order.address}
-              </div>
+              {/* Address */}
+              {order.address && (
+                <div className="px-4 py-2 text-[10px] text-gray-400"
+                  style={{ borderTop: "1px solid #f3f4f6" }}>
+                  📍 {order.address}
+                </div>
+              )}
             </div>
           ))}
         </div>

@@ -71,7 +71,7 @@ export default function PlaceOrderPage() {
           onSelectCategory={handleCategorySelect}
           isOpen={menuOpen}
           onClose={() => setMenuOpen(false)}
-          onOpen={()=> setMenuOpen(true)}
+          onOpen={() => setMenuOpen(true)}
         />
 
         {/* <main className="flex-1 overflow-y-auto p-6">
@@ -80,10 +80,10 @@ export default function PlaceOrderPage() {
           </h2>
           {renderCategoryComponent()}
         </main> */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 md:ml-72">
-          <div className="flex items-center gap-2 mb-5">
-            <span className="w-1 h-6 bg-emerald-600 rounded-full"></span>
-            <h2 className="text-xl font-bold text-gray-800">
+        <main className="flex-1 overflow-y-auto pt-3 pb-24 px-2 md:ml-[88px] md:pt-4 md:pb-6 md:px-4">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="w-1 h-5 bg-emerald-600 rounded-full"></span>
+            <h2 className="text-lg font-bold text-gray-800">
               {selectedCategory === "All" ? "All Products" : selectedCategory}
             </h2>
           </div>

@@ -1,3 +1,5 @@
+
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaSignOutAlt, FaEdit } from "react-icons/fa";
@@ -70,7 +72,7 @@ const ProfilePage = () => {
   const totalSpent = orders.reduce((s, o) => s + parseFloat(o.total_amount || 0), 0);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 pb-24 md:pb-8">
       {/* Top bar */}
       <div className="bg-white border-b border-gray-100 shadow-sm px-6 py-4 flex items-center justify-between">
         <button onClick={() => navigate("/welcome")}
@@ -87,7 +89,7 @@ const ProfilePage = () => {
       {loading ? (
         <div className="flex items-center justify-center py-20 text-gray-400">Loading profile…</div>
       ) : (
-        <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+        <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
 
           {/* Avatar banner */}
           <div className="bg-gradient-to-br from-emerald-600 to-green-500 rounded-2xl p-6 text-white flex items-center gap-4">

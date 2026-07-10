@@ -120,7 +120,7 @@ export const getProfile = async (req, res) => {
 
   try {
     const userResult = await db.query(
-      `SELECT name, email, phone, address FROM users WHERE id = $1`,
+      `SELECT name, email, phone, address, avatar FROM users WHERE id = $1`,
       [userId]
     );
 
@@ -134,7 +134,8 @@ export const getProfile = async (req, res) => {
       username: user.name,
       email: user.email,
       phone: user.phone || "",
-      address: user.address || ""
+      address: user.address || "",
+      avatar: user.avatar || null
     });
   } catch (err) {
     console.error(err);

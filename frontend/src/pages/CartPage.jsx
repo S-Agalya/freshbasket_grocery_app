@@ -9,7 +9,7 @@ const CartPage = () => {
   const totalAmount = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 pb-20 md:pb-0">
       {/* Header */}
       <div className="sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-3">

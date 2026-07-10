@@ -13,6 +13,7 @@ import MyOrdersPage from './pages/MyOrdersPage';
 import WishlistPage from "./pages/WishlistPage";
 import Footer from './components/Footer';
 import './App.css';
+import BottomNav from "./components/BottomNav";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
             </Routes>
           </div>
           <Footer />
+          <BottomNav/>
         </div>
       </Router>
     </CartProvider>

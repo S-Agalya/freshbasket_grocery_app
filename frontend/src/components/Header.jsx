@@ -14,6 +14,27 @@ const STATUS_COLORS = {
   Cancelled: "text-red-600",
 };
 
+/* ── Small avatar used in the header profile button ── */
+function HeaderAvatar({ username }) {
+  const [err, setErr] = useState(false);
+  const email = localStorage.getItem("email") || "";
+  const src = !err && email
+    ? `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(email)}&backgroundColor=b6e3f4,ffd5dc,c0aede`
+    : null;
+  const initial = username ? username.charAt(0).toUpperCase() : "?";
+  return (
+    <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center"
+      style={{ background: "linear-gradient(135deg,#16a34a,#059669)" }}>
+      {src ? (
+        <img src={src} alt="avatar" className="w-full h-full object-cover"
+          style={{ background: "#e0f2fe" }} onError={() => setErr(true)} />
+      ) : (
+        <span className="text-white font-bold text-xs">{initial}</span>
+      )}
+    </div>
+  );
+}
+
 const Header = ({ username = "User", onMenuToggle }) => {
   const navigate = useNavigate();
   const { cartItems, clearCart } = useContext(CartContext);
@@ -239,10 +260,7 @@ const Header = ({ username = "User", onMenuToggle }) => {
           {/* Profile dropdown */}
           <div className="relative group ml-1">
             <button className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-gray-100 transition">
-              <div className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs text-white"
-                style={{ background: "linear-gradient(135deg,#16a34a,#059669)" }}>
-                {username.charAt(0).toUpperCase()}
-              </div>
+              <HeaderAvatar username={username} />
               <span className="text-sm font-medium text-gray-700 hidden md:block max-w-[80px] truncate capitalize">{username}</span>
             </button>
             <div className="absolute right-0 top-11 w-44 bg-white rounded-2xl z-50 overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150"

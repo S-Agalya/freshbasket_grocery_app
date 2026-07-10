@@ -78,7 +78,7 @@ const ProfilePage = () => {
       {/* Top bar */}
       <div className="bg-white sticky top-0 z-30" style={{ boxShadow: "0 1px 0 rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.04)" }}>
         <div className="max-w-3xl mx-auto flex items-center justify-between px-4 py-3.5">
-          <button onClick={() => navigate("/welcome")} className="w-8 h-8 flex items-center justify-center rounded-xl text-gray-500 hover:bg-gray-100 transition">?</button>
+          <button onClick={() => navigate("/welcome")} className="w-8 h-8 flex items-center justify-center rounded-xl text-gray-500 hover:bg-gray-100 transition">←</button>
           <span className="font-bold text-gray-800 text-sm">My Profile</span>
           <button onClick={handleLogout} className="flex items-center gap-1.5 text-xs font-semibold text-red-500 hover:text-red-700 px-2 py-1.5 rounded-xl hover:bg-red-50 transition">
             <FaSignOutAlt size={11} /> Logout
@@ -129,7 +129,7 @@ const ProfilePage = () => {
                 <h2 className="text-lg font-extrabold text-gray-900 leading-tight">{profile.username || "User"}</h2>
                 <p className="text-xs text-gray-400 mt-0.5">{profile.email}</p>
                 <span className="inline-flex items-center gap-1 mt-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "#f0fdf4", color: "#15803d" }}>
-                  ? FreshBasket Member
+                  ✓ FreshBasket Member
                 </span>
                 {isEditing && (
                   <div className="mt-4 space-y-3 pt-4" style={{ borderTop: "1px solid #f1f5f1" }}>
@@ -155,7 +155,7 @@ const ProfilePage = () => {
           <div className="grid grid-cols-3 gap-3">
             {[
               { value: orders.length,                             label: "Orders",   color: "#16a34a" },
-              { value: `?${totalSpent.toLocaleString("en-IN")}`, label: "Spent",    color: "#b45309" },
+              { value: `₹${totalSpent.toLocaleString("en-IN")}`, label: "Spent",    color: "#b45309" },
               { value: wishlistCount,                             label: "Wishlist", color: "#e11d48" },
             ].map(({ value, label, color }) => (
               <div key={label} className="bg-white rounded-2xl p-3 text-center" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
@@ -175,8 +175,8 @@ const ProfilePage = () => {
                 </button>
               </div>
               <div className="divide-y divide-gray-50">
-                <InfoRow icon={FaUser}         label="Full Name" value={profile.username || "�"} />
-                <InfoRow icon={FaEnvelope}     label="Email"     value={profile.email    || "�"} />
+                <InfoRow icon={FaUser}         label="Full Name" value={profile.username || "—"} />
+                <InfoRow icon={FaEnvelope}     label="Email"     value={profile.email    || "—"} />
                 <InfoRow icon={FaPhone}        label="Phone"     value={profile.phone    || "Not set"} />
                 <InfoRow icon={FaMapMarkerAlt} label="Address"   value={profile.address  || "Not set"} />
               </div>
@@ -209,20 +209,20 @@ const ProfilePage = () => {
             <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
               <div className="flex items-center justify-between px-4 py-3.5" style={{ borderBottom: "1px solid #f3f4f6" }}>
                 <span className="text-sm font-bold text-gray-800">Recent Orders</span>
-                <button onClick={() => navigate("/my-orders")} className="text-xs font-semibold text-green-700 hover:underline">View all ?</button>
+                <button onClick={() => navigate("/my-orders")} className="text-xs font-semibold text-green-700 hover:underline">View all →</button>
               </div>
               <div className="divide-y divide-gray-50">
                 {orders.slice(0, 3).map(o => (
                   <div key={o.id} className="flex justify-between items-center px-4 py-3.5">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-base" style={{ background: "#f0fdf4" }}>??</div>
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-base" style={{ background: "#f0fdf4" }}>📦</div>
                       <div>
                         <p className="text-sm font-semibold text-gray-700">Order #{o.id}</p>
                         <p className="text-[11px] text-gray-400">{new Date(o.created_at).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" })}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold" style={{ color: "#0f3d22" }}>?{o.total_amount}</p>
+                      <p className="text-sm font-bold" style={{ color: "#0f3d22" }}>₹{o.total_amount}</p>
                       <span className={`text-[10px] font-semibold ${o.status==="Delivered"?"text-green-500":o.status==="Cancelled"?"text-red-500":"text-amber-500"}`}>{o.status}</span>
                     </div>
                   </div>
@@ -234,10 +234,10 @@ const ProfilePage = () => {
           {/* Footer */}
           <div className="text-center py-4">
             <div className="flex items-center justify-center gap-2 mb-1">
-              <span className="text-xl">??</span>
+              <span className="text-xl">🥬</span>
               <span className="font-extrabold text-gray-700 text-sm">FreshBasket</span>
             </div>
-            <p className="text-xs text-gray-400">Version 1.0.0 � Made with ?? in India</p>
+            <p className="text-xs text-gray-400">Version 1.0.0 · Made with ❤️ in India</p>
           </div>
         </div>
       )}

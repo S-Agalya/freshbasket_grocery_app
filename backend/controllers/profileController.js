@@ -137,6 +137,7 @@ export const getProfile = async (req, res) => {
       address: user.address || "",
       avatar: user.avatar || null
     });
+    ///////
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error fetching profile", details: err.message });

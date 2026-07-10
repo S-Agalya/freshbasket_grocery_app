@@ -71,6 +71,7 @@ export default function PlaceOrderPage() {
           onSelectCategory={handleCategorySelect}
           isOpen={menuOpen}
           onClose={() => setMenuOpen(false)}
+          onOpen={()=> setMenuOpen(true)}
         />
 
         {/* <main className="flex-1 overflow-y-auto p-6">

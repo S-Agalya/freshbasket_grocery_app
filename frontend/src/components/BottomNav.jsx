@@ -21,7 +21,16 @@ export default function BottomNav() {
   if (HIDDEN_PATHS.includes(pathname)) return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 md:hidden">
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-40 md:hidden"
+      style={{
+        background: "rgba(255,255,255,0.88)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        borderTop: "1px solid rgba(0,0,0,0.06)",
+        boxShadow: "0 -4px 20px rgba(0,0,0,0.06)",
+      }}
+    >
       <div className="flex h-16">
         {NAV_ITEMS.map(({ icon: Icon, label, path, badge }) => {
           const active =
@@ -32,20 +41,32 @@ export default function BottomNav() {
             <button
               key={path}
               onClick={() => navigate(path)}
-              className="flex-1 flex flex-col items-center justify-center gap-0.5 relative pt-1"
+              className="flex-1 flex flex-col items-center justify-center gap-0.5 relative"
             >
               {active && (
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-green-600 rounded-full" />
+                <span
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full"
+                  style={{ background: "linear-gradient(90deg,#16a34a,#059669)" }}
+                />
               )}
               <div className="relative">
-                <Icon size={21} className={active ? "text-green-600" : "text-gray-400"} />
+                <Icon
+                  size={20}
+                  style={{ color: active ? "#16a34a" : "#9ca3af" }}
+                />
                 {count > 0 && (
-                  <span className="absolute -top-1.5 -right-2.5 bg-green-600 text-white text-[9px] rounded-full min-w-[16px] h-4 px-0.5 flex items-center justify-center font-bold leading-none">
+                  <span
+                    className="absolute -top-1.5 -right-2.5 text-white text-[9px] rounded-full min-w-[16px] h-4 px-0.5 flex items-center justify-center font-bold leading-none"
+                    style={{ background: "linear-gradient(135deg,#16a34a,#059669)" }}
+                  >
                     {count > 9 ? "9+" : count}
                   </span>
                 )}
               </div>
-              <span className={`text-[10px] font-medium ${active ? "text-green-600" : "text-gray-400"}`}>
+              <span
+                className="text-[10px] font-semibold mt-0.5"
+                style={{ color: active ? "#16a34a" : "#9ca3af" }}
+              >
                 {label}
               </span>
             </button>

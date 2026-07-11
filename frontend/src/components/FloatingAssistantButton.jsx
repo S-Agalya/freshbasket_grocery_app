@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { FaRobot, FaTimes, FaStar } from "react-icons/fa";
 import AiAssistantPanel from "./AiAssistantPanel";
@@ -6,6 +6,12 @@ import AiAssistantPanel from "./AiAssistantPanel";
 export default function FloatingAssistantButton() {
   const location = useLocation();
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOpenAssistant = () => setOpen(true);
+    window.addEventListener("freshbasket-open-assistant", handleOpenAssistant);
+    return () => window.removeEventListener("freshbasket-open-assistant", handleOpenAssistant);
+  }, []);
 
   const hiddenRoutes = ["/login", "/register", "/welcome"];
   const shouldHide = hiddenRoutes.includes(location.pathname);
@@ -16,7 +22,7 @@ export default function FloatingAssistantButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full border border-emerald-200 bg-gradient-to-r from-emerald-600 via-green-600 to-lime-500 px-4 py-3.5 text-white shadow-[0_22px_60px_rgba(16,185,129,0.32)] transition hover:translate-y-[-2px] hover:scale-[1.02] active:scale-[0.98] md:bottom-8 md:right-8"
+        className="fixed bottom-24 right-4 z-50 flex items-center gap-2 rounded-full border border-emerald-200 bg-gradient-to-r from-emerald-600 via-green-600 to-lime-500 px-4 py-3.5 text-white shadow-[0_22px_60px_rgba(16,185,129,0.32)] transition hover:translate-y-[-2px] hover:scale-[1.02] active:scale-[0.98] md:bottom-8 md:right-8"
         aria-label="Open FreshBasket Assistant"
       >
         <div className="rounded-full bg-white/20 p-2.5 shadow-inner">

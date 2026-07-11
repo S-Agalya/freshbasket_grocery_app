@@ -1,97 +1,106 @@
-const normalizeText = (value = "") =>
+const normalize = (value = "") =>
   value
     .toLowerCase()
+    .trim()
     .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+    .replace(/\s+/g, " ");
 
-const extractQuantity = (text = "") => {
-  const match = text.match(/(\d+(?:\.\d+)?)\s*(kg|g|gm|grams|gram|litre|litres|ltr|ml|pcs|pc|piece|pieces|pack|packs|box|boxes|bottle|bottles|dozen|bundles|bundle)?/i);
+const extractQuantity = (text) => {
+  const match = text.match(/(\d+(?:\.\d+)?)\s*(kg|g|litre|litres|ltr|l|dozen|pcs|piece|pack|packet|bottle|bottles)/i);
 
-  if (!match) return 1;
+  if (!match) return null;
 
-  const amount = Number(match[1]);
-  if (Number.isNaN(amount) || amount <= 0) return 1;
-  return amount;
+  const quantity = parseFloat(match[1]);
+  const unit = match[2].toLowerCase();
+
+  return { quantity, unit };
 };
 
-const scoreProductMatch = (product, query) => {
-  const productName = normalizeText(product.name);
-  const category = normalizeText(product.category || "");
-  const queryText = normalizeText(query);
+export const parseShoppingRequest = (message, products = []) => {
+  const text = message || "";
+  const normalizedText = normalize(text);
 
-  if (!queryText) return 0;
-
-  if (productName === queryText) return 100;
-  if (productName.includes(queryText) || queryText.includes(productName)) return 85;
-
-  const productTokens = productName.split(" ");
-  const queryTokens = queryText.split(" ");
-  const overlap = productTokens.filter((token) => queryTokens.includes(token)).length;
-  if (overlap > 0) return 30 + overlap * 10;
-  if (category.includes(queryText) || queryText.includes(category)) return 20;
-  return 0;
-};
-
-export const matchProduct = (products = [], searchTerm = "") => {
-  if (!searchTerm) return null;
-
-  const ranked = products
-    .map((product) => ({
-      product,
-      score: scoreProductMatch(product, searchTerm),
-    }))
-    .filter((entry) => entry.score > 0)
-    .sort((a, b) => b.score - a.score);
-
-  return ranked[0]?.product || null;
-};
-
-export const buildFallbackShoppingResponse = (message = "", products = []) => {
-  const lowerMessage = normalizeText(message);
-  const matchedProducts = products.filter((product) => {
-    const name = normalizeText(product.name);
-    return name && lowerMessage.includes(name);
-  });
-
-  if (matchedProducts.length > 0) {
-    const primary = matchedProducts[0];
-    const qty = extractQuantity(message);
+  if (!normalizedText) {
     return {
-      intent: "add_to_cart",
-      reply: `Sure! I found ${primary.name} and added ${qty} ${primary.unit || "unit"} to your cart.`,
-      shouldAddToCart: true,
-      items: [
-        {
-          productName: primary.name,
-          qty,
-          unit: primary.unit || "unit",
-        },
-      ],
-      suggestions: [],
+      intent: "PRODUCT_ONLY",
+      reply: "😊 What would you like to add today?",
+      needsQuantity: true,
+      needsConfirmation: false,
+      products: [],
+      total: 0,
     };
   }
 
-  if (/recipe|cook|make|prepare|dish|dinner|breakfast|lunch|biryani|pasta|fried rice/i.test(message)) {
-    const suggestions = products.slice(0, 4).map((product) => ({
-      productName: product.name,
-      reason: "Popular choice from the available catalog",
-    }));
+  const matchedProduct = products.find((product) => normalize(product.name) === normalizedText);
+
+  if (matchedProduct) {
+    if (matchedProduct.stock <= 0) {
+      return {
+        intent: "OUT_OF_STOCK",
+        reply: `😔 ${matchedProduct.name} is currently out of stock.`,
+        needsQuantity: false,
+        needsConfirmation: false,
+        products: [],
+        total: 0,
+      };
+    }
+
+    const qtyInfo = extractQuantity(text);
+
+    if (!qtyInfo) {
+      return {
+        intent: "PRODUCT_ONLY",
+        reply: `🛒 ${matchedProduct.name} is available. How much would you like?`,
+        needsQuantity: true,
+        needsConfirmation: false,
+        products: [],
+        total: 0,
+      };
+    }
+
+    const subtotal = matchedProduct.price * qtyInfo.quantity;
 
     return {
-      intent: "suggest_products",
-      reply: "I can help with that. Here are a few items you may want to consider.",
-      shouldAddToCart: false,
-      items: [],
-      suggestions,
+      intent: "PRODUCT_WITH_QUANTITY",
+      reply: `🛒 ${matchedProduct.name} × ${qtyInfo.quantity} ${qtyInfo.unit} will cost ₹${subtotal}. Would you like me to add it to your cart?`,
+      needsQuantity: false,
+      needsConfirmation: true,
+      products: [
+        {
+          id: matchedProduct.id,
+          name: matchedProduct.name,
+          quantity: qtyInfo.quantity,
+          unit: qtyInfo.unit,
+          price: matchedProduct.price,
+          subtotal,
+        },
+      ],
+      total: subtotal,
+    };
+  }
+
+  const closeMatch = products.find((product) => {
+    const name = normalize(product.name);
+    return name.includes(normalizedText) || normalizedText.includes(name);
+  });
+
+  if (closeMatch) {
+    return {
+      intent: "SPELLING_SUGGESTION",
+      reply: `Did you mean ${closeMatch.name}?`,
+      needsQuantity: false,
+      needsConfirmation: false,
+      products: [],
+      total: 0,
     };
   }
 
   return {
-    intent: "greeting",
-    reply: "I can help you add groceries to your cart. Try saying something like: add 2 kg apples or suggest items for biryani.",
-    shouldAddToCart: false,
-    items: [],
-    suggestions: [],
+    intent: "PRODUCT_NOT_FOUND",
+    reply: `😔 We don't sell "${message}" in FreshBasket yet.`,
+    needsQuantity: false,
+    needsConfirmation: false,
+    products: [],
+    total: 0,
   };
 };

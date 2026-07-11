@@ -25,6 +25,14 @@
 //conecting to db
 import ai from "../services/geminiService.js";
 import db from "../config/db.js";
+import { matchProduct, buildFallbackShoppingResponse } from "../services/productMatcher.js";
+
+const extractQuantity = (text = "") => {
+  const match = text.match(/(\d+(?:\.\d+)?)\s*(kg|g|gm|grams|gram|litre|litres|ltr|ml|pcs|pc|piece|pieces|pack|packs|box|boxes|bottle|bottles|dozen|bundles|bundle)?/i);
+  if (!match) return 1;
+  const amount = Number(match[1]);
+  return Number.isNaN(amount) || amount <= 0 ? 1 : amount;
+};
 
 export const chatWithAI = async (req, res) => {
   try {
@@ -623,31 +631,54 @@ Return ONLY JSON.
 Return ONLY JSON.
 `;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-flash-latest",
-      contents: prompt,
-    });
+    let parsed = buildFallbackShoppingResponse(message, products);
 
-    let text = response.text
-      .replace(/```json/g, "")
-      .replace(/```/g, "")
-      .trim();
+    if (process.env.GEMINI_API_KEY) {
+      try {
+        const response = await ai.models.generateContent({
+          model: "gemini-flash-latest",
+          contents: prompt,
+        });
 
-    let parsed;
+        const text = (response.text || "{}")
+          .replace(/```json/g, "")
+          .replace(/```/g, "")
+          .trim();
 
-    try {
-      parsed = JSON.parse(text);
-    } catch (err) {
-      console.error("Invalid Gemini JSON");
-      console.log(text);
-
-      return res.status(500).json({
-        message: "Invalid AI response",
-        raw: text,
-      });
+        parsed = JSON.parse(text);
+      } catch (err) {
+        console.warn("Gemini fallback triggered", err.message);
+      }
     }
 
-    res.json(parsed);
+    const normalizedItems = (parsed.items || []).map((item) => ({
+      ...item,
+      qty: Number(item.qty) || extractQuantity(message),
+    }));
+
+    const matchedItems = normalizedItems
+      .map((item) => {
+        const product = matchProduct(products, item.productName);
+        if (!product) return null;
+        return {
+          ...item,
+          productId: product.id,
+          price: product.price,
+          image: product.image,
+          name: product.name,
+          stock: product.stock,
+          unit: product.unit || item.unit || "unit",
+        };
+      })
+      .filter(Boolean);
+
+    res.json({
+      reply: parsed.reply || "I can help with that.",
+      intent: parsed.intent || "unknown",
+      shouldAddToCart: Boolean(parsed.shouldAddToCart) || matchedItems.length > 0,
+      items: matchedItems,
+      suggestions: parsed.suggestions || [],
+    });
   } catch (err) {
     console.error(err);
 

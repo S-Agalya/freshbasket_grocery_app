@@ -22,15 +22,16 @@ export const CartProvider = ({ children }) => {
   };
 
   // Your existing functions
-  const addToCart = (product) => {
+  const addToCart = (product, quantity = 1) => {
+    const amount = Number(quantity || product?.qty || 1);
     setCartItems((prevItems) => {
       const existing = prevItems.find((item) => item.id === product.id);
       if (existing) {
         return prevItems.map((item) =>
-          item.id === product.id ? { ...item, qty: item.qty + 1 } : item
+          item.id === product.id ? { ...item, qty: item.qty + amount } : item
         );
       } else {
-        return [...prevItems, { ...product, qty: 1 }];
+        return [...prevItems, { ...product, qty: amount }];
       }
     });
   };

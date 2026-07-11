@@ -7,18 +7,35 @@ const API_URL = import.meta.env.VITE_API_URL;
 export default function AiAssistantPanel() {
   const { addToCart, cartItems } = useContext(CartContext);
   const [message, setMessage] = useState("");
-  const [reply, setReply] = useState("Hello! Tell me what you want to shop for, or upload a photo of a grocery list.");
+  const [conversation, setConversation] = useState([
+    {
+      role: "assistant",
+      text: "Hello! Tell me what you want to shop for, or upload a photo of a grocery list.",
+    },
+  ]);
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewProducts, setPreviewProducts] = useState([]);
 
   const cartCount = useMemo(() => cartItems.reduce((sum, item) => sum + item.qty, 0), [cartItems]);
 
+  const buildContextMessage = (inputText) => {
+    const history = conversation
+      .filter((entry) => entry.role !== "system")
+      .map((entry) => `${entry.role === "user" ? "Customer" : "Assistant"}: ${entry.text}`)
+      .join("\n");
+    return history ? `${history}\nCustomer: ${inputText}` : `Customer: ${inputText}`;
+  };
+
   const handleSend = async () => {
-    if (!message.trim() && !selectedFile) return;
+    const userText = (message || "").trim();
+    const uploadText = selectedFile ? "Please review this uploaded shopping list." : "";
+    const inputText = userText || uploadText;
+
+    if (!inputText) return;
 
     setLoading(true);
-    setReply("Checking your request...");
+    setConversation((prev) => [...prev, { role: "user", text: inputText }]);
 
     try {
       if (selectedFile) {
@@ -31,47 +48,53 @@ export default function AiAssistantPanel() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Image analysis failed");
 
-        setReply(data.reply || "I found a few items from your photo.");
+        const assistantText = data.reply || "I found a few items from your photo.";
+        setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);
         setPreviewProducts(data.products || []);
 
         (data.products || []).forEach((item) => {
-          addToCart({
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            image: "",
-            stock: 100,
-            qty: item.quantity,
-          });
+          addToCart(
+            {
+              id: item.id,
+              name: item.name,
+              price: item.price,
+              image: "",
+              stock: 100,
+            },
+            item.quantity || 1
+          );
         });
       } else {
         const res = await fetch(`${API_URL}/api/ai/chat`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message }),
+          body: JSON.stringify({ message: buildContextMessage(inputText) }),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "AI request failed");
 
-        setReply(data.reply || "I can help you shop.");
+        const assistantText = data.reply || "I can help you shop.";
+        setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);
         setPreviewProducts(data.products || []);
 
         (data.products || []).forEach((item) => {
-          addToCart({
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            image: "",
-            stock: 100,
-            qty: item.quantity,
-          });
+          addToCart(
+            {
+              id: item.id,
+              name: item.name,
+              price: item.price,
+              image: "",
+              stock: 100,
+            },
+            item.quantity || 1
+          );
         });
       }
 
       setMessage("");
       setSelectedFile(null);
     } catch (error) {
-      setReply(error.message || "Something went wrong.");
+      setConversation((prev) => [...prev, { role: "assistant", text: error.message || "Something went wrong." }]);
     } finally {
       setLoading(false);
     }
@@ -95,8 +118,14 @@ export default function AiAssistantPanel() {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-gray-50 border border-gray-100 p-3 text-sm text-gray-700 mb-3 min-h-[72px]">
-        {reply}
+      <div className="rounded-2xl bg-gray-50 border border-gray-100 p-3 text-sm text-gray-700 mb-3 min-h-[72px] max-h-[220px] overflow-y-auto space-y-2">
+        {conversation.map((entry, index) => (
+          <div key={`${entry.role}-${index}`} className={`flex ${entry.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div className={`max-w-[90%] rounded-2xl px-3 py-2 ${entry.role === "user" ? "bg-green-600 text-white" : "bg-white text-gray-700 border border-gray-100"}`}>
+              {entry.text}
+            </div>
+          </div>
+        ))}
       </div>
 
       {previewProducts.length > 0 && (

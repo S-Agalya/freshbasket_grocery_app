@@ -215,29 +215,8 @@ export default function AiAssistantPanel() {
 
     const normalizedInput = inputText.toLowerCase();
     const confirmation = /\b(yes|ok|add|proceed|confirm)\b/i.test(normalizedInput);
-    const wantsExplicitAdd = /\b(add to cart|add this to cart|add it to cart|buy|place|put|shop|order)\b/i.test(normalizedInput) || /\b(cart|basket)\b/i.test(normalizedInput);
-    const directShopping = parseDirectShoppingRequest(inputText);
+    const wantsExplicitAdd = /\b(add to cart|add this to cart|add it to cart|add apples to cart|add .* to cart|buy|place|put|shop|order)\b/i.test(normalizedInput) || /\b(cart|basket)\b/i.test(normalizedInput);
     const isDirectAddVerb = /\b(add|buy|place|put|shop|order)\b/i.test(normalizedInput) && /\b(cart|basket)\b/i.test(normalizedInput);
-
-    if (directShopping) {
-      addToCart(
-        {
-          id: directShopping.id,
-          name: directShopping.name,
-          price: directShopping.price,
-          image: "",
-          stock: 100,
-        },
-        directShopping.quantity || 1
-      );
-      setConversation((prev) => [...prev, { role: "user", text: inputText }, { role: "assistant", text: `${directShopping.name} has been added to your cart.` }]);
-      setPendingAdd(null);
-      setPreviewProducts([]);
-      setMessage("");
-      setSelectedFile(null);
-      setLoading(false);
-      return;
-    }
 
     if (pendingAdd && confirmation) {
       handleConfirmAdd();
@@ -314,7 +293,7 @@ export default function AiAssistantPanel() {
         setPreviewProducts(data.products || []);
 
         const parsedProducts = data.products || [];
-        const wantsImmediateAdd = parsedProducts.length > 0 && (wantsExplicitAdd || isDirectAddVerb);
+        const wantsImmediateAdd = parsedProducts.length > 0 && wantsExplicitAdd;
 
         if (wantsImmediateAdd) {
           const firstItem = parsedProducts[0];
@@ -332,7 +311,7 @@ export default function AiAssistantPanel() {
           return;
         }
 
-        if (parsedProducts.length > 0 && !wantsImmediateAdd && !isDirectAddVerb) {
+        if (parsedProducts.length > 0 && !wantsImmediateAdd) {
           const firstItem = parsedProducts[0];
           setPendingAdd({
             item: {

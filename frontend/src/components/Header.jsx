@@ -108,7 +108,7 @@ const Header = ({ username = "User", onMenuToggle }) => {
 
   return (
     <header className="sticky top-0 z-40 bg-white" style={{ boxShadow: "0 1px 0 rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)" }}>
-      <div className="flex items-center gap-3 px-4 py-3 max-w-screen-xl mx-auto">
+      <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 max-w-screen-xl mx-auto">
         {/* Hamburger (mobile) */}
         {onMenuToggle && (
           <button
@@ -123,8 +123,8 @@ const Header = ({ username = "User", onMenuToggle }) => {
         )}
 
         {/* Logo */}
-        <button onClick={() => navigate("/welcome")} className="flex items-center gap-2 shrink-0">
-          <div className="p-1.5 rounded-xl" style={{ background: "linear-gradient(135deg,#16a34a,#059669)" }}>
+        <button onClick={() => navigate("/welcome")} className="flex items-center gap-2 shrink-0 pl-1 sm:pl-0 pr-1">
+          <div className="p-2 rounded-xl" style={{ background: "linear-gradient(135deg,#16a34a,#059669)" }}>
             <FaLeaf size={15} className="text-white" />
           </div>
           <span className="font-extrabold text-lg hidden sm:block tracking-tight">
@@ -134,8 +134,8 @@ const Header = ({ username = "User", onMenuToggle }) => {
         </button>
 
         {/* Search Bar */}
-        <div ref={searchRef} className="relative flex-1 max-w-xl mx-auto">
-          <div className="flex items-center rounded-2xl px-4 py-2.5 transition-all"
+        <div ref={searchRef} className="relative flex-1 min-w-0 max-w-xl mx-1 sm:mx-auto z-[60]">
+          <div className="flex items-center rounded-2xl px-3 sm:px-4 py-2.5 transition-all w-full"
             style={{ background: "#f3f7f4", border: "1.5px solid #e2ede6" }}>
             <FaSearch className="shrink-0 mr-2.5" size={13} style={{ color: "#6b9e7a" }} />
             <input
@@ -153,12 +153,12 @@ const Header = ({ username = "User", onMenuToggle }) => {
           </div>
 
           {showResults && results.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-2xl z-50 max-h-52 sm:max-h-72 overflow-y-auto"
-              style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.06)" }}>
+            <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl z-[70] max-h-60 sm:max-h-72 overflow-y-auto"
+              style={{ boxShadow: "0 12px 45px rgba(0,0,0,0.14)", border: "1px solid rgba(0,0,0,0.06)" }}>
               {results.map((p) => (
                 <div key={p.id}
                   onClick={() => { navigate(`/product/${p.id}`); setShowResults(false); setQuery(""); }}
-                  className="flex items-center gap-2.5 px-3 py-2 sm:px-4 sm:py-2.5 cursor-pointer border-b border-gray-50 last:border-0 hover:bg-green-50 transition">
+                  className="flex items-center gap-2.5 px-3 py-2.5 sm:px-4 sm:py-3 cursor-pointer border-b border-gray-50 last:border-0 hover:bg-green-50 transition">
                   {p.image && <img src={p.image} alt={p.name} className="w-8 h-8 sm:w-10 sm:h-10 object-contain rounded-lg bg-gray-50 flex-shrink-0" />}
                   <div className="flex-1 min-w-0">
                     <p className="text-xs sm:text-sm font-semibold text-gray-800 truncate">{p.name}</p>
@@ -175,15 +175,15 @@ const Header = ({ username = "User", onMenuToggle }) => {
             </div>
           )}
           {showResults && results.length === 0 && query.trim() && (
-            <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-2xl z-50 px-4 py-3 text-xs sm:text-sm text-gray-400 text-center"
-              style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.1)", border: "1px solid rgba(0,0,0,0.06)" }}>
+            <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl z-[70] px-4 py-3 text-xs sm:text-sm text-gray-400 text-center"
+              style={{ boxShadow: "0 12px 35px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.06)" }}>
               No results for "<span className="text-gray-700 font-medium">{query}</span>"
             </div>
           )}
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 ml-0.5 sm:ml-0">
           {/* Bell */}
           {phone && (
             <div ref={notifRef} className="relative">
@@ -198,10 +198,11 @@ const Header = ({ username = "User", onMenuToggle }) => {
               </button>
               {showNotif && (
                 <div
-                  className="absolute right-0 top-12 bg-white rounded-2xl z-50 overflow-hidden"
+                  className="absolute right-0 top-[calc(100%+0.6rem)] bg-white rounded-2xl z-[70] overflow-hidden"
                   style={{
-                    width: "min(300px, calc(100vw - 1rem))",
-                    boxShadow: "0 8px 40px rgba(0,0,0,0.14)",
+                    width: "min(320px, calc(100vw - 1rem))",
+                    maxWidth: "320px",
+                    boxShadow: "0 12px 45px rgba(0,0,0,0.14)",
                     border: "1px solid rgba(0,0,0,0.07)",
                   }}
                 >

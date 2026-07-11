@@ -202,6 +202,8 @@ export default function AiAssistantPanel() {
         setConversation((prev) => [...prev, { role: "assistant", text: "I could not find that item in your cart yet." }]);
       }
 
+      setMessage("");
+      setSelectedFile(null);
       setLoading(false);
       return;
     }

@@ -60,7 +60,7 @@ export default function WelcomePage() {
   const getQty = (id) => cartItems.find(i => i.id === id)?.qty || 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 md:pb-8">
+    <div className="min-h-screen bg-gray-50 pb-32 md:pb-10">
       <Header username={username} />
 
       <main className="max-w-screen-xl mx-auto px-4 md:px-8 py-4">
@@ -257,11 +257,19 @@ export default function WelcomePage() {
                       ) : (
                         <div className="flex items-center justify-between rounded-xl py-1.5 px-2"
                           style={{ background: "linear-gradient(135deg,#16a34a,#059669)" }}>
-                          <button onClick={() => decreaseQty(item.id)} className="text-white flex items-center justify-center">
+                          <button
+                            onClick={() => decreaseQty(item.id)}
+                            className="w-8 h-8 rounded-full bg-white/15 text-white flex items-center justify-center transition hover:bg-white/25"
+                            aria-label="Decrease quantity"
+                          >
                             <FaMinus size={9} />
                           </button>
-                          <span className="text-white text-xs font-bold">{qty}</span>
-                          <button onClick={() => increaseQty(item.id)} className="text-white flex items-center justify-center">
+                          <span className="text-white text-sm font-bold px-2">{qty}</span>
+                          <button
+                            onClick={() => increaseQty(item.id)}
+                            className="w-8 h-8 rounded-full bg-white/15 text-white flex items-center justify-center transition hover:bg-white/25"
+                            aria-label="Increase quantity"
+                          >
                             <FaPlus size={9} />
                           </button>
                         </div>

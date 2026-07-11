@@ -134,7 +134,7 @@ const Header = ({ username = "User", onMenuToggle }) => {
         </button>
 
         {/* Search Bar */}
-        <div ref={searchRef} className="relative flex-1 min-w-0 max-w-xl mx-1 sm:mx-auto z-[60]">
+        <div ref={searchRef} className="relative flex-1 min-w-0 w-full sm:max-w-xl mx-1 sm:mx-auto z-[60]">
           <div className="flex items-center rounded-2xl px-3 sm:px-4 py-2.5 transition-all w-full"
             style={{ background: "#f3f7f4", border: "1.5px solid #e2ede6" }}>
             <FaSearch className="shrink-0 mr-2.5" size={13} style={{ color: "#6b9e7a" }} />
@@ -153,7 +153,7 @@ const Header = ({ username = "User", onMenuToggle }) => {
           </div>
 
           {showResults && results.length > 0 && (
-            <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl z-[70] max-h-[60vh] overflow-y-auto"
+            <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl z-[70] max-h-[55vh] overflow-y-auto"
               style={{ boxShadow: "0 12px 45px rgba(0,0,0,0.14)", border: "1px solid rgba(0,0,0,0.06)", maxWidth: "calc(100vw - 1rem)" }}>
               {results.map((p) => (
                 <div key={p.id}

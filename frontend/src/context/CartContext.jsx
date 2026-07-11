@@ -50,10 +50,12 @@ export const CartProvider = ({ children }) => {
 
   const decreaseQty = (id) => {
     setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id && item.qty > 1
-          ? { ...item, qty: item.qty - 1 }
-          : item
+      prevItems.flatMap((item) =>
+        item.id === id
+          ? item.qty > 1
+            ? [{ ...item, qty: item.qty - 1 }]
+            : []
+          : [item]
       )
     );
   };

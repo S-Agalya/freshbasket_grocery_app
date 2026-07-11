@@ -22,14 +22,14 @@ export default function FloatingAssistantButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-24 right-4 z-50 flex items-center gap-2 rounded-full border border-emerald-200 bg-gradient-to-r from-emerald-600 via-green-600 to-lime-500 px-4 py-3.5 text-white shadow-[0_22px_60px_rgba(16,185,129,0.32)] transition hover:translate-y-[-2px] hover:scale-[1.02] active:scale-[0.98] md:bottom-8 md:right-8"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full border border-emerald-200 bg-gradient-to-r from-emerald-600 via-green-600 to-lime-500 px-3 py-3 text-white shadow-[0_18px_40px_rgba(16,185,129,0.26)] transition hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] md:bottom-8 md:right-8"
         aria-label="Open FreshBasket Assistant"
       >
-        <div className="rounded-full bg-white/20 p-2.5 shadow-inner">
+        <div className="rounded-full bg-white/20 p-2 shadow-inner">
           <FaRobot size={15} />
         </div>
-        <span className="text-sm font-semibold tracking-wide">Ask AI</span>
-        <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.25em]">
+        <span className="hidden sm:inline text-sm font-semibold tracking-wide">Ask AI</span>
+        <span className="hidden sm:inline rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.25em]">
           <FaStar size={10} className="inline" />
         </span>
       </button>

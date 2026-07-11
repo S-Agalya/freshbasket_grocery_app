@@ -3,6 +3,7 @@ import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import { CartContext } from "../context/CartContext";
+import AiAssistantPanel from "../components/AiAssistantPanel";
 import { FaPlus, FaMinus, FaChevronLeft, FaChevronRight, FaMapMarkerAlt, FaBolt } from "react-icons/fa";
 
 const CATEGORIES = [
@@ -84,6 +85,8 @@ export default function WelcomePage() {
           </h1>
           <p className="text-sm text-gray-500 mt-0.5">What would you like to order today?</p>
         </div>
+
+        <AiAssistantPanel />
 
         {/* Banner Carousel */}
         <div className="relative rounded-2xl overflow-hidden mb-7 select-none">

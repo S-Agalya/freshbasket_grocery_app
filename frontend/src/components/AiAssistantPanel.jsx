@@ -1,5 +1,5 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { FaRobot, FaPaperPlane, FaUpload, FaShoppingCart, FaMicrophone, FaMicrophoneSlash, FaVolumeUp, FaStop } from "react-icons/fa";
+import { FaRobot, FaPaperPlane, FaUpload, FaShoppingCart, FaMicrophone, FaMicrophoneSlash, FaVolumeUp, FaStop, FaRedo } from "react-icons/fa";
 import { CartContext } from "../context/CartContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -40,6 +40,7 @@ export default function AiAssistantPanel() {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const recognitionRef = useRef(null);
+  const messagesEndRef = useRef(null);
 
   const cartCount = useMemo(() => cartItems.reduce((sum, item) => sum + item.qty, 0), [cartItems]);
   const lastAssistantReply = useMemo(() => {
@@ -51,6 +52,10 @@ export default function AiAssistantPanel() {
   useEffect(() => {
     localStorage.setItem("freshbasket_assistant_chat", JSON.stringify(conversation));
   }, [conversation]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [conversation, loading]);
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -108,6 +113,20 @@ export default function AiAssistantPanel() {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     setIsSpeaking(false);
+  };
+
+  const refreshChat = () => {
+    const welcome = [
+      {
+        role: "assistant",
+        text: "Hello! Tell me what you want to shop for, or upload a photo of a grocery list.",
+      },
+    ];
+    setConversation(welcome);
+    setPendingAdd(null);
+    setPreviewProducts([]);
+    setMessage("");
+    localStorage.setItem("freshbasket_assistant_chat", JSON.stringify(welcome));
   };
 
   const handleVoiceToggle = () => {
@@ -260,24 +279,24 @@ export default function AiAssistantPanel() {
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-4 md:p-5 mb-6">
-      <div className="flex items-center justify-between mb-3">
+    <div className="bg-white rounded-[24px] border border-gray-200 shadow-[0_10px_35px_rgba(0,0,0,0.06)] p-3 md:p-4 mb-6">
+      <div className="flex items-center justify-between mb-3 rounded-2xl bg-gradient-to-r from-green-50 to-emerald-50 px-3 py-2.5 border border-green-100">
         <div className="flex items-center gap-2">
-          <div className="bg-green-100 p-2 rounded-2xl text-green-700">
-            <FaRobot size={16} />
+          <div className="bg-green-600 p-2 rounded-2xl text-white shadow-sm">
+            <FaRobot size={15} />
           </div>
           <div>
             <h3 className="font-bold text-gray-900">FreshBasket Assistant</h3>
-            <p className="text-xs text-gray-500">Chat, shop, or upload a list</p>
+            <p className="text-[11px] text-gray-500">Smart shopping • voice • image list</p>
           </div>
         </div>
-        <div className="flex items-center gap-1.5 bg-green-50 px-2.5 py-1 rounded-full text-green-700 text-xs font-semibold">
-          <FaShoppingCart size={12} />
+        <div className="flex items-center gap-1.5 bg-white/80 px-2.5 py-1 rounded-full text-green-700 text-xs font-semibold border border-green-100">
+          <FaShoppingCart size={11} />
           {cartCount} in cart
         </div>
       </div>
 
-      <div className="rounded-2xl bg-gray-50 border border-gray-100 p-3 text-sm text-gray-700 mb-3 min-h-[72px] max-h-[220px] overflow-y-auto space-y-2">
+      <div className="rounded-[20px] bg-gray-50 border border-gray-100 p-3 text-sm text-gray-700 mb-3 min-h-[220px] max-h-[280px] overflow-y-auto space-y-2">
         {conversation.map((entry, index) => (
           <div key={`${entry.role}-${index}`} className={`flex ${entry.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`max-w-[90%] rounded-2xl px-3 py-2 ${entry.role === "user" ? "bg-green-600 text-white" : "bg-white text-gray-700 border border-gray-100"}`}>
@@ -287,7 +306,7 @@ export default function AiAssistantPanel() {
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-white text-gray-700 border border-gray-100 rounded-2xl px-3 py-2">
+            <div className="bg-white text-gray-700 border border-gray-100 rounded-2xl px-3 py-2 shadow-sm">
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-bounce" />
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-bounce [animation-delay:120ms]" />
@@ -296,6 +315,7 @@ export default function AiAssistantPanel() {
             </div>
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
 
       {previewProducts.length > 0 && (
@@ -320,6 +340,13 @@ export default function AiAssistantPanel() {
       </div>
 
       <div className="flex gap-2">
+        <button
+          onClick={refreshChat}
+          className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-xl"
+          title="Refresh chat"
+        >
+          <FaRedo size={14} />
+        </button>
         <input
           value={message}
           onChange={(e) => setMessage(e.target.value)}

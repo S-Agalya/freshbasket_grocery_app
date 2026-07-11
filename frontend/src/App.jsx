@@ -46,7 +46,7 @@ function App() {
               <Route path="*" element={<LoginPage />} />
             </Routes>
           </div>
-           <AIFloatingButton />
+       
           <ConditionalFooter />
           <BottomNav />
         </div>

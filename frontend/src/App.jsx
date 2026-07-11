@@ -14,8 +14,7 @@ import WishlistPage from './pages/WishlistPage';
 import Footer from './components/Footer';
 import BottomNav from './components/BottomNav';
 import './App.css';
-import AIChatPage from "./pages/AIChatPage";
-import AIFloatingButton from "./components/AIFloatingButton";
+
 // Hide footer on browse/auth pages where a fixed sidebar exists or there's no need
 function ConditionalFooter() {
   const { pathname } = useLocation();
@@ -42,12 +41,7 @@ function App() {
               <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
               <Route path="/summary" element={<ProtectedRoute><OrderSummaryPage /></ProtectedRoute>} />
               <Route
-  path="/ai"
-  element={
-    <ProtectedRoute>
-      <AIChatPage />
-    </ProtectedRoute>
-  }
+  
 />
               <Route path="*" element={<LoginPage />} />
             </Routes>

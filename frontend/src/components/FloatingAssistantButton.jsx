@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { FaRobot, FaTimes, FaSparkles } from "react-icons/fa";
+import { FaRobot, FaTimes, FaStar } from "react-icons/fa";
 import AiAssistantPanel from "./AiAssistantPanel";
 
 export default function FloatingAssistantButton() {
@@ -24,7 +24,7 @@ export default function FloatingAssistantButton() {
         </div>
         <span className="text-sm font-semibold">Ask AI</span>
         <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em]">
-          <FaSparkles size={10} className="inline" />
+          <FaStar size={10} className="inline" />
         </span>
       </button>
 

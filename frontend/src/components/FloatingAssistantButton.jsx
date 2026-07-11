@@ -13,7 +13,7 @@ export default function FloatingAssistantButton() {
     return () => window.removeEventListener("freshbasket-open-assistant", handleOpenAssistant);
   }, []);
 
-  const hiddenRoutes = ["/login", "/register", "/welcome"];
+  const hiddenRoutes = ["/login", "/register", "/chat"];
   const shouldHide = hiddenRoutes.includes(location.pathname);
 
   if (shouldHide) return null;

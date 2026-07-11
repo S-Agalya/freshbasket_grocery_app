@@ -31,14 +31,13 @@ export const chatWithAI = async (req, res) => {
   try {
     const { message } = req.body;
 
-    // Get all products
+    // Fetch products from database
     const result = await db.query(`
       SELECT
         id,
         name,
         category,
         price,
-        image,
         stock,
         unit,
         unit_quantity
@@ -48,60 +47,97 @@ export const chatWithAI = async (req, res) => {
 
     const products = result.rows;
 
+    // Build a clean product list for Gemini
+    const productList = products
+      .map(
+        (p) => `
+ID: ${p.id}
+Name: ${p.name}
+Category: ${p.category}
+Price: ₹${p.price}
+Stock: ${p.stock}
+Unit: ${p.unit_quantity} ${p.unit}
+`
+      )
+      .join("\n");
+
     const prompt = `
-You are an AI shopping assistant for FreshBasket.
+You are the AI shopping assistant of FreshBasket Grocery Store.
 
-These are the products available.
+These are the available products in the store.
 
-${JSON.stringify(products)}
+${productList}
 
-Customer says:
-
+Customer Request:
 "${message}"
 
-Your task:
+Instructions:
 
-1. Understand what the customer wants.
-2. Match ONLY products from the above list.
-3. Never invent products.
-4. If quantity is mentioned, extract it.
-5. Return ONLY JSON.
+1. Understand exactly what the customer wants.
+2. Match ONLY products from the product list.
+3. Never invent product names.
+4. Extract quantities if the customer mentions them.
+5. If stock = 0, tell the customer the product is out of stock.
+6. NEVER include out-of-stock products in the "products" array.
+7. If possible, suggest similar available products.
+8. If the customer asks for ingredients for a recipe, recommend ONLY products available in the list.
+9. Return ONLY valid JSON.
 
-Format:
+Response format:
 
 {
-  "reply":"Short response",
-  "products":[
-      {
-        "id":1,
-        "quantity":2
-      }
+  "reply": "Your response to the customer",
+  "products": [
+    {
+      "id": 1,
+      "quantity": 2
+    }
   ]
 }
 
-No markdown.
-No explanation.
-Only JSON.
+If nothing can be added:
+
+{
+  "reply": "Sorry, Milk is currently out of stock.",
+  "products": []
+}
+
+Return ONLY JSON.
 `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-flash-latest",
+      model: "gemini-2.5-flash",
       contents: prompt,
     });
 
-    let text = response.text.trim();
+    let text = response.text;
 
-    // Remove markdown if Gemini adds it
-    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+    // Remove markdown if Gemini returns it
+    text = text
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
 
-    const parsed = JSON.parse(text);
+    let parsed;
+
+    try {
+      parsed = JSON.parse(text);
+    } catch (err) {
+      console.error("Gemini returned invalid JSON:");
+      console.log(text);
+
+      return res.status(500).json({
+        message: "Invalid AI response",
+        raw: text,
+      });
+    }
 
     res.json(parsed);
-
   } catch (err) {
     console.error(err);
 
     res.status(500).json({
+      message: "AI Error",
       error: err.message,
     });
   }

@@ -4,15 +4,35 @@ import { CartContext } from "../context/CartContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+const normalize = (value = "") =>
+  value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
 export default function AiAssistantPanel() {
-  const { addToCart, cartItems } = useContext(CartContext);
+  const { addToCart, removeFromCart, cartItems } = useContext(CartContext);
+
+  const getInitialConversation = () => {
+    try {
+      const saved = localStorage.getItem("freshbasket_assistant_chat");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch {
+      // ignore invalid localStorage data
+    }
+
+    return [
+      {
+        role: "assistant",
+        text: "Hello! Tell me what you want to shop for, or upload a photo of a grocery list.",
+      },
+    ];
+  };
+
   const [message, setMessage] = useState("");
-  const [conversation, setConversation] = useState([
-    {
-      role: "assistant",
-      text: "Hello! Tell me what you want to shop for, or upload a photo of a grocery list.",
-    },
-  ]);
+  const [conversation, setConversation] = useState(getInitialConversation);
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewProducts, setPreviewProducts] = useState([]);
@@ -20,6 +40,10 @@ export default function AiAssistantPanel() {
   const recognitionRef = useRef(null);
 
   const cartCount = useMemo(() => cartItems.reduce((sum, item) => sum + item.qty, 0), [cartItems]);
+
+  useEffect(() => {
+    localStorage.setItem("freshbasket_assistant_chat", JSON.stringify(conversation));
+  }, [conversation]);
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -96,6 +120,41 @@ export default function AiAssistantPanel() {
 
     setLoading(true);
     setConversation((prev) => [...prev, { role: "user", text: inputText }]);
+    setMessage("");
+    setSelectedFile(null);
+
+    const normalizedInput = inputText.toLowerCase();
+    const wantsRemoval = /\b(remove|delete|clear|empty)\b/i.test(normalizedInput);
+
+    if (wantsRemoval) {
+      const targetName = inputText
+        .replace(/^(remove|delete|clear|empty)\s+/i, "")
+        .replace(/\b(that|this|it|product|from cart|from the cart)\b/gi, "")
+        .trim();
+
+      let itemToRemove = null;
+
+      if (targetName) {
+        itemToRemove = [...cartItems]
+          .slice()
+          .reverse()
+          .find((item) => normalize(item.name).includes(normalize(targetName)) || normalize(targetName).includes(normalize(item.name)));
+      }
+
+      if (!itemToRemove && cartItems.length > 0) {
+        itemToRemove = [...cartItems].slice().reverse()[0];
+      }
+
+      if (itemToRemove) {
+        removeFromCart(itemToRemove.id);
+        setConversation((prev) => [...prev, { role: "assistant", text: `${itemToRemove.name} has been removed from your cart.` }]);
+      } else {
+        setConversation((prev) => [...prev, { role: "assistant", text: "I could not find that item in your cart yet." }]);
+      }
+
+      setLoading(false);
+      return;
+    }
 
     try {
       if (selectedFile) {
@@ -153,8 +212,6 @@ export default function AiAssistantPanel() {
         });
       }
 
-      setMessage("");
-      setSelectedFile(null);
     } catch (error) {
       setConversation((prev) => [...prev, { role: "assistant", text: error.message || "Something went wrong." }]);
     } finally {
@@ -226,6 +283,12 @@ export default function AiAssistantPanel() {
         <input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
           placeholder="Type: add 2kg apples or suggest biryani ingredients"
           className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-green-500"
         />

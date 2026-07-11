@@ -179,6 +179,7 @@ export default function AiAssistantPanel() {
 
     const normalizedInput = inputText.toLowerCase();
     const confirmation = /\b(yes|ok|add|proceed|confirm)\b/i.test(normalizedInput);
+    const wantsExplicitAdd = /\b(add|buy|place|shop)\b/i.test(normalizedInput) || /\b(cart)\b/i.test(normalizedInput);
 
     if (pendingAdd && confirmation) {
       handleConfirmAdd();
@@ -255,6 +256,25 @@ export default function AiAssistantPanel() {
         setPreviewProducts(data.products || []);
 
         const parsedProducts = data.products || [];
+        const directIntent = /\b(apple|apples|milk|bread|banana|carrot|onion|egg|eggs|rice|curd)\b/i.test(normalizedInput);
+        const wantsImmediateAdd = parsedProducts.length > 0 && (wantsExplicitAdd || directIntent);
+
+        if (wantsImmediateAdd) {
+          const firstItem = parsedProducts[0];
+          addToCart(
+            {
+              id: firstItem.id,
+              name: firstItem.name,
+              price: firstItem.price,
+              image: "",
+              stock: 100,
+            },
+            firstItem.quantity || 1
+          );
+          setConversation((prev) => [...prev, { role: "assistant", text: `${firstItem.name} has been added to your cart.` }]);
+          return;
+        }
+
         if (parsedProducts.length > 0) {
           const firstItem = parsedProducts[0];
           setPendingAdd({
@@ -296,7 +316,7 @@ export default function AiAssistantPanel() {
         </div>
       </div>
 
-      <div className="rounded-[20px] bg-gray-50 border border-gray-100 p-3 text-sm text-gray-700 mb-3 min-h-[220px] max-h-[280px] overflow-y-auto space-y-2">
+      <div className="rounded-[20px] bg-gray-50 border border-gray-100 p-3 text-sm text-gray-700 mb-3 min-h-[220px] max-h-[280px] overflow-y-auto overflow-x-hidden space-y-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
         {conversation.map((entry, index) => (
           <div key={`${entry.role}-${index}`} className={`flex ${entry.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`max-w-[90%] rounded-2xl px-3 py-2 ${entry.role === "user" ? "bg-green-600 text-white" : "bg-white text-gray-700 border border-gray-100"}`}>

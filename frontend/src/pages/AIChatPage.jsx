@@ -23,7 +23,7 @@ export default function AIChatPage() {
     bottomRef.current?.scrollIntoView({
       behavior: "smooth",
     });
-  }, [messages, loading]);
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;

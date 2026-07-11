@@ -37,7 +37,7 @@ export const parseShoppingRequest = (message, products = []) => {
     if (matchedProduct.stock <= 0) {
       return {
         intent: "OUT_OF_STOCK",
-        reply: `😔 ${matchedProduct.name} is currently out of stock.`,
+        reply: `😔 Sorry! ${matchedProduct.name} is currently out of stock. We’ll be happy to help you with a similar option soon 😊`,
         needsQuantity: false,
         needsConfirmation: false,
         products: [],
@@ -50,7 +50,7 @@ export const parseShoppingRequest = (message, products = []) => {
     if (!qtyInfo) {
       return {
         intent: "PRODUCT_ONLY",
-        reply: `🛒 ${matchedProduct.name} is available. How much would you like?`,
+        reply: `🛒 ${matchedProduct.name} is available! How much would you like today? 😊`,
         needsQuantity: true,
         needsConfirmation: false,
         products: [],
@@ -62,7 +62,7 @@ export const parseShoppingRequest = (message, products = []) => {
 
     return {
       intent: "PRODUCT_WITH_QUANTITY",
-      reply: `🛒 ${matchedProduct.name} × ${qtyInfo.quantity} ${qtyInfo.unit} will cost ₹${subtotal}. Would you like me to add it to your cart?`,
+      reply: `🛒 Great choice! ${matchedProduct.name} × ${qtyInfo.quantity} ${qtyInfo.unit} will cost ₹${subtotal}. Would you like me to add it to your cart? 😊`,
       needsQuantity: false,
       needsConfirmation: true,
       products: [
@@ -87,7 +87,7 @@ export const parseShoppingRequest = (message, products = []) => {
   if (closeMatch) {
     return {
       intent: "SPELLING_SUGGESTION",
-      reply: `Did you mean ${closeMatch.name}?`,
+      reply: `😊 Did you mean ${closeMatch.name}? I can help you with that.`,
       needsQuantity: false,
       needsConfirmation: false,
       products: [],
@@ -97,7 +97,7 @@ export const parseShoppingRequest = (message, products = []) => {
 
   return {
     intent: "PRODUCT_NOT_FOUND",
-    reply: `😔 We don't sell "${message}" in FreshBasket yet.`,
+    reply: `� Sorry! We’re not having "${message}" in our store right now. If you want, I can suggest a similar product from our fresh range 😊`,
     needsQuantity: false,
     needsConfirmation: false,
     products: [],

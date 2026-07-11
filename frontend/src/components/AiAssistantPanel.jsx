@@ -36,6 +36,7 @@ export default function AiAssistantPanel() {
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewProducts, setPreviewProducts] = useState([]);
+  const [pendingAdd, setPendingAdd] = useState(null);
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const recognitionRef = useRef(null);
@@ -131,6 +132,25 @@ export default function AiAssistantPanel() {
     }
   };
 
+  const handleConfirmAdd = () => {
+    if (!pendingAdd) return;
+
+    const { item, quantity } = pendingAdd;
+    addToCart(
+      {
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        image: item.image || "",
+        stock: item.stock || 100,
+      },
+      quantity || 1
+    );
+
+    setConversation((prev) => [...prev, { role: "assistant", text: `${item.name} has been added to your cart.` }]);
+    setPendingAdd(null);
+  };
+
   const handleSend = async () => {
     const userText = (message || "").trim();
     const uploadText = selectedFile ? "Please review this uploaded shopping list." : "";
@@ -138,12 +158,22 @@ export default function AiAssistantPanel() {
 
     if (!inputText) return;
 
+    const normalizedInput = inputText.toLowerCase();
+    const confirmation = /\b(yes|ok|add|proceed|confirm)\b/i.test(normalizedInput);
+
+    if (pendingAdd && confirmation) {
+      handleConfirmAdd();
+      setMessage("");
+      setSelectedFile(null);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setConversation((prev) => [...prev, { role: "user", text: inputText }]);
     setMessage("");
     setSelectedFile(null);
 
-    const normalizedInput = inputText.toLowerCase();
     const wantsRemoval = /\b(remove|delete|clear|empty)\b/i.test(normalizedInput);
 
     if (wantsRemoval) {
@@ -190,19 +220,6 @@ export default function AiAssistantPanel() {
         const assistantText = data.reply || "I found a few items from your photo.";
         setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);
         setPreviewProducts(data.products || []);
-
-        (data.products || []).forEach((item) => {
-          addToCart(
-            {
-              id: item.id,
-              name: item.name,
-              price: item.price,
-              image: "",
-              stock: 100,
-            },
-            item.quantity || 1
-          );
-        });
       } else {
         const res = await fetch(`${API_URL}/api/ai/chat`, {
           method: "POST",
@@ -216,18 +233,21 @@ export default function AiAssistantPanel() {
         setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);
         setPreviewProducts(data.products || []);
 
-        (data.products || []).forEach((item) => {
-          addToCart(
-            {
-              id: item.id,
-              name: item.name,
-              price: item.price,
+        const parsedProducts = data.products || [];
+        if (parsedProducts.length > 0) {
+          const firstItem = parsedProducts[0];
+          setPendingAdd({
+            item: {
+              id: firstItem.id,
+              name: firstItem.name,
+              price: firstItem.price,
               image: "",
               stock: 100,
             },
-            item.quantity || 1
-          );
-        });
+            quantity: firstItem.quantity || 1,
+          });
+          setConversation((prev) => [...prev, { role: "assistant", text: `Shall I add ${firstItem.name} × ${firstItem.quantity || 1} to your cart?` }]);
+        }
       }
 
     } catch (error) {

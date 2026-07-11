@@ -458,30 +458,53 @@ total=0
 
 RULE 7A
 
-If the customer's product name is very similar to a product in the AVAILABLE PRODUCTS list,
-DO NOT classify it as PRODUCT_NOT_FOUND immediately.
+Before deciding PRODUCT_NOT_FOUND,
 
-Treat it as a possible spelling mistake.
+compare the customer's product name with EVERY product name in AVAILABLE PRODUCTS.
 
-Suggest up to 3 closest matching products.
+If there is even ONE product whose spelling is very close,
+DO NOT return PRODUCT_NOT_FOUND.
 
-Example:
+Instead return SPELLING_SUGGESTION.
+
+Never ignore possible typing mistakes.
+
+Examples
 
 Customer:
 aple
 
-Reply:
+Return Apple
 
-🍎 Did you mean "Apple"?
+----------------
 
-Return
+Customer:
+bnana
 
-{
-  "intent":"SPELLING_SUGGESTION",
-  "reply":"🍎 Did you mean Apple?",
-  "suggestions":["Apple"],
-  "needsConfirmation":true
-}
+Return Banana
+
+----------------
+
+Customer:
+carot
+
+Return Carrot
+
+----------------
+
+Customer:
+milkk
+
+Return Milk
+
+----------------
+
+Customer:
+cabage
+
+Return Cabbage
+
+Only return PRODUCT_NOT_FOUND when there are NO close matches at all.
 
 --------------------------------
 

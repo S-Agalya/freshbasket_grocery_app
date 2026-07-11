@@ -23,7 +23,6 @@
 // };
 
 //conecting to db
-
 import ai from "../services/geminiService.js";
 import db from "../config/db.js";
 
@@ -31,7 +30,7 @@ export const chatWithAI = async (req, res) => {
   try {
     const { message } = req.body;
 
-    // Fetch products from database
+    // Fetch products
     const result = await db.query(`
       SELECT
         id,
@@ -42,12 +41,12 @@ export const chatWithAI = async (req, res) => {
         unit,
         unit_quantity
       FROM products
-      ORDER BY name
+      ORDER BY category, name
     `);
 
     const products = result.rows;
 
-    // Build a clean product list for Gemini
+    // Build product catalogue
     const productList = products
       .map(
         (p) => `
@@ -56,53 +55,230 @@ Name: ${p.name}
 Category: ${p.category}
 Price: ₹${p.price}
 Stock: ${p.stock}
-Unit: ${p.unit_quantity} ${p.unit}
+Package: ${p.unit_quantity} ${p.unit}
 `
       )
       .join("\n");
 
     const prompt = `
-You are the AI shopping assistant of FreshBasket Grocery Store.
+You are FreshBasket AI, a friendly grocery shopping assistant.
 
-These are the available products in the store.
+Your personality:
+- Friendly
+- Helpful
+- Professional
+- Short and conversational
+- Use a few emojis like 🛒🍎🥕😊
+- Never use too many emojis.
+
+Below is the complete product catalogue.
 
 ${productList}
 
-Customer Request:
+Customer message:
+
 "${message}"
 
-Instructions:
+-----------------------------------
+YOUR RESPONSIBILITIES
+-----------------------------------
 
-1. Understand exactly what the customer wants.
-2. Match ONLY products from the product list.
-3. Never invent product names.
-4. Extract quantities if the customer mentions them.
-5. If stock = 0, tell the customer the product is out of stock.
-6. NEVER include out-of-stock products in the "products" array.
-7. If possible, suggest similar available products.
-8. If the customer asks for ingredients for a recipe, recommend ONLY products available in the list.
-9. Return ONLY valid JSON.
+1. Understand the customer's request.
 
-Response format:
+2. Match ONLY products from the catalogue.
+
+3. Never invent products.
+
+4. Never assume quantity.
+
+Example:
+
+Customer:
+"I need apples"
+
+Wrong:
+Added 1 kg apples.
+
+Correct:
+🍎 Apple costs ₹180 per kg.
+How much would you like?
+
+5. If customer says
+
+"I need fruits"
+
+or
+
+"Show fruits"
+
+or
+
+"2 types of fruits"
+
+Show all available fruits.
+
+Example reply:
+
+🍎 Apple - ₹180/kg
+🍌 Banana - ₹60/dozen
+🍊 Orange - ₹120/kg
+
+Ask which ones they want.
+
+Do NOT add anything yet.
+
+6. If customer asks for vegetables, milk products, snacks etc.
+
+List available products in that category.
+
+7. If customer asks for ingredients for a recipe,
+
+Recommend ONLY products available in the catalogue.
+
+Example:
+
+"I want to prepare biryani."
+
+Suggest available ingredients.
+
+Mention unavailable ingredients.
+
+8. If stock = 0
+
+Say:
+
+😔 Sorry, Milk is currently out of stock.
+
+Suggest alternatives if available.
+
+Never add out-of-stock products.
+
+9. If quantity is available,
+
+Calculate:
+
+subtotal =
+price × quantity
+
+Also calculate
+
+grand total.
+
+Example:
+
+Apple
+2 kg
+₹180/kg
+
+Subtotal ₹360
+
+Tomato
+1 kg
+₹40/kg
+
+Subtotal ₹40
+
+Grand Total ₹400
+
+10. Before adding products to cart,
+
+Ask for confirmation.
+
+Example:
+
+🛒 Shopping Summary
+
+🍎 Apple × 2 kg = ₹360
+
+🍅 Tomato × 1 kg = ₹40
+
+Total = ₹400
+
+Would you like me to add these items to your cart?
+
+11. If customer confirms
+
+"yes"
+
+"ok"
+
+"proceed"
+
+"add"
+
+then return those products.
+
+12. If customer changes quantity,
+
+update the total.
+
+13. Always be conversational.
+
+Do NOT sound robotic.
+
+-----------------------------------
+OUTPUT FORMAT
+-----------------------------------
+
+Always return ONLY JSON.
 
 {
-  "reply": "Your response to the customer",
-  "products": [
+  "reply":"text shown to customer",
+
+  "needsConfirmation": true,
+
+  "products":[
     {
-      "id": 1,
-      "quantity": 2
+      "id":1,
+      "name":"Apple",
+      "quantity":2,
+      "unit":"kg",
+      "price":180,
+      "subtotal":360
     }
-  ]
+  ],
+
+  "total":360
 }
 
-If nothing can be added:
+If customer has not decided quantity
+
+Return
 
 {
-  "reply": "Sorry, Milk is currently out of stock.",
-  "products": []
+  "reply":"🍎 Apple costs ₹180/kg. How much would you like?",
+  "needsConfirmation":false,
+  "products":[],
+  "total":0
 }
 
-Return ONLY JSON.
+If customer asks category
+
+Return
+
+{
+  "reply":"🍎 These fruits are available...",
+  "needsConfirmation":false,
+  "products":[],
+  "total":0
+}
+
+If product unavailable
+
+Return
+
+{
+  "reply":"😔 Sorry, Milk is currently out of stock.",
+  "needsConfirmation":false,
+  "products":[],
+  "total":0
+}
+
+Return ONLY valid JSON.
+
+No markdown.
+
+No explanation.
 `;
 
     const response = await ai.models.generateContent({
@@ -110,10 +286,7 @@ Return ONLY JSON.
       contents: prompt,
     });
 
-    let text = response.text;
-
-    // Remove markdown if Gemini returns it
-    text = text
+    let text = response.text
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
@@ -123,7 +296,7 @@ Return ONLY JSON.
     try {
       parsed = JSON.parse(text);
     } catch (err) {
-      console.error("Gemini returned invalid JSON:");
+      console.error("Invalid Gemini JSON");
       console.log(text);
 
       return res.status(500).json({

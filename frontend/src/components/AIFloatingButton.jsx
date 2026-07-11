@@ -7,7 +7,8 @@ export default function AIFloatingButton() {
 
   if (
     location.pathname === "/login" ||
-    location.pathname === "/register"
+    location.pathname === "/register" ||
+    location.pathname === "/ai"
   ) {
     return null;
   }

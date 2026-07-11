@@ -1,5 +1,5 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { FaRobot, FaPaperPlane, FaUpload, FaShoppingCart, FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
+import { FaRobot, FaPaperPlane, FaUpload, FaShoppingCart, FaMicrophone, FaMicrophoneSlash, FaVolumeUp, FaStop } from "react-icons/fa";
 import { CartContext } from "../context/CartContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -37,9 +37,15 @@ export default function AiAssistantPanel() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewProducts, setPreviewProducts] = useState([]);
   const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const recognitionRef = useRef(null);
 
   const cartCount = useMemo(() => cartItems.reduce((sum, item) => sum + item.qty, 0), [cartItems]);
+  const lastAssistantReply = useMemo(() => {
+    const reversed = [...conversation].reverse();
+    const entry = reversed.find((item) => item.role === "assistant");
+    return entry?.text || "";
+  }, [conversation]);
 
   useEffect(() => {
     localStorage.setItem("freshbasket_assistant_chat", JSON.stringify(conversation));
@@ -91,7 +97,16 @@ export default function AiAssistantPanel() {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "en-US";
     utterance.rate = 1;
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
     window.speechSynthesis.speak(utterance);
+  };
+
+  const stopSpeaking = () => {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
   };
 
   const handleVoiceToggle = () => {
@@ -107,8 +122,13 @@ export default function AiAssistantPanel() {
       return;
     }
 
-    recognition.start();
-    setIsListening(true);
+    try {
+      recognition.stop();
+      recognition.start();
+      setIsListening(true);
+    } catch {
+      setIsListening(false);
+    }
   };
 
   const handleSend = async () => {
@@ -169,7 +189,6 @@ export default function AiAssistantPanel() {
 
         const assistantText = data.reply || "I found a few items from your photo.";
         setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);
-        speakReply(assistantText);
         setPreviewProducts(data.products || []);
 
         (data.products || []).forEach((item) => {
@@ -195,7 +214,6 @@ export default function AiAssistantPanel() {
 
         const assistantText = data.reply || "I can help you shop.";
         setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);
-        speakReply(assistantText);
         setPreviewProducts(data.products || []);
 
         (data.products || []).forEach((item) => {
@@ -298,6 +316,21 @@ export default function AiAssistantPanel() {
           title="Voice input"
         >
           {isListening ? <FaMicrophoneSlash size={14} /> : <FaMicrophone size={14} />}
+        </button>
+        <button
+          onClick={() => {
+            if (isSpeaking) {
+              stopSpeaking();
+            } else if (lastAssistantReply) {
+              speakReply(lastAssistantReply);
+            } else {
+              setConversation((prev) => [...prev, { role: "assistant", text: "There is no reply to read yet." }]);
+            }
+          }}
+          className={`px-3 py-2 rounded-xl ${isSpeaking ? "bg-amber-500 text-white" : "bg-gray-100 text-gray-700"}`}
+          title="Read aloud"
+        >
+          {isSpeaking ? <FaStop size={14} /> : <FaVolumeUp size={14} />}
         </button>
         <button
           onClick={handleSend}

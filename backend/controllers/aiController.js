@@ -624,7 +624,7 @@ Return ONLY JSON.
 `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-pro",
+      model: "gemini-flash-latest",
       contents: prompt,
     });
 

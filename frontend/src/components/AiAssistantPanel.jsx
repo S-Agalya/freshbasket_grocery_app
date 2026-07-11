@@ -54,7 +54,10 @@ export default function AiAssistantPanel() {
   }, [conversation]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    const node = messagesEndRef.current;
+    if (node) {
+      node.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
   }, [conversation, loading]);
 
   useEffect(() => {
@@ -95,6 +98,39 @@ export default function AiAssistantPanel() {
       .map((entry) => `${entry.role === "user" ? "Customer" : "Assistant"}: ${entry.text}`)
       .join("\n");
     return history ? `${history}\nCustomer: ${inputText}` : `Customer: ${inputText}`;
+  };
+
+  const parseDirectShoppingRequest = (inputText) => {
+    const text = inputText || "";
+    const lower = text.toLowerCase();
+    const isShoppingAction = /\b(add|buy|get|place|shop|order)\b/i.test(lower) || /\b(cart)\b/i.test(lower);
+
+    if (!isShoppingAction) return null;
+
+    const productNames = [
+      { key: "apple", aliases: ["apple", "apples"] },
+      { key: "banana", aliases: ["banana", "bananas"] },
+      { key: "milk", aliases: ["milk"] },
+      { key: "bread", aliases: ["bread"] },
+      { key: "egg", aliases: ["egg", "eggs"] },
+      { key: "rice", aliases: ["rice"] },
+      { key: "curd", aliases: ["curd", "yogurt", "yoghurt"] },
+      { key: "onion", aliases: ["onion", "onions"] },
+      { key: "carrot", aliases: ["carrot", "carrots"] },
+    ];
+
+    const matchedProduct = productNames.find((product) => product.aliases.some((alias) => lower.includes(alias)));
+    if (!matchedProduct) return null;
+
+    const quantityMatch = text.match(/(\d+(?:\.\d+)?)\s*(kg|kilo|kilogram|g|gram|grams|pcs|piece|pieces|pack|packs|litre|litres|ltr|l|bottle|bottles|dozen|dozens)/i);
+    const quantity = quantityMatch ? Number(quantityMatch[1]) : 1;
+
+    return {
+      id: matchedProduct.key,
+      name: matchedProduct.key.charAt(0).toUpperCase() + matchedProduct.key.slice(1),
+      quantity,
+      price: matchedProduct.key === "apple" ? 50 : matchedProduct.key === "banana" ? 40 : matchedProduct.key === "milk" ? 60 : matchedProduct.key === "bread" ? 35 : matchedProduct.key === "egg" ? 90 : matchedProduct.key === "rice" ? 120 : matchedProduct.key === "curd" ? 45 : matchedProduct.key === "onion" ? 30 : 25,
+    };
   };
 
   const speakReply = (text) => {
@@ -180,6 +216,27 @@ export default function AiAssistantPanel() {
     const normalizedInput = inputText.toLowerCase();
     const confirmation = /\b(yes|ok|add|proceed|confirm)\b/i.test(normalizedInput);
     const wantsExplicitAdd = /\b(add to cart|add this to cart|add it to cart|buy|place|shop)\b/i.test(normalizedInput) || /\b(cart)\b/i.test(normalizedInput);
+    const directShopping = parseDirectShoppingRequest(inputText);
+
+    if (directShopping) {
+      addToCart(
+        {
+          id: directShopping.id,
+          name: directShopping.name,
+          price: directShopping.price,
+          image: "",
+          stock: 100,
+        },
+        directShopping.quantity || 1
+      );
+      setConversation((prev) => [...prev, { role: "user", text: inputText }, { role: "assistant", text: `${directShopping.name} has been added to your cart.` }]);
+      setPendingAdd(null);
+      setPreviewProducts([]);
+      setMessage("");
+      setSelectedFile(null);
+      setLoading(false);
+      return;
+    }
 
     if (pendingAdd && confirmation) {
       handleConfirmAdd();
@@ -299,7 +356,7 @@ export default function AiAssistantPanel() {
   };
 
   return (
-    <div className="bg-white rounded-[24px] border border-gray-200 shadow-[0_10px_35px_rgba(0,0,0,0.06)] p-3 md:p-4 mb-6">
+    <div className="bg-white rounded-[24px] border border-gray-200 shadow-[0_10px_35px_rgba(0,0,0,0.06)] p-3 md:p-4 mb-6 flex flex-col h-[520px] max-h-[78vh] overflow-hidden">
       <div className="flex items-center justify-between mb-3 rounded-2xl bg-gradient-to-r from-green-50 to-emerald-50 px-3 py-2.5 border border-green-100">
         <div className="flex items-center gap-2">
           <div className="bg-green-600 p-2 rounded-2xl text-white shadow-sm">
@@ -316,7 +373,7 @@ export default function AiAssistantPanel() {
         </div>
       </div>
 
-      <div className="rounded-[20px] bg-gray-50 border border-gray-100 p-3 text-sm text-gray-700 mb-3 min-h-[220px] max-h-[280px] overflow-y-auto overflow-x-hidden space-y-2">
+      <div className="flex-1 min-h-0 rounded-[20px] bg-gray-50 border border-gray-100 p-3 text-sm text-gray-700 mb-3 overflow-y-auto overflow-x-hidden space-y-2">
         {conversation.map((entry, index) => (
           <div key={`${entry.role}-${index}`} className={`flex ${entry.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`max-w-[90%] rounded-2xl px-3 py-2 ${entry.role === "user" ? "bg-green-600 text-white" : "bg-white text-gray-700 border border-gray-100"}`}>
@@ -351,7 +408,7 @@ export default function AiAssistantPanel() {
         </div>
       )}
 
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex items-center gap-2 mb-2 shrink-0">
         <label className="flex items-center gap-2 cursor-pointer bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-xl text-sm text-gray-700">
           <FaUpload size={12} />
           <span>{selectedFile ? selectedFile.name : "Upload list"}</span>
@@ -359,7 +416,7 @@ export default function AiAssistantPanel() {
         </label>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 shrink-0">
         <button
           onClick={refreshChat}
           className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-xl"

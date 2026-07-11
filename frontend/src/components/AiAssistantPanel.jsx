@@ -314,7 +314,6 @@ export default function AiAssistantPanel() {
         if (!res.ok) throw new Error(data.message || "AI request failed");
 
         const assistantText = data.reply || "I can help you shop.";
-        setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);
         setPreviewProducts(data.products || []);
 
         const parsedProducts = data.products || [];
@@ -349,6 +348,8 @@ export default function AiAssistantPanel() {
             quantity: firstItem.quantity || 1,
           });
           setConversation((prev) => [...prev, { role: "assistant", text: `Shall I add ${firstItem.name} × ${firstItem.quantity || 1} to your cart?` }]);
+        } else if (!wantsImmediateAdd) {
+          setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);
         }
       }
 

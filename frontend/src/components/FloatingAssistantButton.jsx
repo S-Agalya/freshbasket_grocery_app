@@ -16,22 +16,22 @@ export default function FloatingAssistantButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full border border-emerald-200 bg-gradient-to-r from-emerald-600 via-green-600 to-lime-500 px-4 py-3 text-white shadow-[0_20px_45px_rgba(16,185,129,0.28)] transition hover:scale-[1.02] active:scale-[0.98]"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full border border-emerald-200 bg-gradient-to-r from-emerald-600 via-green-600 to-lime-500 px-4 py-3.5 text-white shadow-[0_22px_60px_rgba(16,185,129,0.32)] transition hover:translate-y-[-2px] hover:scale-[1.02] active:scale-[0.98] md:bottom-8 md:right-8"
         aria-label="Open FreshBasket Assistant"
       >
-        <div className="rounded-full bg-white/20 p-2">
+        <div className="rounded-full bg-white/20 p-2.5 shadow-inner">
           <FaRobot size={15} />
         </div>
-        <span className="text-sm font-semibold">Ask AI</span>
-        <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em]">
+        <span className="text-sm font-semibold tracking-wide">Ask AI</span>
+        <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.25em]">
           <FaStar size={10} className="inline" />
         </span>
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 px-3 py-4 backdrop-blur-sm sm:items-center sm:px-4">
-          <div className="w-full max-w-3xl rounded-[28px] border border-white/50 bg-white/95 p-2 shadow-[0_25px_80px_rgba(0,0,0,0.22)] backdrop-blur-xl sm:p-3">
-            <div className="mb-2 flex items-center justify-between rounded-[20px] bg-gradient-to-r from-emerald-50 to-lime-50 px-3 py-2.5">
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/45 px-3 py-4 backdrop-blur-md sm:items-center sm:px-4">
+          <div className="w-full max-w-3xl rounded-[30px] border border-white/60 bg-white/95 p-2 shadow-[0_30px_90px_rgba(0,0,0,0.24)] backdrop-blur-xl sm:p-3">
+            <div className="mb-2 flex items-center justify-between rounded-[20px] bg-gradient-to-r from-emerald-50 via-white to-lime-50 px-3 py-2.5">
               <div className="flex items-center gap-2">
                 <div className="rounded-2xl bg-emerald-600 p-2 text-white">
                   <FaRobot size={14} />

@@ -224,6 +224,7 @@ const ProfilePage = () => {
                     <div className="text-right">
                       <p className="text-sm font-bold" style={{ color: "#0f3d22" }}>₹{o.total_amount}</p>
                       <span className={`text-[10px] font-semibold ${o.status==="Delivered"?"text-green-500":o.status==="Cancelled"?"text-red-500":"text-amber-500"}`}>{o.status}</span>
+                      
                     </div>
                   </div>
                 ))}

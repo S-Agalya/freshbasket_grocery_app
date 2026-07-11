@@ -68,7 +68,7 @@ export default function AIChatPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#f7f7f8]">
+    <div className="h-screen flex flex-col overflow-hidden">
 
       {/* Header */}
 

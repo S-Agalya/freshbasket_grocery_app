@@ -153,8 +153,8 @@ const Header = ({ username = "User", onMenuToggle }) => {
           </div>
 
           {showResults && results.length > 0 && (
-            <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl z-[70] max-h-60 sm:max-h-72 overflow-y-auto"
-              style={{ boxShadow: "0 12px 45px rgba(0,0,0,0.14)", border: "1px solid rgba(0,0,0,0.06)" }}>
+            <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl z-[70] max-h-[60vh] overflow-y-auto"
+              style={{ boxShadow: "0 12px 45px rgba(0,0,0,0.14)", border: "1px solid rgba(0,0,0,0.06)", maxWidth: "calc(100vw - 1rem)" }}>
               {results.map((p) => (
                 <div key={p.id}
                   onClick={() => { navigate(`/product/${p.id}`); setShowResults(false); setQuery(""); }}
@@ -176,7 +176,7 @@ const Header = ({ username = "User", onMenuToggle }) => {
           )}
           {showResults && results.length === 0 && query.trim() && (
             <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl z-[70] px-4 py-3 text-xs sm:text-sm text-gray-400 text-center"
-              style={{ boxShadow: "0 12px 35px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.06)" }}>
+              style={{ boxShadow: "0 12px 35px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.06)", maxWidth: "calc(100vw - 1rem)" }}>
               No results for "<span className="text-gray-700 font-medium">{query}</span>"
             </div>
           )}
@@ -201,7 +201,8 @@ const Header = ({ username = "User", onMenuToggle }) => {
                   className="absolute right-0 top-[calc(100%+0.6rem)] bg-white rounded-2xl z-[70] overflow-hidden"
                   style={{
                     width: "min(320px, calc(100vw - 1rem))",
-                    maxWidth: "320px",
+                    maxWidth: "calc(100vw - 1rem)",
+                    maxHeight: "70vh",
                     boxShadow: "0 12px 45px rgba(0,0,0,0.14)",
                     border: "1px solid rgba(0,0,0,0.07)",
                   }}

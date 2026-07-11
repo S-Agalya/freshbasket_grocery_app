@@ -215,9 +215,9 @@ export default function AiAssistantPanel() {
 
     const normalizedInput = inputText.toLowerCase();
     const confirmation = /\b(yes|ok|add|proceed|confirm)\b/i.test(normalizedInput);
-    const wantsExplicitAdd = /\b(add to cart|add this to cart|add it to cart|buy|place|shop)\b/i.test(normalizedInput) || /\b(cart)\b/i.test(normalizedInput);
+    const wantsExplicitAdd = /\b(add to cart|add this to cart|add it to cart|buy|place|put|shop|order)\b/i.test(normalizedInput) || /\b(cart|basket)\b/i.test(normalizedInput);
     const directShopping = parseDirectShoppingRequest(inputText);
-    const isDirectAddVerb = /\b(add|buy|get|place|shop|order)\b/i.test(normalizedInput) && /\b(cart|basket)\b/i.test(normalizedInput);
+    const isDirectAddVerb = /\b(add|buy|place|put|shop|order)\b/i.test(normalizedInput) && /\b(cart|basket)\b/i.test(normalizedInput);
 
     if (directShopping) {
       addToCart(
@@ -314,8 +314,7 @@ export default function AiAssistantPanel() {
         setPreviewProducts(data.products || []);
 
         const parsedProducts = data.products || [];
-        const directIntent = /\b(apple|apples|milk|bread|banana|carrot|onion|egg|eggs|rice|curd)\b/i.test(normalizedInput);
-        const wantsImmediateAdd = parsedProducts.length > 0 && (wantsExplicitAdd || directIntent || isDirectAddVerb);
+        const wantsImmediateAdd = parsedProducts.length > 0 && (wantsExplicitAdd || isDirectAddVerb);
 
         if (wantsImmediateAdd) {
           const firstItem = parsedProducts[0];

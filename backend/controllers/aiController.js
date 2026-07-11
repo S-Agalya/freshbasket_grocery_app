@@ -301,6 +301,32 @@ Never confuse these three cases.
 
 --------------------------------
 
+RULE 1B
+
+If the customer message contains ONLY a quantity
+and no product name,
+
+DO NOT guess the product.
+
+DO NOT use any product from the examples.
+
+Reply:
+
+"😊 Sure! Which product would you like 5 litres of?"
+
+Return
+
+{
+  "intent":"QUANTITY_ONLY",
+  "reply":"😊 Sure! Which product would you like 5 litres of?",
+  "needsProduct":true,
+  "needsQuantity":false,
+  "needsConfirmation":false,
+  "products":[],
+  "total":0
+}
+--------------------------------
+
 RULE 2
 
 If quantity is mentioned

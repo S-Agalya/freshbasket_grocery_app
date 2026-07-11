@@ -13,6 +13,7 @@ import MyOrdersPage from './pages/MyOrdersPage';
 import WishlistPage from './pages/WishlistPage';
 import Footer from './components/Footer';
 import BottomNav from './components/BottomNav';
+import FloatingAssistantButton from './components/FloatingAssistantButton';
 import './App.css';
 
 // Hide footer on browse/auth pages where a fixed sidebar exists or there's no need
@@ -49,6 +50,7 @@ function App() {
        
           <ConditionalFooter />
           <BottomNav />
+          <FloatingAssistantButton />
         </div>
       </Router>
     </CartProvider>

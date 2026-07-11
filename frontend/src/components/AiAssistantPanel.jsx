@@ -202,7 +202,7 @@ export default function AiAssistantPanel() {
       quantity || 1
     );
 
-    setConversation((prev) => [...prev, { role: "assistant", text: `${item.name} has been added to your cart.` }]);
+    setConversation((prev) => [...prev, { role: "user", text: "Yes" }, { role: "assistant", text: `${item.name} has been added to your cart.` }]);
     setPendingAdd(null);
   };
 
@@ -239,6 +239,9 @@ export default function AiAssistantPanel() {
         .replace(/\b(that|this|it|product|from cart|from the cart)\b/gi, "")
         .trim();
 
+      const amountMatch = inputText.match(/(\d+(?:\.\d+)?)\s*(kg|kilo|kilogram|g|gram|grams|pcs|piece|pieces|pack|packs|litre|litres|ltr|l|bottle|bottles|dozen|dozens)/i);
+      const amountToRemove = amountMatch ? Number(amountMatch[1]) : null;
+
       let itemToRemove = null;
 
       if (targetName) {
@@ -253,8 +256,30 @@ export default function AiAssistantPanel() {
       }
 
       if (itemToRemove) {
-        removeFromCart(itemToRemove.id);
-        setConversation((prev) => [...prev, { role: "assistant", text: `${itemToRemove.name} has been removed from your cart.` }]);
+        if (amountToRemove && amountToRemove > 0) {
+          const currentQty = itemToRemove.qty || 1;
+          const newQty = Math.max(0, currentQty - amountToRemove);
+          if (newQty <= 0) {
+            removeFromCart(itemToRemove.id);
+            setConversation((prev) => [...prev, { role: "assistant", text: `${itemToRemove.name} has been removed from your cart.` }]);
+          } else {
+            removeFromCart(itemToRemove.id);
+            addToCart(
+              {
+                id: itemToRemove.id,
+                name: itemToRemove.name,
+                price: itemToRemove.price,
+                image: itemToRemove.image || "",
+                stock: itemToRemove.stock || 100,
+              },
+              newQty
+            );
+            setConversation((prev) => [...prev, { role: "assistant", text: `${amountToRemove} ${itemToRemove.name} removed from your cart.` }]);
+          }
+        } else {
+          removeFromCart(itemToRemove.id);
+          setConversation((prev) => [...prev, { role: "assistant", text: `${itemToRemove.name} has been removed from your cart.` }]);
+        }
       } else {
         setConversation((prev) => [...prev, { role: "assistant", text: "I could not find that item in your cart yet." }]);
       }

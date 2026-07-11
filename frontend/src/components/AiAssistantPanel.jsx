@@ -179,7 +179,7 @@ export default function AiAssistantPanel() {
 
     const normalizedInput = inputText.toLowerCase();
     const confirmation = /\b(yes|ok|add|proceed|confirm)\b/i.test(normalizedInput);
-    const wantsExplicitAdd = /\b(add|buy|place|shop)\b/i.test(normalizedInput) || /\b(cart)\b/i.test(normalizedInput);
+    const wantsExplicitAdd = /\b(add to cart|add this to cart|add it to cart|buy|place|shop)\b/i.test(normalizedInput) || /\b(cart)\b/i.test(normalizedInput);
 
     if (pendingAdd && confirmation) {
       handleConfirmAdd();
@@ -316,7 +316,7 @@ export default function AiAssistantPanel() {
         </div>
       </div>
 
-      <div className="rounded-[20px] bg-gray-50 border border-gray-100 p-3 text-sm text-gray-700 mb-3 min-h-[220px] max-h-[280px] overflow-y-auto overflow-x-hidden space-y-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+      <div className="rounded-[20px] bg-gray-50 border border-gray-100 p-3 text-sm text-gray-700 mb-3 min-h-[220px] max-h-[280px] overflow-y-auto overflow-x-hidden space-y-2">
         {conversation.map((entry, index) => (
           <div key={`${entry.role}-${index}`} className={`flex ${entry.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`max-w-[90%] rounded-2xl px-3 py-2 ${entry.role === "user" ? "bg-green-600 text-white" : "bg-white text-gray-700 border border-gray-100"}`}>

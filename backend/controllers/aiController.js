@@ -160,6 +160,65 @@ Return ONLY JSON.
       return parsed;
     };
 
+    const normalizeErrorMessage = (err) => {
+      if (!err) return "AI service is unavailable. Please try again later.";
+
+      const tryParseJson = (text) => {
+        try {
+          return JSON.parse(text);
+        } catch {
+          return null;
+        }
+      };
+
+      let message = "";
+      if (typeof err.message === "string") {
+        message = err.message;
+      } else if (typeof err === "string") {
+        message = err;
+      } else {
+        message = JSON.stringify(err);
+      }
+
+      const normalizedFromBody = err?.body?.error?.message || err?.body?.message;
+      if (typeof normalizedFromBody === "string" && normalizedFromBody.trim()) {
+        message = normalizedFromBody;
+      } else if (message.trim()) {
+        let parsed = null;
+        if (message.trim().startsWith("{")) {
+          parsed = tryParseJson(message);
+        } else {
+          const firstBrace = message.indexOf("{");
+          if (firstBrace >= 0) {
+            parsed = tryParseJson(message.slice(firstBrace));
+          }
+        }
+
+        if (parsed) {
+          if (parsed?.error?.message) {
+            message = parsed.error.message;
+          } else if (parsed?.message) {
+            message = parsed.message;
+          }
+        }
+      }
+
+      const lower = message.toLowerCase();
+      if (lower.includes("quota exceeded") || lower.includes("resource_exhausted") || lower.includes("free_tier_requests") || lower.includes("429")) {
+        return "AI quota exceeded. Please try again in a bit.";
+      }
+      if (lower.includes("invalid ai response") || lower.includes("invalid gemini")) {
+        return "AI response could not be understood. Please try again.";
+      }
+      if (lower.includes("rate limit") || lower.includes("too many requests")) {
+        return "AI rate limit reached. Please wait a moment and try again.";
+      }
+      if (lower.includes("quota") && lower.includes("exhausted")) {
+        return "AI quota exceeded. Please try again in a bit.";
+      }
+      return message || "AI service is unavailable. Please try again later.";
+    };
+
     if (isStream) {
       res.setHeader("Content-Type", "application/x-ndjson; charset=utf-8");
       res.setHeader("Cache-Control", "no-cache");
@@ -196,7 +255,8 @@ Return ONLY JSON.
         return res.end();
       } catch (err) {
         console.error(err);
-        res.write(JSON.stringify({ type: "error", message: err.message || "AI Error" }) + "\n");
+        const userMessage = normalizeErrorMessage(err);
+        res.write(JSON.stringify({ type: "error", message: userMessage }) + "\n");
         return res.end();
       }
     }
@@ -234,9 +294,10 @@ Return ONLY JSON.
   } catch (err) {
     console.error(err);
 
+    const message = normalizeErrorMessage(err);
+
     res.status(500).json({
-      message: "AI Error",
-      error: err.message,
+      message,
     });
   }
 };

@@ -41,6 +41,7 @@ export const chatWithAI = async (req, res) => {
         unit,
         unit_quantity
       FROM products
+      WHERE stock > 0
       ORDER BY category, name
     `);
 
@@ -48,16 +49,7 @@ export const chatWithAI = async (req, res) => {
 
     // Build product catalogue
     const productList = products
-      .map(
-        (p) => `
-ID: ${p.id}
-Name: ${p.name}
-Category: ${p.category}
-Price: ₹${p.price}
-Stock: ${p.stock}
-Package: ${p.unit_quantity} ${p.unit}
-`
-      )
+      .map((p) => `${p.name} | ₹${p.price} | ${p.unit_quantity} ${p.unit} | stock ${p.stock}`)
       .join("\n");
 
     // Build system prompt - shopkeeper style, short and emotional
@@ -70,6 +62,9 @@ STYLE:
 - Use at least one emoji in every reply.
 - Sound warm, helpful, and cheerful.
 - Never sound formal or robotic.
+- Answer the customer's latest request directly.
+- Do not use generic filler. Speak to what the customer actually asked.
+- If they ask to add an item, respond as if you are helping them do that.
 
 PERSONALITY:
 Cheerful 🌿 Helpful 🤝 Polite 🙏 Caring 💚 Warm 😊
@@ -117,9 +112,10 @@ Return ONLY JSON.
       parts: [{ text: "Understood! I'm your friendly shopkeeper. I'll help you shop with warmth and emotion. I remember what we've discussed and won't repeat myself. Ready! 🛒" }]
     });
 
-    // Add conversation history if provided
-    if (history && Array.isArray(history) && history.length > 0) {
-      for (const turn of history) {
+    // Add a short slice of conversation history if provided
+    const recentHistory = Array.isArray(history) ? history.slice(-6) : [];
+    if (recentHistory.length > 0) {
+      for (const turn of recentHistory) {
         if (turn.role === "user") {
           contents.push({
             role: "user",

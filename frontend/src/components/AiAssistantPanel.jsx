@@ -129,7 +129,7 @@ export default function AiAssistantPanel() {
       id: matchedProduct.key,
       name: matchedProduct.key.charAt(0).toUpperCase() + matchedProduct.key.slice(1),
       quantity,
-      price: matchedProduct.key === "apple" ? 50 : matchedProduct.key === "banana" ? 40 : matchedProduct.key === "milk" ? 60 : matchedProduct.key === "bread" ? 35 : matchedProduct.key === "egg" ? 90 : matchedProduct.key === "rice" ? 120 : matchedProduct.key === "curd" ? 45 : matchedProduct.key === "onion" ? 30 : 25,
+      price: matchedProduct.key === "apple" ? 50 : matchedProduct.key === "banana" ? 45 : matchedProduct.key === "milk" ? 60 : matchedProduct.key === "bread" ? 35 : matchedProduct.key === "egg" ? 90 : matchedProduct.key === "rice" ? 120 : matchedProduct.key === "curd" ? 45 : matchedProduct.key === "onion" ? 30 : 45,
     };
   };
 
@@ -231,6 +231,8 @@ export default function AiAssistantPanel() {
       setLoading(false);
       return;
     }
+
+    const directAdd = parseDirectShoppingRequest(inputText);
 
     // If it's a new shopping request, clear pending and proceed normally
     if (isNewRequest) {
@@ -337,14 +339,20 @@ export default function AiAssistantPanel() {
         setPendingAdd(null);
 
         const parsedProducts = data.products || [];
-        
-        // Only auto-add if explicitly requested with a clear add-to-cart phrase
         const explicitAddPhrase = /\b(add to cart|add this to cart|add it to cart|add.*to cart|buy now|place order)\b/i.test(inputText);
-        const shouldAutoAdd = parsedProducts.length > 0 && explicitAddPhrase;
+        const shouldAutoAdd = (parsedProducts.length > 0 && (explicitAddPhrase || Boolean(directAdd))) || Boolean(directAdd && !data.needsConfirmation);
 
         if (shouldAutoAdd) {
-          // Auto-add items directly
-          for (const item of parsedProducts) {
+          const itemsToAdd = parsedProducts.length > 0
+            ? parsedProducts
+            : [{
+                id: directAdd.id,
+                name: directAdd.name,
+                price: directAdd.price,
+                quantity: directAdd.quantity || 1,
+              }];
+
+          for (const item of itemsToAdd) {
             addToCart(
               {
                 id: item.id,

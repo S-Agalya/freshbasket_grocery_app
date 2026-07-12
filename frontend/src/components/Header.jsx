@@ -198,10 +198,12 @@ const Header = ({ username = "User", onMenuToggle }) => {
               </button>
               {showNotif && (
                 <div
-                  className="absolute top-[calc(100%+0.6rem)] z-[100] bg-white rounded-2xl overflow-hidden"
+                  className="fixed z-[100] bg-white rounded-2xl overflow-hidden"
                   style={{
-                    right: "0",
-                    width: window.innerWidth < 640 ? "min(85vw, 360px)" : "360px",
+                    top: "70px",
+                    right: window.innerWidth < 640 ? "0.75rem" : "2rem",
+                    width: window.innerWidth < 640 ? "calc(100vw - 1.5rem)" : "380px",
+                    maxWidth: "380px",
                     maxHeight: "65vh",
                     boxShadow: "0 12px 45px rgba(0,0,0,0.14)",
                     border: "1px solid rgba(0,0,0,0.07)"

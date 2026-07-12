@@ -15,49 +15,70 @@
 //   "Detergents",
 //   "Shampoos",
 //   "Handwash",
-//   "Snacks",
-//   "Soaps",
-// ];
+    <div>
+      {/* Filters & Add Product */}
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-3">
+        {/* ➕ Add Product Button */}
+        <div className="flex flex-wrap gap-3 items-center">
+          <button
+            onClick={() => { setEditProduct(null); setShowModal(true); }}
+            className="primary-cta px-4 py-2 rounded-md shadow-sm hover:brightness-95 flex items-center gap-2"
+          >
+            <span className="text-sm">➕</span> <span className="font-medium">Add Product</span>
+          </button>
 
-// const stockFilters = ["All", "In Stock", "Out of Stock"];
+          {/* CSV Upload */}
+          <input
+            ref={csvInputRef}
+            type="file"
+            accept=".csv"
+            className="hidden"
+            onChange={handleCSVUpload}
+          />
+          <button
+            onClick={() => csvInputRef.current?.click()}
+            disabled={csvUploading}
+            className="px-4 py-2 rounded-md bg-surface text-primary-900 border border-surface-100 shadow-sm flex items-center gap-2 hover:shadow-md disabled:opacity-60"
+          >
+            <FaUpload /> <span className="text-sm">{csvUploading ? "Uploading..." : "Upload CSV"}</span>
+          </button>
+          <button
+            onClick={downloadTemplate}
+            className="px-4 py-2 rounded-md border border-surface-100 text-muted text-sm hover:bg-surface-100"
+          >
+            ⬇ Template
+          </button>
+        </div>
 
-// function AdminProducts({ onProductChange }) {
-//   const [products, setProducts] = useState([]);
-//   const [showModal, setShowModal] = useState(false);
-//   const [editProduct, setEditProduct] = useState(null);
-//   const [categoryFilter, setCategoryFilter] = useState("All");
-//   const [stockFilter, setStockFilter] = useState("All");
-//   const API_URL = import.meta.env.VITE_API_URL;
+        {/* 🧭 Filters */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Category Filter */}
+        Select Category <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="border border-surface-100 rounded px-3 py-2 bg-surface"
+          >
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
 
-//   const fetchProducts = async () => {
-//     try {
-//       const token = localStorage.getItem("adminToken");
-//       const res = await axios.get(`${API_URL}/api/admin/products`, {
-//         headers: { "Authorization": `Bearer ${token}` }
-//       });
-//       setProducts(res.data || []);
-//       if (onProductChange) onProductChange();
-//     } catch (err) {
-//       console.error("Error fetching products:", err);
-//     }
-//   };
-
-//   useEffect(() => {
-//      const interval = setInterval(fetchProducts, 5000);
-//     return () => clearInterval(interval);
-//     fetchProducts();
-//   }, []);
-
-//   const handleDelete = async (id) => {
-//     if (!window.confirm("Are you sure you want to delete this product?")) return;
-//     try {
-//       const token = localStorage.getItem("adminToken");
-//       await axios.delete(`${API_URL}/api/admin/products/${id}`, {
-//         headers: { "Authorization": `Bearer ${token}` }
-//       });
-//       await fetchProducts();
-//       if (onProductChange) onProductChange();
-//     } catch (err) {
+          {/* Stock Filter */}
+          Stocks:<select
+            value={stockFilter}
+            onChange={(e) => setStockFilter(e.target.value)}
+            className="border border-surface-100 rounded px-3 py-2 bg-surface"
+          >
+            {stockFilters.map((filter) => (
+              <option key={filter} value={filter}>
+                {filter}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 //       console.error("Error deleting product:", err);
 //     }
 //   };
@@ -412,37 +433,37 @@ function AdminProducts({ onProductChange }) {
             return (
               <div
                 key={product.id}
-                className="bg-white shadow-lg rounded-xl p-4 flex flex-col items-center text-center hover:shadow-2xl transition-all duration-300"
+                className="card-premium p-5 flex flex-col items-center text-center hover:shadow-2xl transition-all duration-300"
               >
                 {product.image ? (
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="w-36 h-36 object-cover rounded-lg mb-4"
+                    className="w-40 h-40 object-cover rounded-lg mb-4"
                   />
                 ) : (
-                  <div className="w-36 h-36 bg-gray-200 rounded-lg mb-4 flex items-center justify-center text-gray-500">
+                  <div className="w-40 h-40 bg-surface-100 rounded-lg mb-4 flex items-center justify-center text-muted">
                     No Image
                   </div>
                 )}
 
-                <h3 className="text-lg font-semibold text-gray-800">
+                <h3 className="text-lg font-semibold text-primary-900">
                   {product.name}
                 </h3>
-                <p className="text-gray-500 text-sm">{product.category}</p>
-                <p className="text-green-600 font-bold text-lg mt-1">
+                <p className="text-muted text-sm">{product.category}</p>
+                <p className="text-accent font-bold text-lg mt-2">
                   ₹{product.price}
                 </p>
 
                 {/* ✅ Stock status badge */}
 {/* ✅ Stock status badge */}
-<div className="mt-2">
+<div className="mt-3">
   {isOutOfStock ? (
     <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-semibold">
       Out of Stock
     </span>
   ) : (
-    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
+    <span className="bg-surface-100 text-primary-900 px-3 py-1 rounded-full text-sm font-semibold">
       {product.product_type === "bulk"
         ? `In Stock: ${product.stock} ${product.stock_unit} (each ${product.unit_quantity} ${product.unit})`
         : `In Stock: ${product.stock} ${product.unit || product.stock_unit}`}
@@ -452,22 +473,19 @@ function AdminProducts({ onProductChange }) {
 
 
                 {/* ✏️ Edit / 🗑️ Delete Buttons */}
-                <div className="flex space-x-3 mt-4">
+                <div className="flex space-x-3 mt-5">
                   <button
-                    onClick={() => {
-                      setEditProduct(product);
-                      setShowModal(true);
-                    }}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-5 rounded-lg text-sm flex items-center justify-center"
+                    onClick={() => { setEditProduct(product); setShowModal(true); }}
+                    className="px-4 py-2 rounded-md bg-primary-900 text-white text-sm hover:brightness-95 flex items-center gap-2"
                   >
-                    <FaEdit className="mr-1" /> Edit
+                    <FaEdit /> <span>Edit</span>
                   </button>
 
                   <button
                     onClick={() => handleDelete(product.id)}
-                    className="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-5 rounded-lg text-sm flex items-center justify-center"
+                    className="px-4 py-2 rounded-md bg-red-600 text-white text-sm hover:bg-red-700 flex items-center gap-2"
                   >
-                    <FaTrash className="mr-1" /> Delete
+                    <FaTrash /> <span>Delete</span>
                   </button>
                 </div>
               </div>

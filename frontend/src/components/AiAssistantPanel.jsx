@@ -202,7 +202,15 @@ export default function AiAssistantPanel() {
       quantity || 1
     );
 
-    setConversation((prev) => [...prev, { role: "user", text: "Yes" }, { role: "assistant", text: `${item.name} has been added to your cart.` }]);
+    const quantityText = quantity > 1 ? `${quantity} units of` : "";
+    setConversation((prev) => [
+      ...prev,
+      { role: "user", text: "Yes" },
+      {
+        role: "assistant",
+        text: `Hurray! ${quantityText} ${item.name} ${quantity > 1 ? "have" : "has"} been added to your cart. Anything else you'd like to grab today? 😊`,
+      },
+    ]);
     setPendingAdd(null);
   };
 

@@ -136,6 +136,71 @@ Return ONLY JSON.
       parts: [{ text: message }]
     });
 
+    const isStream = req.query.stream === "true";
+
+    const normalizeText = (rawText) =>
+      rawText
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
+
+    const parsePayload = (rawText) => {
+      let parsed;
+      try {
+        parsed = JSON.parse(normalizeText(rawText));
+      } catch (err) {
+        console.error("Invalid Gemini JSON");
+        console.log(rawText);
+        throw new Error("Invalid AI response");
+      }
+
+      const reply = typeof parsed.reply === "string" ? parsed.reply.trim() : "";
+      const hasEmoji = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(reply);
+      parsed.reply = hasEmoji ? reply : `${reply || "Absolutely! I can help with that"} 😊`;
+      return parsed;
+    };
+
+    if (isStream) {
+      res.setHeader("Content-Type", "application/x-ndjson; charset=utf-8");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+      if (typeof res.flushHeaders === "function") {
+        res.flushHeaders();
+      }
+
+      let accumulatedText = "";
+      try {
+        const stream = await ai.models.generateContentStream({
+          model: "gemini-flash-latest",
+          contents: contents,
+        });
+
+        for await (const chunk of stream) {
+          const chunkText = (chunk?.text || "").toString();
+          if (!chunkText) continue;
+
+          if (chunkText.startsWith(accumulatedText)) {
+            accumulatedText = chunkText;
+          } else {
+            accumulatedText += chunkText;
+          }
+
+          res.write(JSON.stringify({ type: "chunk", text: accumulatedText }) + "\n");
+          if (typeof res.flush === "function") {
+            res.flush();
+          }
+        }
+
+        const parsed = parsePayload(accumulatedText);
+        res.write(JSON.stringify({ type: "done", payload: parsed }) + "\n");
+        return res.end();
+      } catch (err) {
+        console.error(err);
+        res.write(JSON.stringify({ type: "error", message: err.message || "AI Error" }) + "\n");
+        return res.end();
+      }
+    }
+
     const response = await ai.models.generateContent({
       model: "gemini-flash-latest",
       contents: contents,

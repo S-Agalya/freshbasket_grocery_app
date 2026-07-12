@@ -7,25 +7,23 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        navy: {
-          900: '#083344',
-          700: '#0b3f4a'
+        primary: {
+          900: '#071233',
+          700: '#0b1730'
         },
-        sand: {
-          DEFAULT: '#F5EDE2',
-          700: '#D9C9B6'
+        accent: {
+          DEFAULT: '#FF7A00'
         },
-        gold: {
-          600: '#D4A94F'
+        surface: {
+          DEFAULT: '#FFFFFF',
+          100: '#F6F7F9'
         },
-        green: {
-          700: '#0f766e',
-          600: '#059669',
-          800: '#0b5e56'
+        muted: {
+          DEFAULT: '#9CA3AF'
         }
       },
       boxShadow: {
-        premium: '0 12px 30px rgba(2,6,23,0.12), 0 2px 6px rgba(2,6,23,0.06)'
+        premium: '0 18px 40px rgba(7,18,51,0.08), 0 4px 12px rgba(7,18,51,0.04)'
       },
       fontFamily: {
         inter: ['Inter', 'ui-sans-serif', 'system-ui']

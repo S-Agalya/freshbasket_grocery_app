@@ -117,22 +117,23 @@ function AdminDashboard() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-surface-100">
       {/* Hamburger for mobile */}
       <button
-        className="md:hidden fixed top-4 left-4 z-50 bg-green-700 text-white p-2 rounded-md shadow-md"
+        className="md:hidden fixed top-4 left-4 z-50 bg-primary-900 text-white p-2 rounded-md shadow-md"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        aria-label="Open menu"
       >
         ☰
       </button>
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-screen w-64 bg-green-700 text-white flex flex-col justify-between transform transition-transform duration-300 z-50 shadow-lg
+        className={`fixed top-0 left-0 h-screen w-64 bg-surface text-primary-900 flex flex-col justify-between transform transition-transform duration-300 z-50 shadow-lg
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
         <div>
-          <h1 className="text-2xl font-bold text-center md:text-left p-6 border-b border-green-800">
+          <h1 className="text-2xl font-bold text-center md:text-left p-6 border-b border-surface-100">
             Admin Panel
           </h1>
           <nav className="flex flex-col p-4 space-y-2">
@@ -145,8 +146,8 @@ function AdminDashboard() {
                 }}
                 className={`w-full text-left px-4 py-2 rounded-md font-medium flex items-center space-x-2 transition-colors ${
                   location.pathname === item.path
-                    ? "bg-green-900 shadow-md"
-                    : "hover:bg-green-800"
+                    ? "bg-primary-900 text-white shadow-md"
+                    : "hover:bg-surface-100"
                 }`}
               >
                 {item.icon} <span>{item.name}</span>
@@ -168,7 +169,7 @@ function AdminDashboard() {
       {/* Overlay for mobile */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black opacity-40 z-40 md:hidden"
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         ></div>
       )}
@@ -177,42 +178,42 @@ function AdminDashboard() {
       <main className="flex-1 p-6 md:ml-64 transition-all duration-300">
         {location.pathname === "/dashboard" && (
           <div className="w-full max-w-5xl mx-auto">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+            <h2 className="text-2xl font-bold text-primary-900 mb-6">
               Dashboard Overview
             </h2>
 
             {/* Top 4 cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white p-6 rounded shadow text-center">
-                <h3 className="text-lg font-semibold text-gray-700">Total Products</h3>
-                <p className="text-3xl font-bold text-green-600">{stats.products}</p>
+              <div className="card-premium p-6 text-center">
+                <h3 className="text-lg font-semibold text-primary-900">Total Products</h3>
+                <p className="text-3xl font-bold text-primary-900">{stats.products}</p>
               </div>
 
               <div
-                className="bg-white p-6 rounded shadow text-center cursor-pointer hover:bg-green-50 transition-all"
+                className="card-premium p-6 text-center cursor-pointer hover:shadow-lg transition-all"
                 onClick={() =>
                   setActiveSummary(activeSummary === "orders" ? null : "orders")
                 }
               >
-                <h3 className="text-lg font-semibold text-gray-700">Today Orders</h3>
-                <p className="text-3xl font-bold text-green-600">{orderSummary.pending}</p>
-                <p className="text-sm text-gray-500 mt-1">(Click to view details)</p>
+                <h3 className="text-lg font-semibold text-primary-900">Today Orders</h3>
+                <p className="text-3xl font-bold text-accent">{orderSummary.pending}</p>
+                <p className="text-sm text-muted mt-1">(Click to view details)</p>
               </div>
 
               <div
-                className="bg-white p-6 rounded shadow text-center cursor-pointer hover:bg-green-50 transition-all"
+                className="card-premium p-6 text-center cursor-pointer hover:shadow-lg transition-all"
                 onClick={() =>
                   setActiveSummary(activeSummary === "stock" ? null : "stock")
                 }
               >
-                <h3 className="text-lg font-semibold text-gray-700">Out of Stock</h3>
+                <h3 className="text-lg font-semibold text-primary-900">Out of Stock</h3>
                 <p className="text-3xl font-bold text-red-500">{stats.outOfStock}</p>
-                <p className="text-sm text-gray-500 mt-1">(Click to view details)</p>
+                <p className="text-sm text-muted mt-1">(Click to view details)</p>
               </div>
 
-              <div className="bg-white p-6 rounded shadow text-center">
-                <h3 className="text-lg font-semibold text-gray-700">Total Orders</h3>
-                <p className="text-3xl font-bold text-green-600">{totalOrders}</p>
+              <div className="card-premium p-6 text-center">
+                <h3 className="text-lg font-semibold text-primary-900">Total Orders</h3>
+                <p className="text-3xl font-bold text-primary-900">{totalOrders}</p>
               </div>
             </div>
 

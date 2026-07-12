@@ -215,8 +215,8 @@ export default function AiAssistantPanel() {
 
     const normalizedInput = inputText.toLowerCase();
     
-    // Confirmation: yes, ok, proceed, confirm (simple confirmations)
-    const confirmation = /^\s*(yes|ok|proceed|confirm|y|sure|absolutely|yep|fine)\s*$/i.test(normalizedInput);
+    // Confirmation: yes, ok, proceed, confirm, + synonyms anywhere in the input
+    const confirmation = /\b(yes|ok|proceed|confirm|y|sure|absolutely|yep|fine|add it|add them|go ahead|do it|please do)\b/i.test(normalizedInput);
     
     // New request with specific product: "add X kg product", "I need product"
     const hasProductName = /\b(apple|banana|carrot|milk|bread|egg|rice|curd|yogurt|onion|potato|tomato|lettuce|spinach|beans)\b/i.test(normalizedInput);
@@ -318,7 +318,7 @@ export default function AiAssistantPanel() {
         setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);
         setPreviewProducts(data.products || []);
       } else {
-        const res = await fetch(`${API_URL}/api/ai/chat`, {
+        const res = await fetch(`${API_URL}/api/ai/chat?stream=true`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
@@ -329,13 +329,88 @@ export default function AiAssistantPanel() {
             }))
           }),
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "AI request failed");
 
-        const assistantText = data.reply || "I can help you shop.";
+        const streamContentType = res.headers.get("content-type") || "";
+        let data;
+        let assistantText = "";
+
+        if (res.ok && streamContentType.includes("application/x-ndjson") && res.body) {
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = "";
+          let assistantIndex = null;
+          let finalPayload = null;
+
+          const appendOrUpdateAssistant = (text) => {
+            setConversation((prev) => {
+              const next = [...prev];
+              if (assistantIndex === null) {
+                assistantIndex = next.length;
+                next.push({ role: "assistant", text });
+              } else {
+                next[assistantIndex] = { ...next[assistantIndex], text };
+              }
+              return next;
+            });
+          };
+
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop();
+
+            for (const line of lines) {
+              if (!line.trim()) continue;
+              let event;
+              try {
+                event = JSON.parse(line);
+              } catch (err) {
+                continue;
+              }
+
+              if (event.type === "chunk") {
+                assistantText = event.text || assistantText;
+                appendOrUpdateAssistant(assistantText);
+              } else if (event.type === "done") {
+                finalPayload = event.payload;
+                assistantText = finalPayload?.reply || assistantText;
+                appendOrUpdateAssistant(assistantText);
+              } else if (event.type === "error") {
+                setConversation((prev) => [...prev, { role: "assistant", text: event.message || "AI Error" }]);
+                throw new Error(event.message || "AI Error");
+              }
+            }
+          }
+
+          if (buffer.trim()) {
+            try {
+              const event = JSON.parse(buffer);
+              if (event.type === "done") {
+                finalPayload = event.payload;
+                assistantText = finalPayload?.reply || assistantText;
+                appendOrUpdateAssistant(assistantText);
+              }
+            } catch (err) {
+              // ignore incomplete final buffer
+            }
+          }
+
+          if (!finalPayload) {
+            throw new Error("Incomplete AI stream response");
+          }
+
+          data = finalPayload;
+        } else {
+          const json = await res.json();
+          if (!res.ok) throw new Error(json.message || "AI request failed");
+          data = json;
+          assistantText = data.reply || "I can help you shop.";
+          setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);
+        }
+
         setPreviewProducts(data.products || []);
-
-        // Always clear old pendingAdd when new message comes in
         setPendingAdd(null);
 
         const parsedProducts = data.products || [];
@@ -364,27 +439,43 @@ export default function AiAssistantPanel() {
               item.quantity || 1
             );
           }
-          setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);
+
+          if (!streamContentType.includes("application/x-ndjson")) {
+            setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);
+          }
           return;
         }
 
-        // If AI says needs confirmation, set pendingAdd for "yes" handling
-        if (data.needsConfirmation && parsedProducts.length > 0) {
-          const firstItem = parsedProducts[0];
-          setPendingAdd({
-            item: {
-              id: firstItem.id,
-              name: firstItem.name,
-              price: firstItem.price,
-              image: "",
-              stock: 100,
-            },
-            quantity: firstItem.quantity || 1,
-          });
+        if (data.needsConfirmation) {
+          if (parsedProducts.length > 0) {
+            const firstItem = parsedProducts[0];
+            setPendingAdd({
+              item: {
+                id: firstItem.id,
+                name: firstItem.name,
+                price: firstItem.price,
+                image: "",
+                stock: 100,
+              },
+              quantity: firstItem.quantity || 1,
+            });
+          } else if (directAdd) {
+            setPendingAdd({
+              item: {
+                id: directAdd.id,
+                name: directAdd.name,
+                price: directAdd.price,
+                image: "",
+                stock: 100,
+              },
+              quantity: directAdd.quantity || 1,
+            });
+          }
         }
 
-        // Always show the AI's actual response (no frontend override)
-        setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);
+        if (!streamContentType.includes("application/x-ndjson")) {
+          setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);
+        }
       }
 
     } catch (error) {

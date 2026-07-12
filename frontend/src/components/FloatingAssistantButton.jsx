@@ -22,7 +22,7 @@ export default function FloatingAssistantButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full border border-emerald-200 bg-gradient-to-r from-emerald-600 via-green-600 to-lime-500 px-3 py-3 text-white shadow-[0_18px_40px_rgba(16,185,129,0.26)] transition hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] md:bottom-8 md:right-8"
+        className="fixed top-24 right-3 sm:top-20 sm:right-4 md:top-24 md:right-8 z-45 flex items-center gap-2 rounded-full border border-emerald-200 bg-gradient-to-r from-emerald-600 via-green-600 to-lime-500 px-3 py-3 text-white shadow-[0_18px_40px_rgba(16,185,129,0.26)] transition hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98]"
         aria-label="Open FreshBasket Assistant"
       >
         <div className="rounded-full bg-white/20 p-2 shadow-inner">

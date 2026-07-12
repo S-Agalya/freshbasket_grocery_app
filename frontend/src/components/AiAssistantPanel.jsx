@@ -214,16 +214,27 @@ export default function AiAssistantPanel() {
     if (!inputText) return;
 
     const normalizedInput = inputText.toLowerCase();
-    const confirmation = /\b(yes|ok|add|proceed|confirm)\b/i.test(normalizedInput);
-    const wantsExplicitAdd = /\b(add to cart|add this to cart|add it to cart|add apples to cart|add .* to cart|buy|place|put|shop|order)\b/i.test(normalizedInput) || /\b(cart|basket)\b/i.test(normalizedInput);
-    const isDirectAddVerb = /\b(add|buy|place|put|shop|order)\b/i.test(normalizedInput) && /\b(cart|basket)\b/i.test(normalizedInput);
+    
+    // Confirmation: yes, ok, proceed, confirm (simple confirmations)
+    const confirmation = /^\s*(yes|ok|proceed|confirm|y|sure|absolutely|yep|fine)\s*$/i.test(normalizedInput);
+    
+    // New request with specific product: "add X kg product", "I need product"
+    const hasProductName = /\b(apple|banana|carrot|milk|bread|egg|rice|curd|yogurt|onion|potato|tomato|lettuce|spinach|beans)\b/i.test(normalizedInput);
+    const wantsExplicitAdd = /\b(add|buy|get|place|put|shop|order|i need|i want|give me)\b/i.test(normalizedInput);
+    const isNewRequest = (wantsExplicitAdd && hasProductName) || /^\s*\d+\s*(kg|l|litre|piece|pc|gm)/i.test(normalizedInput);
 
+    // If there's pending confirmation AND user just says yes/ok/confirm, accept it
     if (pendingAdd && confirmation) {
       handleConfirmAdd();
       setMessage("");
       setSelectedFile(null);
       setLoading(false);
       return;
+    }
+
+    // If it's a new shopping request, clear pending and proceed normally
+    if (isNewRequest) {
+      setPendingAdd(null);
     }
 
     setLoading(true);
@@ -308,7 +319,13 @@ export default function AiAssistantPanel() {
         const res = await fetch(`${API_URL}/api/ai/chat`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: buildContextMessage(inputText) }),
+          body: JSON.stringify({ 
+            message: inputText,
+            history: conversation.map(turn => ({
+              role: turn.role,
+              text: turn.text
+            }))
+          }),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "AI request failed");
@@ -316,26 +333,35 @@ export default function AiAssistantPanel() {
         const assistantText = data.reply || "I can help you shop.";
         setPreviewProducts(data.products || []);
 
-        const parsedProducts = data.products || [];
-        const wantsImmediateAdd = parsedProducts.length > 0 && wantsExplicitAdd;
+        // Always clear old pendingAdd when new message comes in
+        setPendingAdd(null);
 
-        if (wantsImmediateAdd) {
-          const firstItem = parsedProducts[0];
-          addToCart(
-            {
-              id: firstItem.id,
-              name: firstItem.name,
-              price: firstItem.price,
-              image: "",
-              stock: 100,
-            },
-            firstItem.quantity || 1
-          );
-          setConversation((prev) => [...prev, { role: "assistant", text: `${firstItem.name} has been added to your cart.` }]);
+        const parsedProducts = data.products || [];
+        
+        // Only auto-add if explicitly requested with a clear add-to-cart phrase
+        const explicitAddPhrase = /\b(add to cart|add this to cart|add it to cart|add.*to cart|buy now|place order)\b/i.test(inputText);
+        const shouldAutoAdd = parsedProducts.length > 0 && explicitAddPhrase;
+
+        if (shouldAutoAdd) {
+          // Auto-add items directly
+          for (const item of parsedProducts) {
+            addToCart(
+              {
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                image: "",
+                stock: 100,
+              },
+              item.quantity || 1
+            );
+          }
+          setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);
           return;
         }
 
-        if (parsedProducts.length > 0 && !wantsImmediateAdd) {
+        // If AI says needs confirmation, set pendingAdd for "yes" handling
+        if (data.needsConfirmation && parsedProducts.length > 0) {
           const firstItem = parsedProducts[0];
           setPendingAdd({
             item: {
@@ -347,10 +373,10 @@ export default function AiAssistantPanel() {
             },
             quantity: firstItem.quantity || 1,
           });
-          setConversation((prev) => [...prev, { role: "assistant", text: `Shall I add ${firstItem.name} × ${firstItem.quantity || 1} to your cart?` }]);
-        } else if (!wantsImmediateAdd) {
-          setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);
         }
+
+        // Always show the AI's actual response (no frontend override)
+        setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);
       }
 
     } catch (error) {

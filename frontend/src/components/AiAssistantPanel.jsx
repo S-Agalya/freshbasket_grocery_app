@@ -412,7 +412,10 @@ export default function AiAssistantPanel() {
           data = finalPayload;
         } else {
           const json = await res.json();
-          if (!res.ok) throw new Error(json.message || "AI request failed");
+          if (!res.ok) {
+            const message = json.message || json.error || "AI request failed";
+            throw new Error(message);
+          }
           data = json;
           assistantText = data.reply || "I can help you shop.";
           setConversation((prev) => [...prev, { role: "assistant", text: assistantText }]);

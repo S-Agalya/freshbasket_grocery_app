@@ -153,8 +153,8 @@ const Header = ({ username = "User", onMenuToggle }) => {
           </div>
 
           {showResults && results.length > 0 && (
-            <div className="absolute -left-3 sm:left-0 right-0 top-full mt-2 bg-white rounded-2xl z-[70] max-h-[45vh] md:max-h-[55vh] overflow-y-auto overflow-x-hidden"
-              style={{ boxShadow: "0 12px 45px rgba(0,0,0,0.14)", border: "1px solid rgba(0,0,0,0.06)", width: "100vw", maxWidth: "none" }}>
+            <div className="absolute left-0 sm:left-0 right-0 top-full mt-2 bg-white rounded-2xl z-[100] max-h-[45vh] md:max-h-[55vh] overflow-y-auto overflow-x-hidden"
+              style={{ boxShadow: "0 12px 45px rgba(0,0,0,0.14)", border: "1px solid rgba(0,0,0,0.06)", minWidth: "280px" }}>
               {results.map((p) => (
                 <div key={p.id}
                   onClick={() => { navigate(`/product/${p.id}`); setShowResults(false); setQuery(""); }}
@@ -175,8 +175,8 @@ const Header = ({ username = "User", onMenuToggle }) => {
             </div>
           )}
           {showResults && results.length === 0 && query.trim() && (
-            <div className="absolute -left-3 sm:left-0 right-0 top-full mt-2 bg-white rounded-2xl z-[70] px-4 py-3 text-xs sm:text-sm text-gray-400 text-center"
-              style={{ boxShadow: "0 12px 35px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.06)", width: "100vw", maxWidth: "none" }}>
+            <div className="absolute left-0 sm:left-0 right-0 top-full mt-2 bg-white rounded-2xl z-[100] px-4 py-3 text-xs sm:text-sm text-gray-400 text-center"
+              style={{ boxShadow: "0 12px 35px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.06)", minWidth: "280px" }}>
               No results for "<span className="text-gray-700 font-medium">{query}</span>"
             </div>
           )}
@@ -198,12 +198,11 @@ const Header = ({ username = "User", onMenuToggle }) => {
               </button>
               {showNotif && (
                 <div
-                  className="absolute top-[calc(100%+0.6rem)] bg-white rounded-2xl z-[70] overflow-hidden"
+                  className="absolute top-[calc(100%+0.6rem)] z-[100] bg-white rounded-2xl overflow-hidden"
                   style={{
                     right: "0",
-                    width: window.innerWidth < 640 ? "calc(100vw - 1rem)" : "320px",
-                    maxWidth: "320px",
-                    maxHeight: "65vh",
+                    width: window.innerWidth < 640 ? "min(90vw, 340px)" : "340px",
+                    maxHeight: "60vh",
                     boxShadow: "0 12px 45px rgba(0,0,0,0.14)",
                     border: "1px solid rgba(0,0,0,0.07)"
                   }}

@@ -4,8 +4,6 @@ import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { FaTachometerAlt, FaBoxOpen, FaShoppingCart, FaSignOutAlt, FaChartBar, FaExclamationTriangle } from "react-icons/fa";
-import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
 
 function AdminDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -119,88 +117,184 @@ function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-sand text-navy">
-      <Navbar onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Hamburger for mobile */}
+      <button
+        className="md:hidden fixed top-4 left-4 z-50 bg-green-700 text-white p-2 rounded-md shadow-md"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        ☰
+      </button>
 
-      <div className="flex">
-        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} onSelect={(k) => {
-          // map key to route
-          const mapping = { dashboard: '/dashboard', products: '/dashboard/products', orders: '/dashboard/orders' };
-          if (mapping[k]) navigate(mapping[k]);
-        }} />
+      {/* Sidebar */}
+      <aside
+        className={`fixed top-0 left-0 h-screen w-64 bg-green-700 text-white flex flex-col justify-between transform transition-transform duration-300 z-50 shadow-lg
+        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
+      >
+        <div>
+          <h1 className="text-2xl font-bold text-center md:text-left p-6 border-b border-green-800">
+            Admin Panel
+          </h1>
+          <nav className="flex flex-col p-4 space-y-2">
+            {menuItems.map((item) => (
+              <button
+                key={item.path}
+                onClick={() => {
+                  navigate(item.path);
+                  if (isSidebarOpen) setIsSidebarOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2 rounded-md font-medium flex items-center space-x-2 transition-colors ${
+                  location.pathname === item.path
+                    ? "bg-green-900 shadow-md"
+                    : "hover:bg-green-800"
+                }`}
+              >
+                {item.icon} <span>{item.name}</span>
+              </button>
+            ))}
+          </nav>
+        </div>
 
-        <main className="flex-1 p-6 md:ml-64 transition-all duration-300">
-          {location.pathname === "/dashboard" && (
-            <div className="w-full max-w-6xl mx-auto">
-              <h2 className="text-3xl font-bold text-navy-900 mb-6">Dashboard Overview</h2>
+        <div className="p-4 border-t border-green-800">
+          <button
+            onClick={handleLogout}
+            className="w-full bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors shadow-md flex items-center justify-center space-x-2"
+          >
+            <FaSignOutAlt /> <span>Logout</span>
+          </button>
+        </div>
+      </aside>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="card-premium p-6 text-center">
-                  <h3 className="text-lg font-semibold text-navy-700">Total Products</h3>
-                  <p className="text-3xl font-bold text-navy-900">{stats.products}</p>
-                </div>
+      {/* Overlay for mobile */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black opacity-40 z-40 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        ></div>
+      )}
 
-                <div className="card-premium p-6 text-center cursor-pointer hover:glow-gold transition-all" onClick={() => setActiveSummary(activeSummary === 'orders' ? null : 'orders')}>
-                  <h3 className="text-lg font-semibold text-navy-700">Today Orders</h3>
-                  <p className="text-3xl font-bold text-navy-900">{orderSummary.pending}</p>
-                  <p className="text-sm text-navy-700 mt-1">(Click to view details)</p>
-                </div>
+      {/* Main content */}
+      <main className="flex-1 p-6 md:ml-64 transition-all duration-300">
+        {location.pathname === "/dashboard" && (
+          <div className="w-full max-w-5xl mx-auto">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+              Dashboard Overview
+            </h2>
 
-                <div className="card-premium p-6 text-center cursor-pointer hover:glow-gold transition-all" onClick={() => setActiveSummary(activeSummary === 'stock' ? null : 'stock')}>
-                  <h3 className="text-lg font-semibold text-navy-700">Out of Stock</h3>
-                  <p className="text-3xl font-bold text-red-500">{stats.outOfStock}</p>
-                  <p className="text-sm text-navy-700 mt-1">(Click to view details)</p>
-                </div>
-
-                <div className="card-premium p-6 text-center">
-                  <h3 className="text-lg font-semibold text-navy-700">Total Orders</h3>
-                  <p className="text-3xl font-bold text-navy-900">{totalOrders}</p>
-                </div>
+            {/* Top 4 cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white p-6 rounded shadow text-center">
+                <h3 className="text-lg font-semibold text-gray-700">Total Products</h3>
+                <p className="text-3xl font-bold text-green-600">{stats.products}</p>
               </div>
 
-              {lowStockProducts.length > 0 && (
-                <div className="mt-6 p-4 rounded-xl card-premium border border-navy-700">
-                  <div className="flex items-center gap-2 mb-3">
-                    <FaExclamationTriangle className="text-red-500" />
-                    <h3 className="font-semibold text-navy-900">Low Stock Alert — {lowStockProducts.length} product{lowStockProducts.length > 1 ? 's' : ''} need restocking</h3>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {lowStockProducts.map((p) => (
-                      <span key={p.id} className="bg-red-100 text-red-700 text-sm px-3 py-1 rounded-full font-medium">{p.name} — {p.stock} {p.stock_unit} left</span>
-                    ))}
-                  </div>
-                  <button onClick={() => navigate('/dashboard/products')} className="mt-3 text-sm text-navy-900 underline">Go to Products →</button>
-                </div>
-              )}
+              <div
+                className="bg-white p-6 rounded shadow text-center cursor-pointer hover:bg-green-50 transition-all"
+                onClick={() =>
+                  setActiveSummary(activeSummary === "orders" ? null : "orders")
+                }
+              >
+                <h3 className="text-lg font-semibold text-gray-700">Today Orders</h3>
+                <p className="text-3xl font-bold text-green-600">{orderSummary.pending}</p>
+                <p className="text-sm text-gray-500 mt-1">(Click to view details)</p>
+              </div>
 
-              {activeSummary === 'orders' && (
-                <div className="mt-8 card-premium p-6 text-center">
-                  <h3 className="text-xl font-bold text-navy-900 mb-4">Today’s Order Summary</h3>
-                  <div className="flex flex-col sm:flex-row justify-center gap-6">
-                    <div className="bg-navy-50 text-navy-800 font-semibold py-4 px-8 rounded-lg shadow">Total: {orderSummary.total}</div>
-                    <div className="bg-navy-50 text-navy-800 font-semibold py-4 px-8 rounded-lg shadow">Pending: {orderSummary.pending}</div>
-                    <div className="bg-navy-50 text-navy-800 font-semibold py-4 px-8 rounded-lg shadow">Completed: {orderSummary.completed}</div>
-                  </div>
-                  <button onClick={() => navigate('/dashboard/orders')} className="mt-6 bg-navy-900 text-sand px-6 py-2 rounded-md hover:opacity-90 transition-all">Go to Orders Page →</button>
-                </div>
-              )}
+              <div
+                className="bg-white p-6 rounded shadow text-center cursor-pointer hover:bg-green-50 transition-all"
+                onClick={() =>
+                  setActiveSummary(activeSummary === "stock" ? null : "stock")
+                }
+              >
+                <h3 className="text-lg font-semibold text-gray-700">Out of Stock</h3>
+                <p className="text-3xl font-bold text-red-500">{stats.outOfStock}</p>
+                <p className="text-sm text-gray-500 mt-1">(Click to view details)</p>
+              </div>
 
-              {activeSummary === 'stock' && (
-                <div className="mt-8 card-premium p-6 text-center">
-                  <h3 className="text-xl font-bold text-navy-900 mb-4">Stock Summary</h3>
-                  <div className="flex flex-col sm:flex-row justify-center gap-6">
-                    <div className="bg-navy-50 text-navy-800 font-semibold py-4 px-8 rounded-lg shadow">In Stock: {stats.inStock}</div>
-                    <div className="bg-navy-50 text-navy-800 font-semibold py-4 px-8 rounded-lg shadow">Out of Stock: {stats.outOfStock}</div>
-                  </div>
-                  <button onClick={() => navigate('/dashboard/products')} className="mt-6 bg-navy-900 text-sand px-6 py-2 rounded-md hover:opacity-90 transition-all">Go to Products Page →</button>
-                </div>
-              )}
+              <div className="bg-white p-6 rounded shadow text-center">
+                <h3 className="text-lg font-semibold text-gray-700">Total Orders</h3>
+                <p className="text-3xl font-bold text-green-600">{totalOrders}</p>
+              </div>
             </div>
-          )}
 
-          <Outlet context={{ fetchStats, fetchOrderSummary, fetchTotalOrders }} />
-        </main>
-      </div>
+            {/* Low stock alert banner */}
+            {lowStockProducts.length > 0 && (
+              <div className="mt-6 bg-red-50 border border-red-300 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <FaExclamationTriangle className="text-red-500" />
+                  <h3 className="font-semibold text-red-700">
+                    Low Stock Alert — {lowStockProducts.length} product{lowStockProducts.length > 1 ? "s" : ""} need restocking
+                  </h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {lowStockProducts.map((p) => (
+                    <span
+                      key={p.id}
+                      className="bg-red-100 text-red-700 text-sm px-3 py-1 rounded-full font-medium"
+                    >
+                      {p.name} — {p.stock} {p.stock_unit} left
+                    </span>
+                  ))}
+                </div>
+                <button
+                  onClick={() => navigate("/dashboard/products")}
+                  className="mt-3 text-sm text-red-600 underline hover:text-red-800"
+                >
+                  Go to Products →
+                </button>
+              </div>
+            )}
+
+            {/* Single expandable summary box */}
+            {activeSummary === "orders" && (
+              <div className="mt-8 bg-white p-6 rounded shadow-lg text-center">
+                <h3 className="text-xl font-bold text-gray-700 mb-4">
+                  Today’s Order Summary
+                </h3>
+                <div className="flex flex-col sm:flex-row justify-center gap-6">
+                  <div className="bg-blue-100 text-blue-800 font-semibold py-4 px-8 rounded-lg shadow">
+                    Total: {orderSummary.total}
+                  </div>
+                  <div className="bg-yellow-100 text-yellow-800 font-semibold py-4 px-8 rounded-lg shadow">
+                    Pending: {orderSummary.pending}
+                  </div>
+                  <div className="bg-green-100 text-green-800 font-semibold py-4 px-8 rounded-lg shadow">
+                    Completed: {orderSummary.completed}
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigate("/dashboard/orders")}
+                  className="mt-6 bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-all"
+                >
+                  Go to Orders Page →
+                </button>
+              </div>
+            )}
+
+            {activeSummary === "stock" && (
+              <div className="mt-8 bg-white p-6 rounded shadow-lg text-center">
+                <h3 className="text-xl font-bold text-gray-700 mb-4">Stock Summary</h3>
+                <div className="flex flex-col sm:flex-row justify-center gap-6">
+                  <div className="bg-blue-100 text-blue-800 font-semibold py-4 px-8 rounded-lg shadow">
+                    In Stock: {stats.inStock}
+                  </div>
+                  <div className="bg-red-100 text-red-800 font-semibold py-4 px-8 rounded-lg shadow">
+                    Out of Stock:  {stats.outOfStock}
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigate("/dashboard/products")}
+                  className="mt-6 bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-all"
+                >
+                  Go to Products Page →
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Nested routes */}
+        <Outlet context={{ fetchStats, fetchOrderSummary, fetchTotalOrders }} />
+      </main>
     </div>
   );
 }

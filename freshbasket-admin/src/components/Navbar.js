@@ -7,7 +7,7 @@ export default function Navbar({ onToggleSidebar }) {
       <div className="flex items-center gap-4">
         <button className="md:hidden text-gold-600" onClick={onToggleSidebar}>☰</button>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-md bg-navy-700 flex items-center justify-center text-gold font-bold">FB</div>
+          <div className="w-10 h-10 rounded-md bg-navy-700 flex items-center justify-center text-gold-600 font-bold">FB</div>
           <div>
             <div className="text-white font-semibold">FreshBasket Admin</div>
             <div className="text-xs text-sand">Welcome back, Admin</div>

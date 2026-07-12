@@ -153,8 +153,8 @@ const Header = ({ username = "User", onMenuToggle }) => {
           </div>
 
           {showResults && results.length > 0 && (
-            <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl z-[70] max-h-[55vh] overflow-y-auto"
-              style={{ boxShadow: "0 12px 45px rgba(0,0,0,0.14)", border: "1px solid rgba(0,0,0,0.06)", maxWidth: "calc(100vw - 1rem)" }}>
+            <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl z-[70] max-h-[50vh] md:max-h-[55vh] overflow-y-auto overflow-x-hidden"
+              style={{ boxShadow: "0 12px 45px rgba(0,0,0,0.14)", border: "1px solid rgba(0,0,0,0.06)", width: "calc(100vw - 1.5rem)" }}>
               {results.map((p) => (
                 <div key={p.id}
                   onClick={() => { navigate(`/product/${p.id}`); setShowResults(false); setQuery(""); }}
@@ -198,13 +198,12 @@ const Header = ({ username = "User", onMenuToggle }) => {
               </button>
               {showNotif && (
                 <div
-                  className="absolute right-0 top-[calc(100%+0.6rem)] bg-white rounded-2xl z-[70] overflow-hidden"
+                  className="absolute right-0 top-[calc(100%+0.6rem)] bg-white rounded-2xl z-[70] overflow-hidden md:w-80 w-[min(90vw,320px)]"
                   style={{
-                    width: "min(320px, calc(100vw - 1rem))",
-                    maxWidth: "calc(100vw - 1rem)",
                     maxHeight: "70vh",
                     boxShadow: "0 12px 45px rgba(0,0,0,0.14)",
                     border: "1px solid rgba(0,0,0,0.07)",
+                    right: window.innerWidth < 640 ? "-8px" : "0"
                   }}
                 >
                   <div className="px-3 py-2.5 flex justify-between items-center"

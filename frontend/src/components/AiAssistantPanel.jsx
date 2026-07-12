@@ -421,32 +421,34 @@ export default function AiAssistantPanel() {
         </label>
       </div>
 
-      <div className="flex gap-2 shrink-0">
+      <div className="flex gap-1.5 sm:gap-2 shrink-0 flex-wrap sm:flex-nowrap">
         <button
           onClick={refreshChat}
-          className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-xl"
+          className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 sm:px-3 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm"
           title="Refresh chat"
         >
-          <FaRedo size={14} />
+          <FaRedo size={12} className="sm:inline" />
         </button>
         <input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") {
+            if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
               handleSend();
             }
           }}
-          placeholder="Type: add 2kg apples or suggest biryani ingredients"
-          className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-green-500"
+          placeholder="Add 2kg apples..."
+          className="flex-1 min-w-0 border border-gray-200 rounded-lg sm:rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition"
         />
         <button
           onClick={handleVoiceToggle}
-          className={`px-3 py-2 rounded-xl ${isListening ? "bg-red-500 text-white" : "bg-gray-100 text-gray-700"}`}
+          className={`px-2.5 sm:px-3 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm transition ${
+            isListening ? "bg-red-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+          }`}
           title="Voice input"
         >
-          {isListening ? <FaMicrophoneSlash size={14} /> : <FaMicrophone size={14} />}
+          {isListening ? <FaMicrophoneSlash size={12} /> : <FaMicrophone size={12} />}
         </button>
         <button
           onClick={() => {
@@ -458,17 +460,19 @@ export default function AiAssistantPanel() {
               setConversation((prev) => [...prev, { role: "assistant", text: "There is no reply to read yet." }]);
             }
           }}
-          className={`px-3 py-2 rounded-xl ${isSpeaking ? "bg-amber-500 text-white" : "bg-gray-100 text-gray-700"}`}
+          className={`px-2.5 sm:px-3 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm transition ${
+            isSpeaking ? "bg-amber-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+          }`}
           title="Read aloud"
         >
-          {isSpeaking ? <FaStop size={14} /> : <FaVolumeUp size={14} />}
+          {isSpeaking ? <FaStop size={12} /> : <FaVolumeUp size={12} />}
         </button>
         <button
           onClick={handleSend}
           disabled={loading || (!message.trim() && !selectedFile)}
-          className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white px-3 py-2 rounded-xl"
+          className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white px-2.5 sm:px-3 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm transition"
         >
-          {loading ? "..." : <FaPaperPlane size={14} />}
+          {loading ? "..." : <FaPaperPlane size={12} className="sm:inline" />}
         </button>
       </div>
     </div>
